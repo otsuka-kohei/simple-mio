@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
+import com.otsuka.simplemio.fragments.AboutFragment
 import com.otsuka.simplemio.fragments.ConfigFragment
 import com.otsuka.simplemio.fragments.TestFragment
 import kotlinx.android.synthetic.main.activity_main.*
@@ -17,9 +18,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private val configFragment: ConfigFragment = ConfigFragment()
     private val testFragment: TestFragment = TestFragment()
+    private val aboutFragment: AboutFragment = AboutFragment()
 
     private val testFragmentName = "テスト"
     private val configFragmentName = "設定"
+    private val aboutFragmentName = "このアプリについて"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,6 +66,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_config -> {
                 fragment = configFragment
                 fragmentName = configFragmentName
+            }
+            R.id.nav_about -> {
+                fragment = aboutFragment
+                fragmentName = aboutFragmentName
             }
         }
 
