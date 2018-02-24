@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="GraphView">
+        <attr name="background_color" format="color" />
+        <attr name="graph_color" format="color" />
+        <attr name="graph_area_width" format="dimension" />
+        <attr name="graph_area_height" format="dimension" />
+        <attr name="graph_area_padding" format="dimension" />
+        <attr name="graph_vertex_radius" format="dimension" />
+        <attr name="graph_edge_width" format="dimension" />
+        <attr name="graph_label_text_size" format="dimension" />
+        <attr name="graph_label_text_color" format="color" />
+        <attr name="graph_label_text_background" format="color" />
+    </declare-styleable>
+</resources>
