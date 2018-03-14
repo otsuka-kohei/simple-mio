@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import com.otsuka.simplemio.MioUtil
 import com.otsuka.simplemio.R
+import com.otsuka.simplemio.Util
 
 /**
  * Created by otsuka on 2018/02/24.
@@ -39,7 +40,17 @@ class AboutFragment : Fragment(), View.OnClickListener {
     override fun onClick(v: View?) {
         if (v == logoutButton) {
             Log.d("login", "logout")
-            MioUtil.deleteToken(activity)
+            Util.showAlertDialog(activity, "ログアウト", "IIJmioからログアウトしてもよろしいですか？",
+                    "はい", negativeButtonText = "いいえ",
+                    positiveFunc = {
+                        MioUtil.deleteToken(activity)
+                        Util.showAlertDialog(activity, "ログアウト完了", "IIJmioからログアウトしました．\nアプリを終了します",
+                                "はい",
+                                positiveFunc = {
+                                    MioUtil.deleteToken(activity)
+                                    activity.finish()
+                                }, neutralFunc = {}, negativeFunc = { })
+                    }, neutralFunc = {}, negativeFunc = { })
         }
     }
 }

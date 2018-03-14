@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
+import com.otsuka.simplemio.Util.Companion.showAlertDialog
 import com.otsuka.simplemio.fragments.AboutFragment
 import com.otsuka.simplemio.fragments.ConfigFragment
 import com.otsuka.simplemio.fragments.TestFragment
@@ -52,7 +53,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val token = MioUtil.loadToken(this)
 
         if (token == "") {
-            startOAuth()
+            showAlertDialog(this, "ログイン", "IIJmioでのログインが必要です\nブラウザを開いてログインページに移動してもよろしいですか？",
+                    "はい", negativeButtonText = "いいえ",
+                    positiveFunc = { Log.d("positive", "positive"); startOAuth() }, neutralFunc = {}, negativeFunc = { this.finish() })
         }
 
         if (!MioUtil.checkTokenAvailable(token)) {
