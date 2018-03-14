@@ -1,7 +1,6 @@
 package com.otsuka.simplemio
 
 import android.app.Fragment
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -10,6 +9,7 @@ import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
 import com.otsuka.simplemio.fragments.AboutFragment
@@ -103,9 +103,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun startOAuth() {
 
         val uri = "https://api.iijmio.jp/mobile/d/v1/authorization/?" +
-                "client_id=" + getString(R.string.developerID) +
-                "&redirect_uri=" + getString(R.string.app_name) + "://callback" +
+                "response_type=token" +
+                "&client_id=" + getString(R.string.developer_id) +
+                "&redirect_uri=" + getString(R.string.simple_app_name) + "%3A%2F%2Fcallback" +
                 "&state=" + "success"
+
+        Log.d("request URI : ", uri)
 
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
         startActivity(intent)
@@ -121,8 +124,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             val uri: Uri? = intent.data
             if (uri != null) {
 
-                val token = uri.getQueryParameter("access_token")
-                val state = uri.getQueryParameter("state")
+                // 受け取るURIが
+                // simplemio://callback#access_token=token&state=success&token_type=Bearer&expires_in=7776000
+                // となっていて，正しくエンコードできないので # を ? に置き換える
+
+                var uriStr = uri.toString()
+                uriStr = uriStr.replace('#', '?')
+                val validUri = Uri.parse(uriStr)
+
+                val token = validUri.getQueryParameter("access_token")
+                val state = validUri.getQueryParameter("state")
 
                 if (state != "success") {
                     Toast.makeText(this, "正しく認証することができませんでした．", Toast.LENGTH_LONG).show()

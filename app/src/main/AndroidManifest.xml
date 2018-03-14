@@ -27,7 +27,7 @@
 
                 <data
                     android:host="callback"
-                    android:scheme="@string/app_name" />
+                    android:scheme="@string/simple_app_name" />
             </intent-filter>
         </activity>
     </application>
