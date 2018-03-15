@@ -43,13 +43,106 @@ class MioManager(val activity: Activity, val loginFunc: () -> Unit) : Serializab
         editor.apply()
     }
 
-    fun update(execFunc: () -> Unit = {}): Unit {
+    fun updateCoupon(execFunc: (JSONObject) -> Unit = {}, tokenErrorFunc: () -> Unit = {}, errorFunc: () -> Unit = {}) {
+        val url = "https://api.iijmio.jp/mobile/d/v2/coupon/"
 
+        val errorJudgeFunc: (VolleyError) -> Unit = {
+            val errorCode = it.networkResponse.statusCode
+
+            if (errorCode == 403) {
+                tokenErrorFunc()
+            } else {
+                errorFunc()
+            }
+        }
+
+        httpGet(url, { execFunc(it) }, { errorJudgeFunc(it) })
     }
 
-    private fun httpGet(successFunc: (JSONObject) -> Unit, errorFunc: (VolleyError) -> Unit): Unit {
+    fun updatePacket(execFunc: (JSONObject) -> Unit = {}, tokenErrorFunc: () -> Unit = {}, errorFunc: () -> Unit = {}) {
+        val url = "https://api.iijmio.jp/mobile/d/v2/log/packet/"
 
-        val jsonRequest = object : JsonObjectRequest(Request.Method.GET, "https://api.iijmio.jp/mobile/d/v2/coupon/", null,
+        val errorJudgeFunc: (VolleyError) -> Unit = {
+            val errorCode = it.networkResponse.statusCode
+
+            if (errorCode == 403) {
+                tokenErrorFunc()
+            } else {
+                errorFunc()
+            }
+        }
+
+        httpGet(url, { execFunc(it) }, { errorJudgeFunc(it) })
+    }
+
+    private data class CouponStatus(
+            val hdx: String,
+            val on: Boolean
+    )
+
+    private fun genelateCouponPostJsonObject(hdoList: List<CouponStatus>, hduList: List<CouponStatus>): JSONObject {
+        var hdoStr = ""
+        var hduStr = ""
+
+        for ((index, couponStatus) in hdoList.withIndex()) {
+            val hdo = couponStatus.hdx
+            val on = couponStatus.on
+            val str = "{\"hdoServiceCode\":" + hdo + ",\"couponUse\":" + on.toString();"\"}"
+
+            hdoStr += str
+
+            if (index < hdoList.size - 1) hdoStr += ","
+        }
+
+        for ((index, couponStatus) in hduList.withIndex()) {
+            val hdu = couponStatus.hdx
+            val on = couponStatus.on
+            val str = "{\"hdoServiceCode\":" + hdu + ",\"couponUse\":" + on.toString();"\"}"
+
+            hduStr += str
+
+            if (index < hduList.size - 1) hduStr += ","
+        }
+
+        val jsonStr = "{\"couponInfo\":[{\"hdoInfo\":[" + hdoStr + "],\"hduInfo\":[" + hduStr + "]}]}"
+
+        return JSONObject(jsonStr)
+    }
+
+    private fun httpGet(url: String, successFunc: (JSONObject) -> Unit, errorFunc: (VolleyError) -> Unit) {
+
+        val jsonRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
+                object : Response.Listener<JSONObject> {
+                    override fun onResponse(result: JSONObject) {
+                        successFunc(result)
+                    }
+                },
+                object : Response.ErrorListener {
+                    override fun onErrorResponse(error: VolleyError) {
+                        errorFunc(error)
+                    }
+                }) {
+
+            // ヘッダの追加
+            @Throws(AuthFailureError::class)
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = super.getHeaders()
+                val newHeaders = HashMap<String, String>()
+                newHeaders.putAll(headers)
+                newHeaders.put("X-IIJmio-Developer", activity.getString(R.string.developer_id))
+                val token = loadToken()
+                newHeaders.put("X-IIJmio-Authorization", token)
+                return newHeaders
+            }
+        }
+
+        queue.add(jsonRequest)
+        queue.start()
+    }
+
+    private fun httpPost(url: String, jsonObject: JSONObject, successFunc: (JSONObject) -> Unit, errorFunc: (VolleyError) -> Unit) {
+
+        val jsonRequest = object : JsonObjectRequest(Request.Method.POST, url, jsonObject,
                 object : Response.Listener<JSONObject> {
                     override fun onResponse(result: JSONObject) {
                         successFunc(result)
