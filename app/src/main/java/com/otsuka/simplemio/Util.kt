@@ -12,7 +12,7 @@ class Util {
     companion object {
         fun showAlertDialog(activity: Activity, title: String, message: String,
                             positiveButtonText: String = "", neutralButtonText: String = "", negativeButtonText: String = "",
-                            positiveFunc: () -> Unit, neutralFunc: () -> Unit, negativeFunc: () -> Unit) {
+                            positiveFunc: () -> Unit = {}, neutralFunc: () -> Unit = {}, negativeFunc: () -> Unit = {}) {
             if (positiveButtonText == "" && negativeButtonText == "" && negativeButtonText == "") {
                 return
             }

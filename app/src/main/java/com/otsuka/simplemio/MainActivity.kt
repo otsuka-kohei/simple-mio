@@ -16,11 +16,14 @@ import com.otsuka.simplemio.Util.Companion.showAlertDialog
 import com.otsuka.simplemio.fragments.AboutFragment
 import com.otsuka.simplemio.fragments.ConfigFragment
 import com.otsuka.simplemio.fragments.TestFragment
+import com.otsuka.simplemio.mio.MioManager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+
+    private val mioManager: MioManager = MioManager(this, { startOAuth() })
 
     private val configFragment: ConfigFragment = ConfigFragment()
     private val testFragment: TestFragment = TestFragment()
@@ -50,16 +53,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         fragmentTransaction.commit()
 
         // トークンが存在するか，有効かを確認
-        val token = MioUtil.loadToken(this)
+        val token = mioManager.loadToken()
 
         if (token == "") {
             showAlertDialog(this, "ログイン", "IIJmioでのログインが必要です\nブラウザを開いてログインページに移動してもよろしいですか？",
                     "はい", negativeButtonText = "いいえ",
-                    positiveFunc = { Log.d("positive", "positive"); startOAuth() }, neutralFunc = {}, negativeFunc = { this.finish() })
-        }
-
-        if (!MioUtil.checkTokenAvailable(token)) {
-
+                    positiveFunc = { Log.d("positive", "positive"); startOAuth() }, negativeFunc = { this.finish() })
         }
     }
 
@@ -91,6 +90,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 fragmentName = aboutFragmentName
             }
         }
+
+        val bundle = Bundle()
+        bundle.putSerializable("MioManager", mioManager)
+        fragment?.arguments = bundle
 
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.fragment, fragment)
@@ -141,7 +144,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 if (state != "success") {
                     Toast.makeText(this, "正しく認証することができませんでした．", Toast.LENGTH_LONG).show()
                 } else {
-                    MioUtil.saveToken(this, token)
+                    mioManager.saveToken(token)
                     Toast.makeText(this, "トークン:" + token, Toast.LENGTH_LONG).show()
                 }
             }

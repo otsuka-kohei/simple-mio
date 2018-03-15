@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import com.otsuka.simplemio.MioUtil
+import com.otsuka.simplemio.mio.MioManager
 import com.otsuka.simplemio.R
 import com.otsuka.simplemio.Util
 
@@ -19,12 +19,16 @@ class AboutFragment : Fragment(), View.OnClickListener {
     //フラグメント上で発生するイベント（OnClickListenerとか）は極力フラグメントの中で済ませた方がいいと思う
     private lateinit var logoutButton: Button
 
+    private lateinit var mioManager: MioManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+        val bundle = arguments
+        mioManager = bundle.getSerializable("MioManager") as MioManager
         // Inflate the layout for this fragment
         Log.d("onCreateView", "before return")
         return inflater.inflate(R.layout.fragment_about, container, false)
@@ -43,14 +47,14 @@ class AboutFragment : Fragment(), View.OnClickListener {
             Util.showAlertDialog(activity, "ログアウト", "IIJmioからログアウトしてもよろしいですか？",
                     "はい", negativeButtonText = "いいえ",
                     positiveFunc = {
-                        MioUtil.deleteToken(activity)
+                        mioManager.deleteToken()
                         Util.showAlertDialog(activity, "ログアウト完了", "IIJmioからログアウトしました．\nアプリを終了します",
                                 "はい",
                                 positiveFunc = {
-                                    MioUtil.deleteToken(activity)
+                                    mioManager.deleteToken()
                                     activity.finish()
-                                }, neutralFunc = {}, negativeFunc = { })
-                    }, neutralFunc = {}, negativeFunc = { })
+                                })
+                    })
         }
     }
 }
