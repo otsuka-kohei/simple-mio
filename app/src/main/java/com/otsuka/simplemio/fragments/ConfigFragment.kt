@@ -16,4 +16,6 @@ class ConfigFragment : PreferenceFragment() {
         // /app/res/xml/preference.xml に定義されている設定画面を適用
         addPreferencesFromResource(R.xml.preference)
     }
+
+
 }

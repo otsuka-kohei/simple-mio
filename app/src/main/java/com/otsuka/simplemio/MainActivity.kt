@@ -29,6 +29,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val testFragment: TestFragment = TestFragment()
     private val aboutFragment: AboutFragment = AboutFragment()
 
+    private lateinit var navigationView: NavigationView
+
     private val testFragmentName = "テスト"
     private val configFragmentName = "設定"
     private val aboutFragmentName = "このアプリについて"
@@ -43,7 +45,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
-        nav_view.setNavigationItemSelectedListener(this)
+        navigationView = findViewById(R.id.nav_view)
+        navigationView.setNavigationItemSelectedListener(this)
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         toolbar.title = testFragmentName
@@ -75,19 +78,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         var fragment: Fragment? = null
         var fragmentName = ""
+        var itemIndex = 0
 
         when (item.itemId) {
             R.id.nav_test -> {
                 fragment = testFragment
                 fragmentName = testFragmentName
+                itemIndex = 0
             }
             R.id.nav_config -> {
                 fragment = configFragment
                 fragmentName = configFragmentName
+                itemIndex = 1
             }
             R.id.nav_about -> {
                 fragment = aboutFragment
                 fragmentName = aboutFragmentName
+                itemIndex = 2
             }
         }
 
@@ -101,6 +108,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         toolbar.title = fragmentName
+
+        navigationView.getMenu().getItem(itemIndex).isChecked = true
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
