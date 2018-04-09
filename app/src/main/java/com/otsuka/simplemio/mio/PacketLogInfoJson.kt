@@ -1,6 +1,6 @@
 package com.otsuka.simplemio.mio
 
-data class DataUsageInfoJson(
+data class PacketLogInfoJson(
         val returnCode: String,
         val packetLogInfo: ArrayList<PacketLogInfo>
 )

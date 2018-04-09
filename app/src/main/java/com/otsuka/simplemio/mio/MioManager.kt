@@ -6,6 +6,8 @@ import com.android.volley.*
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.otsuka.simplemio.R
+import com.squareup.moshi.KotlinJsonAdapterFactory
+import com.squareup.moshi.Moshi
 import org.json.JSONObject
 import java.io.Serializable
 
@@ -13,6 +15,18 @@ import java.io.Serializable
 /**
  * Created by otsuka on 2018/03/14.
  */
+
+fun jsonParse4Coupon(json: JSONObject): CouponInfoJson? {
+    val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+    return moshi.adapter(CouponInfoJson::class.java).fromJson(json.toString())
+}
+
+fun jsonParse4Packet(json: JSONObject): PacketLogInfoJson? {
+    val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+    return moshi.adapter(PacketLogInfoJson::class.java).fromJson(json.toString())
+}
+
+
 class MioManager(val activity: Activity, val loginFunc: () -> Unit) : Serializable {
 
     companion object {
