@@ -2,20 +2,20 @@ package com.otsuka.simplemio.mio
 
 data class CouponInfoJson(
         val returnCode: String,
-        val couponInfo: ArrayList<CouponInfo>
+        val couponInfo:ArrayList<CouponInfo>
 )
 
 data class CouponInfo(
         val hddServiceCode: String,
         val plan: String,
-        val hdoInfo: ArrayList<HdoInfo>?,
-        val hduInfo: ArrayList<HduInfo>,
+        val hdoInfo: ArrayList<CouponHdoInfo>?,
+        val hduInfo: ArrayList<CouponHduInfo>,
         val coupon: ArrayList<Coupon>?,
         val history: ArrayList<History>?,
         val remains: Int?
 )
 
-data class HdoInfo(
+data class CouponHdoInfo(
         val hdoServiceCode: String,
         val number: String,
         val iccid: String,
@@ -26,7 +26,7 @@ data class HdoInfo(
         val coupon: ArrayList<Coupon>
 )
 
-data class HduInfo(
+data class CouponHduInfo(
         val hduServiceCode: String,
         val number: String,
         val iccid: String,
