@@ -27,37 +27,36 @@ fun jsonParse4Packet(json: JSONObject): PacketLogInfoJson? {
 }
 
 
-class MioManager(val activity: Activity, val loginFunc: () -> Unit) : Serializable {
+object MioManager {
 
-    companion object {
-        // Volleyのキャッシュ処理を排他的に行うため，RequestQueueの複数生成と実行を防ぐためにコンパニオンオブジェクト化
-        lateinit var queue: RequestQueue
-    }
+    private lateinit var queue: RequestQueue
+    private lateinit var loginFunc: () -> Unit
 
-    init {
+    fun setUp(activity: Activity, loginFunc: () -> Unit) {
         queue = Volley.newRequestQueue(activity)
+        this.loginFunc = loginFunc
     }
 
-    fun saveToken(token: String) {
+    fun saveToken(activity: Activity, token: String) {
         val preference = activity.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
         val editor = preference.edit()
         editor.putString("token", token)
         editor.apply()
     }
 
-    fun loadToken(): String {
+    fun loadToken(activity: Activity): String {
         val preference = activity.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
         return preference.getString("token", "")
     }
 
-    fun deleteToken() {
+    fun deleteToken(activity: Activity) {
         val preference = activity.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
         val editor = preference.edit()
         editor.remove("token")
         editor.apply()
     }
 
-    fun updateCoupon(execFunc: (JSONObject) -> Unit = {}, tokenErrorFunc: () -> Unit = {}, errorFunc: () -> Unit = {}) {
+    fun updateCoupon(activity: Activity, execFunc: (JSONObject) -> Unit = {}, tokenErrorFunc: () -> Unit = {}, errorFunc: () -> Unit = {}) {
         val url = "https://api.iijmio.jp/mobile/d/v2/coupon/"
 
         val errorJudgeFunc: (VolleyError) -> Unit = {
@@ -70,10 +69,10 @@ class MioManager(val activity: Activity, val loginFunc: () -> Unit) : Serializab
             }
         }
 
-        httpGet(url, { execFunc(it) }, { errorJudgeFunc(it) })
+        httpGet(activity, url, { execFunc(it) }, { errorJudgeFunc(it) })
     }
 
-    fun updatePacket(execFunc: (JSONObject) -> Unit = {}, tokenErrorFunc: () -> Unit = {}, errorFunc: () -> Unit = {}) {
+    fun updatePacket(activity: Activity, execFunc: (JSONObject) -> Unit = {}, tokenErrorFunc: () -> Unit = {}, errorFunc: () -> Unit = {}) {
         val url = "https://api.iijmio.jp/mobile/d/v2/log/packet/"
 
         val errorJudgeFunc: (VolleyError) -> Unit = {
@@ -86,7 +85,7 @@ class MioManager(val activity: Activity, val loginFunc: () -> Unit) : Serializab
             }
         }
 
-        httpGet(url, { execFunc(it) }, { errorJudgeFunc(it) })
+        httpGet(activity, url, { execFunc(it) }, { errorJudgeFunc(it) })
     }
 
     private data class CouponStatus(
@@ -123,7 +122,7 @@ class MioManager(val activity: Activity, val loginFunc: () -> Unit) : Serializab
         return JSONObject(jsonStr)
     }
 
-    private fun httpGet(url: String, successFunc: (JSONObject) -> Unit, errorFunc: (VolleyError) -> Unit) {
+    private fun httpGet(activity: Activity, url: String, successFunc: (JSONObject) -> Unit, errorFunc: (VolleyError) -> Unit) {
 
         val jsonRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
                 object : Response.Listener<JSONObject> {
@@ -144,7 +143,7 @@ class MioManager(val activity: Activity, val loginFunc: () -> Unit) : Serializab
                 val newHeaders = HashMap<String, String>()
                 newHeaders.putAll(headers)
                 newHeaders.put("X-IIJmio-Developer", activity.getString(R.string.developer_id))
-                val token = loadToken()
+                val token = loadToken(activity)
                 newHeaders.put("X-IIJmio-Authorization", token)
                 return newHeaders
             }
@@ -154,7 +153,7 @@ class MioManager(val activity: Activity, val loginFunc: () -> Unit) : Serializab
         queue.start()
     }
 
-    private fun httpPost(url: String, jsonObject: JSONObject, successFunc: (JSONObject) -> Unit, errorFunc: (VolleyError) -> Unit) {
+    private fun httpPost(activity: Activity, url: String, jsonObject: JSONObject, successFunc: (JSONObject) -> Unit, errorFunc: (VolleyError) -> Unit) {
 
         val jsonRequest = object : JsonObjectRequest(Request.Method.POST, url, jsonObject,
                 object : Response.Listener<JSONObject> {
@@ -175,7 +174,7 @@ class MioManager(val activity: Activity, val loginFunc: () -> Unit) : Serializab
                 val newHeaders = HashMap<String, String>()
                 newHeaders.putAll(headers)
                 newHeaders.put("X-IIJmio-Developer", activity.getString(R.string.developer_id))
-                val token = loadToken()
+                val token = loadToken(activity)
                 newHeaders.put("X-IIJmio-Authorization", token)
                 return newHeaders
             }

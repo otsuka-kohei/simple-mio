@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import com.otsuka.simplemio.R
 import com.otsuka.simplemio.mio.MioManager
 
@@ -19,8 +20,6 @@ class TestFragment : Fragment(), View.OnClickListener {
 
     //フラグメント上で発生するイベント（OnClickListenerとか）は極力フラグメントの中で済ませた方がいいと思う
 
-    private lateinit var mioManager: MioManager
-
     private lateinit var testButton: Button
     private lateinit var testTextView: TextView
 
@@ -30,8 +29,6 @@ class TestFragment : Fragment(), View.OnClickListener {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val bundle = arguments
-        mioManager = bundle.getSerializable("MioManager") as MioManager
         // Inflate the layout for this fragment
         Log.d("onCreateView", "before return")
         return inflater.inflate(R.layout.fragment_test, container, false)
@@ -47,7 +44,9 @@ class TestFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         if (v == testButton) {
-            mioManager.updateCoupon({ it -> testTextView.text = it.toString() })
+            MioManager.updateCoupon(activity, {
+                it -> testTextView.text = it.toString()
+            })
         }
     }
 }

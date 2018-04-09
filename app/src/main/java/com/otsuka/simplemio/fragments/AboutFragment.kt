@@ -19,16 +19,12 @@ class AboutFragment : Fragment(), View.OnClickListener {
     //フラグメント上で発生するイベント（OnClickListenerとか）は極力フラグメントの中で済ませた方がいいと思う
     private lateinit var logoutButton: Button
 
-    private lateinit var mioManager: MioManager
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val bundle = arguments
-        mioManager = bundle.getSerializable("MioManager") as MioManager
         // Inflate the layout for this fragment
         Log.d("onCreateView", "before return")
         return inflater.inflate(R.layout.fragment_about, container, false)
@@ -47,11 +43,11 @@ class AboutFragment : Fragment(), View.OnClickListener {
             Util.showAlertDialog(activity, "ログアウト", "IIJmioからログアウトしてもよろしいですか？",
                     "はい", negativeButtonText = "いいえ",
                     positiveFunc = {
-                        mioManager.deleteToken()
+                        MioManager.deleteToken(activity)
                         Util.showAlertDialog(activity, "ログアウト完了", "IIJmioからログアウトしました．\nアプリを終了します",
                                 "はい",
                                 positiveFunc = {
-                                    mioManager.deleteToken()
+                                    MioManager.deleteToken(activity)
                                     activity.finish()
                                 })
                     })

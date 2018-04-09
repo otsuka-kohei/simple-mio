@@ -23,8 +23,6 @@ import kotlinx.android.synthetic.main.app_bar_main.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    private val mioManager: MioManager = MioManager(this, { startOAuth() })
-
     private val configFragment: ConfigFragment = ConfigFragment()
     private val testFragment: TestFragment = TestFragment()
     private val aboutFragment: AboutFragment = AboutFragment()
@@ -36,6 +34,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val aboutFragmentName = "このアプリについて"
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        MioManager.setUp(this, { startOAuth() })
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
@@ -51,12 +51,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         toolbar.title = testFragmentName
 
+        val defaultFragment = testFragment
         val fragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.fragment, testFragment)
+        fragmentTransaction.replace(R.id.fragment, defaultFragment)
         fragmentTransaction.commit()
 
         // トークンが存在するか，有効かを確認
-        val token = mioManager.loadToken()
+        val token = MioManager.loadToken(this)
 
         if (token == "") {
             showAlertDialog(this, "ログイン", "IIJmioでのログインが必要です\nブラウザを開いてログインページに移動してもよろしいですか？",
@@ -97,10 +98,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 itemIndex = 2
             }
         }
-
-        val bundle = Bundle()
-        bundle.putSerializable("MioManager", mioManager)
-        fragment?.arguments = bundle
 
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.fragment, fragment)
@@ -153,7 +150,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 if (state != "success") {
                     Toast.makeText(this, "正しく認証することができませんでした．", Toast.LENGTH_LONG).show()
                 } else {
-                    mioManager.saveToken(token)
+                    MioManager.saveToken(this, token)
                     Toast.makeText(this, "トークン:" + token, Toast.LENGTH_LONG).show()
                 }
             }
