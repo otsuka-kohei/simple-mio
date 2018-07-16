@@ -125,7 +125,9 @@ object MioManager {
 
         val jsonRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
                 Response.Listener<JSONObject> { successFunc(it) },
-                Response.ErrorListener { errorFunc(it) }) {
+                Response.ErrorListener {
+                    it?.let(errorFunc) // 2回連続で呼び出すと VolleyError が null になる事象の暫定回避策
+                }) {
             // ヘッダの追加
             @Throws(AuthFailureError::class)
             override fun getHeaders(): MutableMap<String, String> {
