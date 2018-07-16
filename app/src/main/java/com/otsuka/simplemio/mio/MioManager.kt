@@ -9,7 +9,6 @@ import com.otsuka.simplemio.R
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import org.json.JSONObject
-import java.io.Serializable
 
 
 /**
@@ -125,17 +124,8 @@ object MioManager {
     private fun httpGet(activity: Activity, url: String, successFunc: (JSONObject) -> Unit, errorFunc: (VolleyError) -> Unit) {
 
         val jsonRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
-                object : Response.Listener<JSONObject> {
-                    override fun onResponse(result: JSONObject) {
-                        successFunc(result)
-                    }
-                },
-                object : Response.ErrorListener {
-                    override fun onErrorResponse(error: VolleyError) {
-                        errorFunc(error)
-                    }
-                }) {
-
+                Response.Listener<JSONObject> { successFunc(it) },
+                Response.ErrorListener { errorFunc(it) }) {
             // ヘッダの追加
             @Throws(AuthFailureError::class)
             override fun getHeaders(): MutableMap<String, String> {
@@ -156,17 +146,8 @@ object MioManager {
     private fun httpPost(activity: Activity, url: String, jsonObject: JSONObject, successFunc: (JSONObject) -> Unit, errorFunc: (VolleyError) -> Unit) {
 
         val jsonRequest = object : JsonObjectRequest(Request.Method.POST, url, jsonObject,
-                object : Response.Listener<JSONObject> {
-                    override fun onResponse(result: JSONObject) {
-                        successFunc(result)
-                    }
-                },
-                object : Response.ErrorListener {
-                    override fun onErrorResponse(error: VolleyError) {
-                        errorFunc(error)
-                    }
-                }) {
-
+                Response.Listener<JSONObject> { successFunc(it) },
+                Response.ErrorListener { errorFunc(it) }) {
             // ヘッダの追加
             @Throws(AuthFailureError::class)
             override fun getHeaders(): MutableMap<String, String> {
@@ -182,5 +163,10 @@ object MioManager {
 
         queue.add(jsonRequest)
         queue.start()
+    }
+
+    fun parseJsonToCoupon(json: JSONObject): CouponInfoJson? {
+        val adapter = Moshi.Builder().build().adapter(CouponInfoJson::class.java)
+        return adapter.fromJson(json.toString())
     }
 }

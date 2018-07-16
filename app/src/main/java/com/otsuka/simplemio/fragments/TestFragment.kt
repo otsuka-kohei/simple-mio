@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import com.otsuka.simplemio.R
 import com.otsuka.simplemio.mio.MioManager
 
@@ -44,8 +43,8 @@ class TestFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         if (v == testButton) {
-            MioManager.updateCoupon(activity, {
-                it -> testTextView.text = it.toString()
+            MioManager.updateCoupon(activity, execFunc = { it ->
+                testTextView.text = MioManager.parseJsonToCoupon(it)?.couponInfo?.get(0)?.hddServiceCode
             })
         }
     }

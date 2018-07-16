@@ -15,20 +15,24 @@ import android.widget.Toast
 import com.otsuka.simplemio.Util.Companion.showAlertDialog
 import com.otsuka.simplemio.fragments.AboutFragment
 import com.otsuka.simplemio.fragments.ConfigFragment
+import com.otsuka.simplemio.fragments.CouponFragment
 import com.otsuka.simplemio.fragments.TestFragment
 import com.otsuka.simplemio.mio.MioManager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.fragment_coupon.*
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
+    private val couponFragment:CouponFragment= CouponFragment()
     private val configFragment: ConfigFragment = ConfigFragment()
     private val testFragment: TestFragment = TestFragment()
     private val aboutFragment: AboutFragment = AboutFragment()
 
     private lateinit var navigationView: NavigationView
 
+    private val couponFragmentName = "クーポン"
     private val testFragmentName = "テスト"
     private val configFragmentName = "設定"
     private val aboutFragmentName = "このアプリについて"
@@ -82,20 +86,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         var itemIndex = 0
 
         when (item.itemId) {
+            R.id.nav_coupon -> {
+                fragment = couponFragment
+                fragmentName = couponFragmentName
+                itemIndex = 0
+            }
             R.id.nav_test -> {
                 fragment = testFragment
                 fragmentName = testFragmentName
-                itemIndex = 0
+                itemIndex = 1
             }
             R.id.nav_config -> {
                 fragment = configFragment
                 fragmentName = configFragmentName
-                itemIndex = 1
+                itemIndex = 2
             }
             R.id.nav_about -> {
                 fragment = aboutFragment
                 fragmentName = aboutFragmentName
-                itemIndex = 2
+                itemIndex = 3
             }
         }
 
