@@ -12,18 +12,7 @@ import com.otsuka.simplemio.ui.listview_item.CouponListItemChild
 import com.otsuka.simplemio.ui.listview_item.CouponListItemParent
 
 
-class CouponExpandableListAdapter(val context: Context) : BaseExpandableListAdapter() {
-
-    private lateinit var children: List<List<CouponListItemChild>>
-    private lateinit var parents: List<CouponListItemParent>
-
-    fun addParents(parent: List<CouponListItemParent>): Unit {
-        this.parents = parents
-    }
-
-    fun addChildren(children: List<List<CouponListItemChild>>): Unit {
-        this.children = children
-    }
+class CouponExpandableListAdapter(val context: Context, val parents: List<CouponListItemParent>, val children: List<List<CouponListItemChild>>) : BaseExpandableListAdapter() {
 
     private fun getBasicChildView(): View {
         return LayoutInflater.from(context).inflate(R.layout.item_child_coupon, null)
@@ -66,7 +55,7 @@ class CouponExpandableListAdapter(val context: Context) : BaseExpandableListAdap
     }
 
     override fun getGroupId(p0: Int): Long {
-        return p0 as Long
+        return p0.toLong()
     }
 
     override fun getChildView(p0: Int, p1: Int, p2: Boolean, p3: View?, p4: ViewGroup?): View {
@@ -88,7 +77,7 @@ class CouponExpandableListAdapter(val context: Context) : BaseExpandableListAdap
     }
 
     override fun getChildId(p0: Int, p1: Int): Long {
-        return p1 as Long
+        return p1.toLong()
     }
 
     override fun getGroupCount(): Int {

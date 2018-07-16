@@ -27,7 +27,6 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
     private lateinit var updateButton: Button
     private lateinit var couponListView: ExpandableListView
-
     private lateinit var progressDialog: ProgressDialog
 
 
@@ -91,9 +90,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
                 children.add(hduChildren)
             }
 
-            val couponExpandableListAdapter = CouponExpandableListAdapter(activity)
-            couponExpandableListAdapter.addParents(parents)
-            couponExpandableListAdapter.addChildren(children)
+            val couponExpandableListAdapter = CouponExpandableListAdapter(activity, parents, children)
             couponListView.setAdapter(couponExpandableListAdapter)
 
             stopProgressDialog()
