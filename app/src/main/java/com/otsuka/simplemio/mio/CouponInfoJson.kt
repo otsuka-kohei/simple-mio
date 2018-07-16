@@ -9,7 +9,7 @@ data class CouponInfo(
         val hddServiceCode: String,
         val plan: String,
         val hdoInfo: List<CouponHdoInfo>?,
-        val hduInfo: List<CouponHduInfo>,
+        val hduInfo: List<CouponHduInfo>?,
         val coupon: List<Coupon>?,
         val history: List<History>?,
         val remains: Int?
