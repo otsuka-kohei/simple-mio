@@ -9,13 +9,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ExpandableListView
+import android.widget.Toast
 import com.otsuka.simplemio.R
+import com.otsuka.simplemio.mio.ApplyCouponStatusResultJson
 import com.otsuka.simplemio.mio.CouponInfo
 import com.otsuka.simplemio.mio.CouponInfoJson
 import com.otsuka.simplemio.mio.MioManager
 import com.otsuka.simplemio.ui.CouponExpandableListAdapter
 import com.otsuka.simplemio.ui.listview_item.CouponListItemChild
 import com.otsuka.simplemio.ui.listview_item.CouponListItemParent
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 /**
@@ -26,8 +30,11 @@ class CouponFragment : Fragment(), View.OnClickListener {
     //フラグメント上で発生するイベント（OnClickListenerとか）は極力フラグメントの中で済ませた方がいいと思う
 
     private lateinit var updateButton: Button
+    private lateinit var applyButton: Button
     private lateinit var couponListView: ExpandableListView
     private lateinit var progressDialog: ProgressDialog
+
+    private val couponStatus = HashMap<String, Boolean>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,14 +53,28 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
         updateButton = activity.findViewById(R.id.updateButton)
         updateButton.setOnClickListener(this)
+
+        applyButton = activity.findViewById(R.id.applyButton)
+        applyButton.setOnClickListener(this)
+
         couponListView = activity.findViewById(R.id.couponListView)
         progressDialog = ProgressDialog(activity)
+
         setCouponInfoToListView()
     }
 
     override fun onClick(v: View?) {
         if (v == updateButton) {
             setCouponInfoToListView()
+        } else if (v == applyButton) {
+            MioManager.applyCouponStatus(activity, couponStatus, execFunc = { it ->
+                val applyCouponStatusResultJson: ApplyCouponStatusResultJson? = MioManager.parseJsonToApplyCouponResponse(it)
+                if (applyCouponStatusResultJson?.returnCode == "OK") {
+                    setCouponInfoToListView()
+                } else {
+                    Toast.makeText(activity, "1分以上経過してから再度お試しください", Toast.LENGTH_LONG)
+                }
+            })
         }
     }
 
@@ -64,36 +85,40 @@ class CouponFragment : Fragment(), View.OnClickListener {
             val couponInfoJson: CouponInfoJson? = MioManager.parseJsonToCoupon(it)
 
             val parents = ArrayList<CouponListItemParent>()
-            val children = ArrayList<List<CouponListItemChild>>()
+            val childrenList = ArrayList<List<CouponListItemChild>>()
 
             val couponInfoList = couponInfoJson?.couponInfo.orEmpty()
             for (couponInfo in couponInfoList) {
-                val parent = CouponListItemParent(couponInfo.hddServiceCode, couponInfo.plan, getVolume(couponInfo))
+                val parent = CouponListItemParent(couponInfo.hddServiceCode, getJapanesePlanName(couponInfo.plan), getVolume(couponInfo))
                 parents.add(parent)
 
+                val children = ArrayList<CouponListItemChild>()
+
                 val hdoInfoList = couponInfo.hdoInfo.orEmpty()
-                val hdoChildren = ArrayList<CouponListItemChild>()
                 for (hdoInfo in hdoInfoList) {
                     val type: String = if (hdoInfo.voice) "音声" else if (hdoInfo.sms) "SMS" else "データ"
                     val child = CouponListItemChild(hdoInfo.number, hdoInfo.hdoServiceCode, type, hdoInfo.couponUse)
-                    hdoChildren.add(child)
+                    children.add(child)
                 }
-                children.add(hdoChildren)
 
                 val hduInfoList = couponInfo.hduInfo.orEmpty()
-                val hduChildren = ArrayList<CouponListItemChild>()
                 for (hduInfo in hduInfoList) {
                     val type: String = if (hduInfo.voice) "音声" else if (hduInfo.sms) "SMS" else "データ"
                     val child = CouponListItemChild(hduInfo.number, hduInfo.hduServiceCode, type, hduInfo.couponUse)
-                    hduChildren.add(child)
+                    children.add(child)
                 }
-                children.add(hduChildren)
+
+                childrenList.add(children)
             }
 
-            val couponExpandableListAdapter = CouponExpandableListAdapter(activity, parents, children)
+            val couponExpandableListAdapter = CouponExpandableListAdapter(activity, parents, childrenList) { serviceCode, status ->
+                couponStatus.put(serviceCode, status)
+                Log.d("coupon status", couponStatus.toString())
+            }
             couponListView.setAdapter(couponExpandableListAdapter)
 
             stopProgressDialog()
+            couponInfoJson?.let { setCouponStatus(it) }
         })
     }
 
@@ -109,6 +134,73 @@ class CouponFragment : Fragment(), View.OnClickListener {
     }
 
     private fun getVolume(couponInfo: CouponInfo): String {
+
+        val plan: String = couponInfo.plan
+
+        if (plan.contains("Eco")) {
+            val mb = couponInfo.remains ?: 0
+            if (mb > 1000) {
+                val gb = mb / 1000
+                return gb.toString() + "GB"
+            }
+
+            return mb.toString() + "MB"
+
+        } else {
+            val couponList = couponInfo.coupon.orEmpty()
+
+            val now: Calendar = Calendar.getInstance()
+            val nowYear: Int = now.get(Calendar.YEAR)
+            val nowMonth: Int = now.get(Calendar.MONTH) + 1
+
+            var volume = 0
+
+            for (coupon in couponList) {
+                val expire: String = coupon.expire ?: "197001"
+                val expireYear: Int = expire.subSequence(0, 4).toString().toInt()
+                val expireMonth: Int = expire.subSequence(4, 6).toString().toInt()
+
+                if (expireYear < nowYear && expireMonth < nowMonth) {
+                    break
+                }
+
+                volume += coupon.volume
+            }
+
+            if (volume > 1000) {
+                volume /= 1000
+                return volume.toString() + "GB"
+            }
+
+            return volume.toString() + "MB"
+        }
+
         return "1GB"
+    }
+
+    private fun getJapanesePlanName(plan: String): String {
+        if (plan == "Family Share") return "ファミリーシェアプラン"
+        if (plan == "Minimum Start") return "ミニマムスタートプラン"
+        if (plan == "Light Start") return "ライトスタートプラン"
+        if (plan == "Eco Minimum") return "エコプランミニマム"
+        if (plan == "Eco Standard") return "エコプランスタンダード"
+
+        return ""
+    }
+
+    private fun setCouponStatus(couponInfoJson: CouponInfoJson): Unit {
+        for (couponInfo in couponInfoJson.couponInfo) {
+
+            val hdoInfoList = couponInfo.hdoInfo.orEmpty()
+            for (hdoInfo in hdoInfoList) {
+                couponStatus[hdoInfo.hdoServiceCode] = hdoInfo.couponUse
+            }
+
+            val hduInfoList = couponInfo.hduInfo.orEmpty()
+            for (hduInfo in hduInfoList) {
+                couponStatus[hduInfo.hduServiceCode] = hduInfo.couponUse
+            }
+
+        }
     }
 }

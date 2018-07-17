@@ -87,9 +87,38 @@ object MioManager {
         httpGet(activity, url, { execFunc(it) }, { errorJudgeFunc(it) })
     }
 
+    fun applyCouponStatus(activity: Activity, coupomStatusMap: Map<String, Boolean>, execFunc: (JSONObject) -> Unit = {}, tokenErrorFunc: () -> Unit = {}, errorFunc: () -> Unit = {}) {
+        val url = "https://api.iijmio.jp/mobile/d/v2/coupon/"
+
+        val errorJudgeFunc: (VolleyError) -> Unit = {
+            val errorCode = it.networkResponse.statusCode
+
+            if (errorCode == 403) {
+                tokenErrorFunc()
+            } else {
+                errorFunc()
+            }
+        }
+
+        val hdoList = ArrayList<CouponStatus>()
+        val hduList = ArrayList<CouponStatus>()
+
+        for ((serviceCode, status) in coupomStatusMap) {
+            if (serviceCode.contains("hdx")) {
+                hdoList.add(CouponStatus(serviceCode, status))
+            } else if (serviceCode.contains("hdu")) {
+                hduList.add(CouponStatus(serviceCode, status))
+            }
+        }
+
+        val postJsonObject: JSONObject = genelateCouponPostJsonObject(hdoList, hduList)
+
+        httpPut(activity, url, postJsonObject, { execFunc(it) }, { errorJudgeFunc(it) })
+    }
+
     private data class CouponStatus(
-            val hdx: String,
-            val on: Boolean
+            val hdxServiceCode: String,
+            val coupon: Boolean
     )
 
     private fun genelateCouponPostJsonObject(hdoList: List<CouponStatus>, hduList: List<CouponStatus>): JSONObject {
@@ -97,8 +126,8 @@ object MioManager {
         var hduStr = ""
 
         for ((index, couponStatus) in hdoList.withIndex()) {
-            val hdo = couponStatus.hdx
-            val on = couponStatus.on
+            val hdo = couponStatus.hdxServiceCode
+            val on = couponStatus.coupon
             val str = "{\"hdoServiceCode\":" + hdo + ",\"couponUse\":" + on.toString();"\"}"
 
             hdoStr += str
@@ -107,16 +136,27 @@ object MioManager {
         }
 
         for ((index, couponStatus) in hduList.withIndex()) {
-            val hdu = couponStatus.hdx
-            val on = couponStatus.on
-            val str = "{\"hdoServiceCode\":" + hdu + ",\"couponUse\":" + on.toString();"\"}"
+            val hdu = couponStatus.hdxServiceCode
+            val on = couponStatus.coupon
+            val str = """{"hdoServiceCode":${hdu},"couponUse":${on}}"""
 
             hduStr += str
 
             if (index < hduList.size - 1) hduStr += ","
         }
 
-        val jsonStr = "{\"couponInfo\":[{\"hdoInfo\":[" + hdoStr + "],\"hduInfo\":[" + hduStr + "]}]}"
+        val jsonStr = """{
+            |               "couponInfo" : [
+            |                   {
+            |                       "hdoInfo" : [
+            |                           ${hdoStr}
+            |                       ],
+            |                       "hduInfo" : [
+            |                           ${hduStr}
+            |                       ]
+            |                   }
+            |               ]
+            |            }""".trimMargin()
 
         return JSONObject(jsonStr)
     }
@@ -126,7 +166,7 @@ object MioManager {
         val jsonRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
                 Response.Listener<JSONObject> { successFunc(it) },
                 Response.ErrorListener {
-                    it?.let(errorFunc) // 2回連続で呼び出すと VolleyError が null になる事象の暫定回避策
+                    it?.let { errorFunc(it) } // 2回連続で呼び出すと VolleyError が null になる事象の暫定回避策
                 }) {
             // ヘッダの追加
             @Throws(AuthFailureError::class)
@@ -134,9 +174,9 @@ object MioManager {
                 val headers = super.getHeaders()
                 val newHeaders = HashMap<String, String>()
                 newHeaders.putAll(headers)
-                newHeaders.put("X-IIJmio-Developer", activity.getString(R.string.developer_id))
+                newHeaders["X-IIJmio-Developer"] = activity.getString(R.string.developer_id)
                 val token = loadToken(activity)
-                newHeaders.put("X-IIJmio-Authorization", token)
+                newHeaders["X-IIJmio-Authorization"] = token
                 return newHeaders
             }
         }
@@ -145,20 +185,23 @@ object MioManager {
         queue.start()
     }
 
-    private fun httpPost(activity: Activity, url: String, jsonObject: JSONObject, successFunc: (JSONObject) -> Unit, errorFunc: (VolleyError) -> Unit) {
+    private fun httpPut(activity: Activity, url: String, jsonObject: JSONObject, successFunc: (JSONObject) -> Unit, errorFunc: (VolleyError) -> Unit) {
 
-        val jsonRequest = object : JsonObjectRequest(Request.Method.POST, url, jsonObject,
+        val jsonRequest = object : JsonObjectRequest(Request.Method.PUT, url, jsonObject,
                 Response.Listener<JSONObject> { successFunc(it) },
-                Response.ErrorListener { errorFunc(it) }) {
+                Response.ErrorListener {
+                    it?.let { errorFunc(it) } // 2回連続で呼び出すと VolleyError が null になる事象の暫定回避策
+                }) {
             // ヘッダの追加
             @Throws(AuthFailureError::class)
             override fun getHeaders(): MutableMap<String, String> {
                 val headers = super.getHeaders()
                 val newHeaders = HashMap<String, String>()
                 newHeaders.putAll(headers)
-                newHeaders.put("X-IIJmio-Developer", activity.getString(R.string.developer_id))
+                newHeaders["X-IIJmio-Developer"] = activity.getString(R.string.developer_id)
                 val token = loadToken(activity)
-                newHeaders.put("X-IIJmio-Authorization", token)
+                newHeaders["X-IIJmio-Authorization"] = token
+                newHeaders["Content-Type"] = "application/json"
                 return newHeaders
             }
         }
@@ -169,6 +212,11 @@ object MioManager {
 
     fun parseJsonToCoupon(json: JSONObject): CouponInfoJson? {
         val adapter = Moshi.Builder().build().adapter(CouponInfoJson::class.java)
+        return adapter.fromJson(json.toString())
+    }
+
+    fun parseJsonToApplyCouponResponse(json: JSONObject): ApplyCouponStatusResultJson? {
+        val adapter = Moshi.Builder().build().adapter(ApplyCouponStatusResultJson::class.java)
         return adapter.fromJson(json.toString())
     }
 }

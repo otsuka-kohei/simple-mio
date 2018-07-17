@@ -38,8 +38,8 @@ data class CouponHduInfo(
 )
 
 data class Coupon(
-        val volume: String,
-        val expire: String?,
+        val volume: Int,
+        val expire: String,
         val type: String
 )
 
