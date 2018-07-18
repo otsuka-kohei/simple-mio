@@ -106,6 +106,8 @@ object MioManager {
 
             val errorCode = it.networkResponse.statusCode
 
+            Log.e("ErrorMessage", it.networkResponse.data.toString())
+
             if (errorCode == 403) {
                 tokenErrorFunc()
             } else {
@@ -139,39 +141,44 @@ object MioManager {
         var hduStr = ""
         Log.d("hdoList", hdoList.toString())
 
+
         for ((index, couponStatus) in hdoList.withIndex()) {
+            if (index == 0) {
+                hdoStr += """"hdoInfo":["""
+            }
+
             val hdo = couponStatus.hdxServiceCode
             val on = couponStatus.coupon
-            val str = """{ "hdoServiceCode" : "$hdo", "couponUse": $on }"""
+            val str = """{"hdoServiceCode":"$hdo","couponUse":$on}"""
 
             hdoStr += str
 
-            if (index < hdoList.size - 1) hdoStr += ",\n"
+            if (index < hdoList.size - 1) {
+                hdoStr += ", "
+            } else {
+                hdoStr += " ]"
+            }
         }
-        Log.d("hdo", hdoStr)
+
+        if (hdoList.isNotEmpty() && hduList.isNotEmpty()) {
+            hdoStr += ","
+        }
 
         for ((index, couponStatus) in hduList.withIndex()) {
+            if (index == 0) {
+                hduStr += """"hduInfo":["""
+            }
+
             val hdu = couponStatus.hdxServiceCode
             val on = couponStatus.coupon
-            val str = """{ "hdoServiceCode" : "$hdu", "couponUse": $on }"""
+            val str = """{"hdoServiceCode":"$hdu","couponUse":$on}"""
 
             hduStr += str
 
             if (index < hduList.size - 1) hduStr += ",\n"
         }
 
-        val jsonStr = """{
-                            "couponInfo": [
-                                {
-                                    "hdoInfo": [
-                                                    $hdoStr
-                                    ],
-                                    "hduInfo": [
-                                                    $hduStr
-                                    ]
-                                }
-                            ]
-                        }"""
+        val jsonStr = """{"couponInfo":[{$hdoStr$hduStr}]}"""
 
         Log.d("put json", jsonStr)
         return JSONObject(jsonStr)
@@ -204,6 +211,7 @@ object MioManager {
         val jsonRequest = object : JsonObjectRequest(Request.Method.PUT, url, jsonObject,
                 Response.Listener<JSONObject> { successFunc(it) },
                 Response.ErrorListener { errorFunc(it) }) {
+
             // ヘッダの追加
             @Throws(AuthFailureError::class)
             override fun getHeaders(): MutableMap<String, String> {
@@ -213,8 +221,11 @@ object MioManager {
                 newHeaders["X-IIJmio-Developer"] = activity.getString(R.string.developer_id)
                 val token = loadToken(activity)
                 newHeaders["X-IIJmio-Authorization"] = token
-                newHeaders["Content-Type"] = "application/json"
                 return newHeaders
+            }
+
+            override fun getBodyContentType(): String {
+                return "application/json"
             }
         }
 
