@@ -11,6 +11,7 @@ import android.widget.Button
 import android.widget.ExpandableListView
 import android.widget.Toast
 import com.otsuka.simplemio.R
+import com.otsuka.simplemio.Util
 import com.otsuka.simplemio.mio.ApplyCouponStatusResultJson
 import com.otsuka.simplemio.mio.CouponInfo
 import com.otsuka.simplemio.mio.CouponInfoJson
@@ -36,6 +37,8 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
     private val couponStatus = HashMap<String, Boolean>()
 
+    lateinit var startOAuthWithDialog: () -> Unit
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +61,12 @@ class CouponFragment : Fragment(), View.OnClickListener {
         applyButton.setOnClickListener(this)
 
         couponListView = activity.findViewById(R.id.couponListView)
+        // ExpandableListView が展開されたときに自動スクロールするようにする
+        couponListView.setOnGroupClickListener() { parent, v, groupPosition, id ->
+            couponListView.smoothScrollToPosition(groupPosition)
+            false
+        }
+
         progressDialog = ProgressDialog(activity)
 
         setCouponInfoToListView()
@@ -71,8 +80,17 @@ class CouponFragment : Fragment(), View.OnClickListener {
                 val applyCouponStatusResultJson: ApplyCouponStatusResultJson? = MioManager.parseJsonToApplyCouponResponse(it)
                 if (applyCouponStatusResultJson?.returnCode == "OK") {
                     setCouponInfoToListView()
+                }
+            }, errorFunc = {
+                val errorCode = it.networkResponse.statusCode
+
+                if (errorCode == 403) {
+                    startOAuthWithDialog()
+                } else if (errorCode == 429) {
+                    Toast.makeText(activity, "1分以上時間を空けてからもう一度お試しください", Toast.LENGTH_LONG).show()
                 } else {
-                    Toast.makeText(activity, "1分以上経過してから再度お試しください", Toast.LENGTH_LONG)
+                    Util.showAlertDialog(activity, "エラー", "予期しないエラーが発生しました。",
+                            "了解")
                 }
             })
         }
@@ -82,9 +100,16 @@ class CouponFragment : Fragment(), View.OnClickListener {
         MioManager.updateCoupon(activity, execFunc = { it ->
             startProgressDialog()
 
+            // ExpandableListView のそれぞれの Group 要素の展開状況を控えておく
+            val groupNum: Int? = couponListView.expandableListAdapter?.groupCount
+            val expandStatus: List<Boolean> = if (groupNum != null) (0 until groupNum).map { couponListView.isGroupExpanded(it) } else ArrayList()
+            groupNum?.let { Log.d("groupNum", groupNum.toString()) }
+
             val couponInfoJson: CouponInfoJson? = MioManager.parseJsonToCoupon(it)
 
+            // 親要素のリスト
             val parents = ArrayList<CouponListItemParent>()
+            // 子要素のリスト（親ごとに分類するため，リストのリストになる）
             val childrenList = ArrayList<List<CouponListItemChild>>()
 
             val couponInfoList = couponInfoJson?.couponInfo.orEmpty()
@@ -111,14 +136,25 @@ class CouponFragment : Fragment(), View.OnClickListener {
                 childrenList.add(children)
             }
 
-            val couponExpandableListAdapter = CouponExpandableListAdapter(activity, parents, childrenList) { serviceCode, status ->
+            val couponExpandableListAdapter = CouponExpandableListAdapter(activity, parents, childrenList, setCouponStatus = { serviceCode, status ->
                 couponStatus.put(serviceCode, status)
                 Log.d("coupon status", couponStatus.toString())
-            }
+            },
+                    getCouponStatus = { serviceCode -> couponStatus.getOrDefault(serviceCode, false) })
             couponListView.setAdapter(couponExpandableListAdapter)
 
             stopProgressDialog()
             couponInfoJson?.let { setCouponStatus(it) }
+
+            // 控えておいた ExpandableListView の展開状況を復元する
+            if (groupNum != null) {
+                for (i in 0 until groupNum) {
+                    if (expandStatus[i]) {
+                        Log.d("expandablelistview", "expand")
+                        couponListView.expandGroup(i)
+                    }
+                }
+            }
         })
     }
 

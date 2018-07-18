@@ -2,7 +2,6 @@ package com.otsuka.simplemio.mio
 
 import android.app.Activity
 import android.content.Context
-import android.util.Log
 import com.android.volley.*
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
@@ -56,64 +55,20 @@ object MioManager {
         editor.apply()
     }
 
-    fun updateCoupon(activity: Activity, execFunc: (JSONObject) -> Unit = {}, tokenErrorFunc: () -> Unit = {}, errorFunc: () -> Unit = {}) {
+    fun updateCoupon(activity: Activity, execFunc: (JSONObject) -> Unit = {}, errorFunc: (VolleyError) -> Unit = {}) {
         val url = "https://api.iijmio.jp/mobile/d/v2/coupon/"
 
-        val errorJudgeFunc: (VolleyError) -> Unit = judge@{
-            if (it.networkResponse == null) {
-                return@judge
-            }
-
-            val errorCode = it.networkResponse.statusCode
-
-            if (errorCode == 403) {
-                tokenErrorFunc()
-            } else {
-                errorFunc()
-            }
-        }
-
-        httpGet(activity, url, { execFunc(it) }, { errorJudgeFunc(it) })
+        httpGet(activity, url, { execFunc(it) }, { errorFunc(it) })
     }
 
-    fun updatePacket(activity: Activity, execFunc: (JSONObject) -> Unit = {}, tokenErrorFunc: () -> Unit = {}, errorFunc: () -> Unit = {}) {
+    fun updatePacket(activity: Activity, execFunc: (JSONObject) -> Unit = {}, errorFunc: (VolleyError) -> Unit = {}) {
         val url = "https://api.iijmio.jp/mobile/d/v2/log/packet/"
 
-        val errorJudgeFunc: (VolleyError) -> Unit = judge@{
-            if (it.networkResponse == null) {
-                return@judge
-            }
-
-            val errorCode = it.networkResponse.statusCode
-
-            if (errorCode == 403) {
-                tokenErrorFunc()
-            } else {
-                errorFunc()
-            }
-        }
-
-        httpGet(activity, url, { execFunc(it) }, { errorJudgeFunc(it) })
+        httpGet(activity, url, { execFunc(it) }, { errorFunc(it) })
     }
 
-    fun applyCouponStatus(activity: Activity, coupomStatusMap: Map<String, Boolean>, execFunc: (JSONObject) -> Unit = {}, tokenErrorFunc: () -> Unit = {}, errorFunc: () -> Unit = {}) {
+    fun applyCouponStatus(activity: Activity, coupomStatusMap: Map<String, Boolean>, execFunc: (JSONObject) -> Unit = {}, errorFunc: (VolleyError) -> Unit = {}) {
         val url = "https://api.iijmio.jp/mobile/d/v2/coupon/"
-
-        val errorJudgeFunc: (VolleyError) -> Unit = judge@{
-            if (it.networkResponse == null) {
-                return@judge
-            }
-
-            val errorCode = it.networkResponse.statusCode
-
-            Log.e("ErrorMessage", it.networkResponse.data.toString())
-
-            if (errorCode == 403) {
-                tokenErrorFunc()
-            } else {
-                errorFunc()
-            }
-        }
 
         val hdoList = ArrayList<CouponStatus>()
         val hduList = ArrayList<CouponStatus>()
@@ -126,9 +81,9 @@ object MioManager {
             }
         }
 
-        val postJsonObject: JSONObject = genelateCouponPostJsonObject(hdoList, hduList)
+        val postJsonObject: JSONObject = generateCouponPostJsonObject(hdoList, hduList)
 
-        httpPut(activity, url, postJsonObject, { execFunc(it) }, { errorJudgeFunc(it) })
+        httpPut(activity, url, postJsonObject, { execFunc(it) }, { errorFunc(it) })
     }
 
     private data class CouponStatus(
@@ -136,16 +91,11 @@ object MioManager {
             val coupon: Boolean
     )
 
-    private fun genelateCouponPostJsonObject(hdoList: List<CouponStatus>, hduList: List<CouponStatus>): JSONObject {
-        var hdoStr = ""
-        var hduStr = ""
-        Log.d("hdoList", hdoList.toString())
-
+    private fun generateCouponPostJsonObject(hdoList: List<CouponStatus>, hduList: List<CouponStatus>): JSONObject {
+        var hdoStr = """"hdoInfo":["""
+        var hduStr = """"hduInfo":["""
 
         for ((index, couponStatus) in hdoList.withIndex()) {
-            if (index == 0) {
-                hdoStr += """"hdoInfo":["""
-            }
 
             val hdo = couponStatus.hdxServiceCode
             val on = couponStatus.coupon
@@ -155,19 +105,11 @@ object MioManager {
 
             if (index < hdoList.size - 1) {
                 hdoStr += ", "
-            } else {
-                hdoStr += " ]"
             }
         }
-
-        if (hdoList.isNotEmpty() && hduList.isNotEmpty()) {
-            hdoStr += ","
-        }
+        hdoStr += " ]"
 
         for ((index, couponStatus) in hduList.withIndex()) {
-            if (index == 0) {
-                hduStr += """"hduInfo":["""
-            }
 
             val hdu = couponStatus.hdxServiceCode
             val on = couponStatus.coupon
@@ -175,12 +117,14 @@ object MioManager {
 
             hduStr += str
 
-            if (index < hduList.size - 1) hduStr += ",\n"
+            if (index < hduList.size - 1) {
+                hduStr += ",\n"
+            }
         }
+        hduStr += " ]"
 
-        val jsonStr = """{"couponInfo":[{$hdoStr$hduStr}]}"""
+        val jsonStr = """{"couponInfo":[{$hdoStr,$hduStr}]}"""
 
-        Log.d("put json", jsonStr)
         return JSONObject(jsonStr)
     }
 

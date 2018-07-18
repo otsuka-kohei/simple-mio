@@ -12,7 +12,7 @@ import com.otsuka.simplemio.ui.listview_item.CouponListItemChild
 import com.otsuka.simplemio.ui.listview_item.CouponListItemParent
 
 
-class CouponExpandableListAdapter(val context: Context, val parents: List<CouponListItemParent>, val children: List<List<CouponListItemChild>>, val updateCouponStatus: (serviceCode: String, status: Boolean) -> Unit) : BaseExpandableListAdapter() {
+class CouponExpandableListAdapter(val context: Context, val parents: List<CouponListItemParent>, val children: List<List<CouponListItemChild>>, val setCouponStatus: (serviceCode: String, status: Boolean) -> Unit, val getCouponStatus: (serviceCode: String) -> Boolean) : BaseExpandableListAdapter() {
 
     private fun getBasicChildView(): View {
         return LayoutInflater.from(context).inflate(R.layout.item_child_coupon, null)
@@ -70,9 +70,9 @@ class CouponExpandableListAdapter(val context: Context, val parents: List<Coupon
 
         couponSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
-                updateCouponStatus(couponListItemChild.serviceCode, true)
+                setCouponStatus(couponListItemChild.serviceCode, true)
             } else {
-                updateCouponStatus(couponListItemChild.serviceCode, false)
+                setCouponStatus(couponListItemChild.serviceCode, false)
             }
         }
 
@@ -80,7 +80,7 @@ class CouponExpandableListAdapter(val context: Context, val parents: List<Coupon
         phoneNumberTextView.text = couponListItemChild.phoneNumber
         serviceCodeTextView.text = couponListItemChild.serviceCode
         typeTextView.text = couponListItemChild.type
-        couponSwitch.isChecked = couponListItemChild.couponUse
+        couponSwitch.isChecked = getCouponStatus(couponListItemChild.serviceCode)
 
         return childView
     }

@@ -20,7 +20,6 @@ import com.otsuka.simplemio.fragments.TestFragment
 import com.otsuka.simplemio.mio.MioManager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
-import kotlinx.android.synthetic.main.fragment_coupon.*
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -55,6 +54,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         toolbar.title = testFragmentName
 
+        couponFragment.startOAuthWithDialog = { startOAuthWithDialog() }
+
         val defaultFragment = testFragment
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.fragment, defaultFragment)
@@ -64,9 +65,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val token = MioManager.loadToken(this)
 
         if (token == "") {
+            Log.d("token", "notoken")
             showAlertDialog(this, "ログイン", "IIJmioでのログインが必要です\nブラウザを開いてログインページに移動してもよろしいですか？",
                     "はい", negativeButtonText = "いいえ",
-                    positiveFunc = { Log.d("positive", "positive"); startOAuth() }, negativeFunc = { this.finish() })
+                    positiveFunc = { startOAuth() }, negativeFunc = { this.finish() })
         }
     }
 
@@ -119,6 +121,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    fun startOAuthWithDialog() {
+        showAlertDialog(this, "ログイン", "IIJmioでのログインが必要です\nブラウザを開いてログインページに移動してもよろしいですか？",
+                "はい", negativeButtonText = "いいえ",
+                positiveFunc = { startOAuth() }, negativeFunc = { this.finish() })
     }
 
     private fun startOAuth() {
