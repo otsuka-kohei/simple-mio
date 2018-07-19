@@ -6,6 +6,7 @@ import com.android.volley.*
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.otsuka.simplemio.R
+import com.otsuka.simplemio.Util
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import org.json.JSONObject
@@ -139,7 +140,7 @@ object MioManager {
                 val headers = super.getHeaders()
                 val newHeaders = HashMap<String, String>()
                 newHeaders.putAll(headers)
-                newHeaders["X-IIJmio-Developer"] = activity.getString(R.string.developer_id)
+                newHeaders["X-IIJmio-Developer"] = Util.getDeveloperId(activity)
                 val token = loadToken(activity)
                 newHeaders["X-IIJmio-Authorization"] = token
                 return newHeaders
@@ -162,7 +163,7 @@ object MioManager {
                 val headers = super.getHeaders()
                 val newHeaders = HashMap<String, String>()
                 newHeaders.putAll(headers)
-                newHeaders["X-IIJmio-Developer"] = activity.getString(R.string.developer_id)
+                newHeaders["X-IIJmio-Developer"] = Util.getDeveloperId(activity)
                 val token = loadToken(activity)
                 newHeaders["X-IIJmio-Authorization"] = token
                 return newHeaders

@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val uri = "https://api.iijmio.jp/mobile/d/v1/authorization/?" +
                 "response_type=token" +
-                "&client_id=" + getString(R.string.developer_id) +
+                "&client_id=" + Util.getDeveloperId(this) +
                 "&redirect_uri=" + getString(R.string.simple_app_name) + "%3A%2F%2Fcallback" +
                 "&state=" + "success"
 
