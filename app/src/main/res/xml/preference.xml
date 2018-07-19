@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="ログイン情報">
-        <ListPreference
-            android:dialogTitle="案内をスキップする数"
-            android:entries="@array/entries_list_preference_navigation_skip"
-            android:entryValues="@array/entryvalues_list_preference_navigation_skip"
-            android:key="list_navigation_skip"
-            android:summary="長い直線経路上に複数のタグが設置してある場合に案内を間引く頻度を指定します"
-            android:title="連続した直線経路上の案内スキップ数"></ListPreference>
+    <PreferenceCategory android:title="今は設定項目はありません。">
+
     </PreferenceCategory>
 
+    <!--
     <PreferenceCategory android:title="ナビゲーション">
         <ListPreference
             android:dialogTitle="案内をスキップする数"
@@ -32,5 +27,6 @@
             android:summary="アプリ起動時に端末に保存されているログを消去します"
             android:title="アプリ起動時にログをリセットする"></CheckBoxPreference>
     </PreferenceCategory>
+    -->
 
 </PreferenceScreen>

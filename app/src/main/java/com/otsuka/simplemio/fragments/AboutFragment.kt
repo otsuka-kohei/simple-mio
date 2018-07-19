@@ -6,10 +6,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebView
 import android.widget.Button
-import com.otsuka.simplemio.mio.MioManager
+import android.widget.TextView
 import com.otsuka.simplemio.R
 import com.otsuka.simplemio.Util
+import com.otsuka.simplemio.mio.MioManager
 
 /**
  * Created by otsuka on 2018/02/24.
@@ -18,6 +20,8 @@ class AboutFragment : Fragment(), View.OnClickListener {
 
     //フラグメント上で発生するイベント（OnClickListenerとか）は極力フラグメントの中で済ませた方がいいと思う
     private lateinit var logoutButton: Button
+    private lateinit var aboutTextView: TextView
+    private lateinit var openSourseWebView: WebView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +39,15 @@ class AboutFragment : Fragment(), View.OnClickListener {
 
         logoutButton = activity.findViewById(R.id.logoutButton)
         logoutButton.setOnClickListener(this)
+
+        aboutTextView = activity.findViewById(R.id.aboutTextView)
+        aboutTextView.text = activity.getString(R.string.about)
+
+        openSourseWebView = activity.findViewById(R.id.openSourseWebView)
+        openSourseWebView.settings.useWideViewPort = true
+        openSourseWebView.settings.loadWithOverviewMode = true
+        openSourseWebView.loadUrl("file:///android_asset/openSourse.html")
+
     }
 
     override fun onClick(v: View?) {

@@ -16,7 +16,6 @@ import com.otsuka.simplemio.Util.Companion.showAlertDialog
 import com.otsuka.simplemio.fragments.AboutFragment
 import com.otsuka.simplemio.fragments.ConfigFragment
 import com.otsuka.simplemio.fragments.CouponFragment
-import com.otsuka.simplemio.fragments.TestFragment
 import com.otsuka.simplemio.mio.MioManager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
@@ -26,13 +25,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private val couponFragment:CouponFragment= CouponFragment()
     private val configFragment: ConfigFragment = ConfigFragment()
-    private val testFragment: TestFragment = TestFragment()
     private val aboutFragment: AboutFragment = AboutFragment()
 
     private lateinit var navigationView: NavigationView
 
     private val couponFragmentName = "クーポン"
-    private val testFragmentName = "テスト"
     private val configFragmentName = "設定"
     private val aboutFragmentName = "このアプリについて"
 
@@ -52,11 +49,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navigationView.setNavigationItemSelectedListener(this)
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
-        toolbar.title = testFragmentName
+        toolbar.title = couponFragmentName
 
         couponFragment.startOAuthWithDialog = { startOAuthWithDialog() }
 
-        val defaultFragment = testFragment
+        val defaultFragment = couponFragment
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.fragment, defaultFragment)
         fragmentTransaction.commit()
@@ -93,20 +90,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 fragmentName = couponFragmentName
                 itemIndex = 0
             }
-            R.id.nav_test -> {
-                fragment = testFragment
-                fragmentName = testFragmentName
-                itemIndex = 1
-            }
             R.id.nav_config -> {
                 fragment = configFragment
                 fragmentName = configFragmentName
-                itemIndex = 2
+                itemIndex = 1
             }
             R.id.nav_about -> {
                 fragment = aboutFragment
                 fragmentName = aboutFragmentName
-                itemIndex = 3
+                itemIndex = 2
             }
         }
 
@@ -165,10 +157,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 val state = validUri.getQueryParameter("state")
 
                 if (state != "success") {
-                    Toast.makeText(this, "正しく認証することができませんでした．", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "正しく認証することができませんでした。", Toast.LENGTH_LONG).show()
                 } else {
                     MioManager.saveToken(this, token)
-                    Toast.makeText(this, "トークン:" + token, Toast.LENGTH_LONG).show()
                 }
             }
         }
