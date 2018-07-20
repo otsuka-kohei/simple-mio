@@ -21,7 +21,7 @@ class AboutFragment : Fragment(), View.OnClickListener {
     //フラグメント上で発生するイベント（OnClickListenerとか）は極力フラグメントの中で済ませた方がいいと思う
     private lateinit var logoutButton: Button
     private lateinit var aboutTextView: TextView
-    private lateinit var openSourseWebView: WebView
+    private lateinit var openSourceWebView: WebView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,11 +43,11 @@ class AboutFragment : Fragment(), View.OnClickListener {
         aboutTextView = activity.findViewById(R.id.aboutTextView)
         aboutTextView.text = activity.getString(R.string.about)
 
-        openSourseWebView = activity.findViewById(R.id.openSourseWebView)
-        openSourseWebView.settings.useWideViewPort = true
-        openSourseWebView.settings.loadWithOverviewMode = true
-        openSourseWebView.settings.builtInZoomControls = true
-        openSourseWebView.loadUrl("file:///android_asset/openSourse.html")
+        openSourceWebView = activity.findViewById(R.id.openSourseWebView)
+        openSourceWebView.settings.useWideViewPort = true
+        openSourceWebView.settings.loadWithOverviewMode = true
+        openSourceWebView.settings.builtInZoomControls = true
+        openSourceWebView.loadUrl("file:///android_asset/openSourse.html")
 
     }
 
