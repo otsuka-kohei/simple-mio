@@ -13,9 +13,9 @@ class ConfigFragment : PreferenceFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        getPreferenceManager().sharedPreferencesName = activity.getString(R.string.preference_file_name)
+
         // /app/res/xml/preference.xml に定義されている設定画面を適用
         addPreferencesFromResource(R.xml.preference)
     }
-
-
 }

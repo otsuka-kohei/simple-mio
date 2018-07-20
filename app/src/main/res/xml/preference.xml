@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="今は設定項目はありません。">
-
+    <PreferenceCategory android:title="クーポン残量表示">
+        <SwitchPreference
+            android:key="@string/preference_key_useMBOnly"
+            android:title="常にMB表示する"
+            android:summary="クーポン残量でGB表を使わず，常にMB表示します。" />
     </PreferenceCategory>
 
     <!--

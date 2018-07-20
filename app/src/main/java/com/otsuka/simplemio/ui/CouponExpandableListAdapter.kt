@@ -69,11 +69,7 @@ class CouponExpandableListAdapter(val context: Context, val parents: List<Coupon
         val couponListItemChild: CouponListItemChild = children[p0][p1]
 
         couponSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
-            if (isChecked) {
-                setCouponStatus(couponListItemChild.serviceCode, true)
-            } else {
-                setCouponStatus(couponListItemChild.serviceCode, false)
-            }
+            setCouponStatus(couponListItemChild.serviceCode, isChecked)
         }
 
 

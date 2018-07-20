@@ -46,6 +46,7 @@ class AboutFragment : Fragment(), View.OnClickListener {
         openSourseWebView = activity.findViewById(R.id.openSourseWebView)
         openSourseWebView.settings.useWideViewPort = true
         openSourseWebView.settings.loadWithOverviewMode = true
+        openSourseWebView.settings.builtInZoomControls = true
         openSourseWebView.loadUrl("file:///android_asset/openSourse.html")
 
     }

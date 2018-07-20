@@ -2,6 +2,7 @@ package com.otsuka.simplemio.fragments
 
 import android.app.Fragment
 import android.app.ProgressDialog
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -36,6 +37,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
     private lateinit var progressDialog: ProgressDialog
 
     private val couponStatus = HashMap<String, Boolean>()
+    private var oldCouponStatus = couponStatus.clone()
 
     lateinit var startOAuthWithDialog: () -> Unit
 
@@ -47,7 +49,6 @@ class CouponFragment : Fragment(), View.OnClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        Log.d("onCreateView", "before return")
         return inflater.inflate(R.layout.fragment_coupon, container, false)
     }
 
@@ -59,6 +60,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
         applyButton = activity.findViewById(R.id.applyButton)
         applyButton.setOnClickListener(this)
+        applyButton.isEnabled = false
 
         couponListView = activity.findViewById(R.id.couponListView)
         // ExpandableListView が展開されたときに自動スクロールするようにする
@@ -68,6 +70,10 @@ class CouponFragment : Fragment(), View.OnClickListener {
         }
 
         progressDialog = ProgressDialog(activity)
+    }
+
+    override fun onResume() {
+        super.onResume()
 
         setCouponInfoToListView()
     }
@@ -103,7 +109,6 @@ class CouponFragment : Fragment(), View.OnClickListener {
             // ExpandableListView のそれぞれの Group 要素の展開状況を控えておく
             val groupNum: Int? = couponListView.expandableListAdapter?.groupCount
             val expandStatus: List<Boolean> = if (groupNum != null) (0 until groupNum).map { couponListView.isGroupExpanded(it) } else ArrayList()
-            groupNum?.let { Log.d("groupNum", groupNum.toString()) }
 
             val couponInfoJson: CouponInfoJson? = MioManager.parseJsonToCoupon(it)
 
@@ -137,8 +142,8 @@ class CouponFragment : Fragment(), View.OnClickListener {
             }
 
             val couponExpandableListAdapter = CouponExpandableListAdapter(activity, parents, childrenList, setCouponStatus = { serviceCode, status ->
-                couponStatus.put(serviceCode, status)
-                Log.d("coupon status", couponStatus.toString())
+                couponStatus[serviceCode] = status
+                updateApplyButtonIsEnable()
             },
                     getCouponStatus = { serviceCode -> couponStatus.getOrDefault(serviceCode, false) })
             couponListView.setAdapter(couponExpandableListAdapter)
@@ -150,12 +155,22 @@ class CouponFragment : Fragment(), View.OnClickListener {
             if (groupNum != null) {
                 for (i in 0 until groupNum) {
                     if (expandStatus[i]) {
-                        Log.d("expandablelistview", "expand")
                         couponListView.expandGroup(i)
                     }
                 }
             }
+
+            oldCouponStatus = couponStatus.clone()
+            updateApplyButtonIsEnable()
         })
+    }
+
+    private fun updateApplyButtonIsEnable() {
+        Log.d("coupon status", "hoge")
+        Log.d("old coupon status", oldCouponStatus.toString())
+        Log.d("coupon status", couponStatus.toString())
+        Log.d("coupon diff", couponStatus.equals(oldCouponStatus).toString())
+        applyButton.isEnabled = !couponStatus.equals(oldCouponStatus)
     }
 
     private fun startProgressDialog(): Unit {
@@ -170,12 +185,14 @@ class CouponFragment : Fragment(), View.OnClickListener {
     }
 
     private fun getVolume(couponInfo: CouponInfo): String {
+        val preference = activity.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
+        val useOnlyMB = preference.getBoolean(activity.getString(R.string.preference_key_useMBOnly), false)
 
         val plan: String = couponInfo.plan
 
         if (plan.contains("Eco")) {
             val mb = couponInfo.remains ?: 0
-            if (mb > 1000) {
+            if (!useOnlyMB && mb > 1000) {
                 val gb = mb / 1000
                 return gb.toString() + "GB"
             }
@@ -203,7 +220,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
                 volume += coupon.volume
             }
 
-            if (volume > 1000) {
+            if (!useOnlyMB && volume > 1000) {
                 volume /= 1000
                 return volume.toString() + "GB"
             }

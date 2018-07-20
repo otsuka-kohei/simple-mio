@@ -109,7 +109,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         toolbar.title = fragmentName
 
-        navigationView.getMenu().getItem(itemIndex).isChecked = true
+        navigationView.menu.getItem(itemIndex).isChecked = true
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return true

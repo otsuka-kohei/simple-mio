@@ -40,19 +40,19 @@ object MioManager {
     fun saveToken(activity: Activity, token: String) {
         val preference = activity.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
         val editor = preference.edit()
-        editor.putString("token", token)
+        editor.putString(activity.getString(R.string.preference_key_token), token)
         editor.apply()
     }
 
     fun loadToken(activity: Activity): String {
         val preference = activity.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
-        return preference.getString("token", "")
+        return preference.getString(activity.getString(R.string.preference_key_token), "")
     }
 
     fun deleteToken(activity: Activity) {
         val preference = activity.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
         val editor = preference.edit()
-        editor.remove("token")
+        editor.remove(activity.getString(R.string.preference_key_token))
         editor.apply()
     }
 
