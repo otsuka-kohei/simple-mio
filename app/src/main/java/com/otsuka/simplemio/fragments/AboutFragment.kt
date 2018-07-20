@@ -43,7 +43,7 @@ class AboutFragment : Fragment(), View.OnClickListener {
         aboutTextView = activity.findViewById(R.id.aboutTextView)
         aboutTextView.text = activity.getString(R.string.about)
 
-        openSourceWebView = activity.findViewById(R.id.openSourseWebView)
+        openSourceWebView = activity.findViewById(R.id.openSourceWebView)
         openSourceWebView.settings.useWideViewPort = true
         openSourceWebView.settings.loadWithOverviewMode = true
         openSourceWebView.settings.builtInZoomControls = true

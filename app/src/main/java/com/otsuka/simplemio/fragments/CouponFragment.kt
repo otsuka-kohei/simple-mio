@@ -82,6 +82,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
         if (v == updateButton) {
             setCouponInfoToListView()
         } else if (v == applyButton) {
+            startProgressDialog()
             MioManager.applyCouponStatus(activity, couponStatus, execFunc = { it ->
                 val applyCouponStatusResultJson: ApplyCouponStatusResultJson? = MioManager.parseJsonToApplyCouponResponse(it)
                 if (applyCouponStatusResultJson?.returnCode == "OK") {
@@ -98,13 +99,14 @@ class CouponFragment : Fragment(), View.OnClickListener {
                     Util.showAlertDialog(activity, "エラー", "予期しないエラーが発生しました。",
                             "了解")
                 }
+                stopProgressDialog()
             })
         }
     }
 
     private fun setCouponInfoToListView(): Unit {
+        startProgressDialog()
         MioManager.updateCoupon(activity, execFunc = { it ->
-            startProgressDialog()
 
             // ExpandableListView のそれぞれの Group 要素の展開状況を控えておく
             val groupNum: Int? = couponListView.expandableListAdapter?.groupCount
@@ -174,6 +176,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
     }
 
     private fun startProgressDialog(): Unit {
+        Log.d("progress", "start")
         progressDialog.setTitle("読み込み中");
         progressDialog.setMessage("少々お待ちください")
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER)
@@ -181,6 +184,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
     }
 
     private fun stopProgressDialog(): Unit {
+        Log.d("progress", "stop")
         progressDialog.dismiss()
     }
 
