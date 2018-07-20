@@ -1,4 +1,4 @@
-package com.otsuka.simplemio.ui.listview_item
+package com.otk1fd.simplemio.ui.listview_item
 
 data class CouponListItemChild(
         val phoneNumber: String,

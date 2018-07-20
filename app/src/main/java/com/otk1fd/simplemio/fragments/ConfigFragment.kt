@@ -1,12 +1,12 @@
-package com.otsuka.simplemio.fragments
+package com.otk1fd.simplemio.fragments
 
 import android.os.Bundle
 import android.preference.PreferenceFragment
-import com.otsuka.simplemio.R
+import com.otk1fd.simplemio.R
 
 
 /**
- * Created by otsuka on 2018/02/24.
+ * Created by otk1fd on 2018/02/24.
  */
 class ConfigFragment : PreferenceFragment() {
 

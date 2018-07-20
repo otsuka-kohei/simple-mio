@@ -1,19 +1,19 @@
-package com.otsuka.simplemio.mio
+package com.otk1fd.simplemio.mio
 
 import android.app.Activity
 import android.content.Context
 import com.android.volley.*
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.otsuka.simplemio.R
-import com.otsuka.simplemio.Util
+import com.otk1fd.simplemio.R
+import com.otk1fd.simplemio.Util
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import org.json.JSONObject
 
 
 /**
- * Created by otsuka on 2018/03/14.
+ * Created by otk1fd on 2018/03/14.
  */
 
 fun jsonParse4Coupon(json: JSONObject): CouponInfoJson? {

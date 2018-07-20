@@ -1,4 +1,4 @@
-package com.otsuka.simplemio
+package com.otk1fd.simplemio
 
 import android.app.Activity
 import android.content.res.Resources
@@ -9,7 +9,7 @@ import org.xmlpull.v1.XmlPullParser
 
 
 /**
- * Created by otsuka on 2018/03/14.
+ * Created by otk1fd on 2018/03/14.
  */
 class Util {
 

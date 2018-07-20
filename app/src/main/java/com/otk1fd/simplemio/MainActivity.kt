@@ -1,4 +1,4 @@
-package com.otsuka.simplemio
+package com.otk1fd.simplemio
 
 import android.app.Fragment
 import android.content.Intent
@@ -12,18 +12,18 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
-import com.otsuka.simplemio.Util.Companion.showAlertDialog
-import com.otsuka.simplemio.fragments.AboutFragment
-import com.otsuka.simplemio.fragments.ConfigFragment
-import com.otsuka.simplemio.fragments.CouponFragment
-import com.otsuka.simplemio.mio.MioManager
+import com.otk1fd.simplemio.Util.Companion.showAlertDialog
+import com.otk1fd.simplemio.fragments.AboutFragment
+import com.otk1fd.simplemio.fragments.ConfigFragment
+import com.otk1fd.simplemio.fragments.CouponFragment
+import com.otk1fd.simplemio.mio.MioManager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    private val couponFragment:CouponFragment= CouponFragment()
+    private val couponFragment: CouponFragment = CouponFragment()
     private val configFragment: ConfigFragment = ConfigFragment()
     private val aboutFragment: AboutFragment = AboutFragment()
 

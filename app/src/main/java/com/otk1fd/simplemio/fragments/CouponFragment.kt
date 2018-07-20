@@ -1,4 +1,4 @@
-package com.otsuka.simplemio.fragments
+package com.otk1fd.simplemio.fragments
 
 import android.app.Fragment
 import android.app.ProgressDialog
@@ -11,21 +11,21 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ExpandableListView
 import android.widget.Toast
-import com.otsuka.simplemio.R
-import com.otsuka.simplemio.Util
-import com.otsuka.simplemio.mio.ApplyCouponStatusResultJson
-import com.otsuka.simplemio.mio.CouponInfo
-import com.otsuka.simplemio.mio.CouponInfoJson
-import com.otsuka.simplemio.mio.MioManager
-import com.otsuka.simplemio.ui.CouponExpandableListAdapter
-import com.otsuka.simplemio.ui.listview_item.CouponListItemChild
-import com.otsuka.simplemio.ui.listview_item.CouponListItemParent
+import com.otk1fd.simplemio.R
+import com.otk1fd.simplemio.Util
+import com.otk1fd.simplemio.mio.ApplyCouponStatusResultJson
+import com.otk1fd.simplemio.mio.CouponInfo
+import com.otk1fd.simplemio.mio.CouponInfoJson
+import com.otk1fd.simplemio.mio.MioManager
+import com.otk1fd.simplemio.ui.CouponExpandableListAdapter
+import com.otk1fd.simplemio.ui.listview_item.CouponListItemChild
+import com.otk1fd.simplemio.ui.listview_item.CouponListItemParent
 import java.util.*
 import kotlin.collections.ArrayList
 
 
 /**
- * Created by otsuka on 2018/02/24.
+ * Created by otk1fd on 2018/02/24.
  */
 class CouponFragment : Fragment(), View.OnClickListener {
 

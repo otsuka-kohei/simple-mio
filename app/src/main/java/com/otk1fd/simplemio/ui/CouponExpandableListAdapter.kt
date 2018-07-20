@@ -1,4 +1,4 @@
-package com.otsuka.simplemio.ui
+package com.otk1fd.simplemio.ui
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
 import android.widget.Switch
 import android.widget.TextView
-import com.otsuka.simplemio.R
-import com.otsuka.simplemio.ui.listview_item.CouponListItemChild
-import com.otsuka.simplemio.ui.listview_item.CouponListItemParent
+import com.otk1fd.simplemio.R
+import com.otk1fd.simplemio.ui.listview_item.CouponListItemChild
+import com.otk1fd.simplemio.ui.listview_item.CouponListItemParent
 
 
 class CouponExpandableListAdapter(val context: Context, val parents: List<CouponListItemParent>, val children: List<List<CouponListItemChild>>, val setCouponStatus: (serviceCode: String, status: Boolean) -> Unit, val getCouponStatus: (serviceCode: String) -> Boolean) : BaseExpandableListAdapter() {

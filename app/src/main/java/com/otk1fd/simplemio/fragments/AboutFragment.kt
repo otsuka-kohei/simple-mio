@@ -1,4 +1,4 @@
-package com.otsuka.simplemio.fragments
+package com.otk1fd.simplemio.fragments
 
 import android.app.Fragment
 import android.os.Bundle
@@ -9,12 +9,12 @@ import android.view.ViewGroup
 import android.webkit.WebView
 import android.widget.Button
 import android.widget.TextView
-import com.otsuka.simplemio.R
-import com.otsuka.simplemio.Util
-import com.otsuka.simplemio.mio.MioManager
+import com.otk1fd.simplemio.R
+import com.otk1fd.simplemio.Util
+import com.otk1fd.simplemio.mio.MioManager
 
 /**
- * Created by otsuka on 2018/02/24.
+ * Created by otk1fd on 2018/02/24.
  */
 class AboutFragment : Fragment(), View.OnClickListener {
 
