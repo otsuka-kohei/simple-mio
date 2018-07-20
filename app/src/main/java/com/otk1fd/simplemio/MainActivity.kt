@@ -16,7 +16,7 @@ import com.otk1fd.simplemio.Util.Companion.showAlertDialog
 import com.otk1fd.simplemio.fragments.AboutFragment
 import com.otk1fd.simplemio.fragments.ConfigFragment
 import com.otk1fd.simplemio.fragments.CouponFragment
-import com.otk1fd.simplemio.mio.MioManager
+import com.otk1fd.simplemio.mio.MioUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 
@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val aboutFragmentName = "このアプリについて"
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        MioManager.setUp(this, { startOAuth() })
+        MioUtil.setUp(this, { startOAuth() })
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -47,9 +47,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         navigationView = findViewById(R.id.nav_view)
         navigationView.setNavigationItemSelectedListener(this)
-
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        toolbar.title = couponFragmentName
+        navigationView.menu.getItem(0).isChecked = true
 
         couponFragment.startOAuthWithDialog = { startOAuthWithDialog() }
 
@@ -58,8 +56,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         fragmentTransaction.replace(R.id.fragment, defaultFragment)
         fragmentTransaction.commit()
 
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        toolbar.title = couponFragmentName
+
         // トークンが存在するか，有効かを確認
-        val token = MioManager.loadToken(this)
+        val token = MioUtil.loadToken(this)
 
         if (token == "") {
             Log.d("token", "notoken")
@@ -82,23 +83,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         var fragment: Fragment? = null
         var fragmentName = ""
-        var itemIndex = 0
 
         when (item.itemId) {
             R.id.nav_coupon -> {
                 fragment = couponFragment
                 fragmentName = couponFragmentName
-                itemIndex = 0
             }
             R.id.nav_config -> {
                 fragment = configFragment
                 fragmentName = configFragmentName
-                itemIndex = 1
             }
             R.id.nav_about -> {
                 fragment = aboutFragment
                 fragmentName = aboutFragmentName
-                itemIndex = 2
             }
         }
 
@@ -109,7 +106,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         toolbar.title = fragmentName
 
-        navigationView.menu.getItem(itemIndex).isChecked = true
+        navigationView.isEnabled = true
+
+        item.isChecked = true
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
@@ -159,7 +158,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 if (state != "success") {
                     Toast.makeText(this, "正しく認証することができませんでした。", Toast.LENGTH_LONG).show()
                 } else {
-                    MioManager.saveToken(this, token)
+                    MioUtil.saveToken(this, token)
                 }
             }
         }

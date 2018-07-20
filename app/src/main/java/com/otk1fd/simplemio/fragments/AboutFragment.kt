@@ -11,7 +11,7 @@ import android.widget.Button
 import android.widget.TextView
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.Util
-import com.otk1fd.simplemio.mio.MioManager
+import com.otk1fd.simplemio.mio.MioUtil
 
 /**
  * Created by otk1fd on 2018/02/24.
@@ -57,11 +57,11 @@ class AboutFragment : Fragment(), View.OnClickListener {
             Util.showAlertDialog(activity, "ログアウト", "IIJmioからログアウトしてもよろしいですか？",
                     "はい", negativeButtonText = "いいえ",
                     positiveFunc = {
-                        MioManager.deleteToken(activity)
+                        MioUtil.deleteToken(activity)
                         Util.showAlertDialog(activity, "ログアウト完了", "IIJmioからログアウトしました．\nアプリを終了します",
                                 "はい",
                                 positiveFunc = {
-                                    MioManager.deleteToken(activity)
+                                    MioUtil.deleteToken(activity)
                                     activity.finish()
                                 })
                     })

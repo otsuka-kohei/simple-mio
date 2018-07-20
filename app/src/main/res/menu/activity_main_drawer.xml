@@ -6,14 +6,17 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_coupon"
+            android:checkable="true"
             android:title="クーポン" />
     </group>
-    <group >
+    <group>
         <item
             android:id="@+id/nav_config"
+            android:checkable="true"
             android:title="設定" />
         <item
             android:id="@+id/nav_about"
+            android:checkable="true"
             android:title="このアプリについて" />
     </group>
 

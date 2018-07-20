@@ -16,7 +16,7 @@ import com.otk1fd.simplemio.Util
 import com.otk1fd.simplemio.mio.ApplyCouponStatusResultJson
 import com.otk1fd.simplemio.mio.CouponInfo
 import com.otk1fd.simplemio.mio.CouponInfoJson
-import com.otk1fd.simplemio.mio.MioManager
+import com.otk1fd.simplemio.mio.MioUtil
 import com.otk1fd.simplemio.ui.CouponExpandableListAdapter
 import com.otk1fd.simplemio.ui.listview_item.CouponListItemChild
 import com.otk1fd.simplemio.ui.listview_item.CouponListItemParent
@@ -83,8 +83,8 @@ class CouponFragment : Fragment(), View.OnClickListener {
             setCouponInfoToListView()
         } else if (v == applyButton) {
             startProgressDialog()
-            MioManager.applyCouponStatus(activity, couponStatus, execFunc = { it ->
-                val applyCouponStatusResultJson: ApplyCouponStatusResultJson? = MioManager.parseJsonToApplyCouponResponse(it)
+            MioUtil.applyCouponStatus(activity, couponStatus, execFunc = { it ->
+                val applyCouponStatusResultJson: ApplyCouponStatusResultJson? = MioUtil.parseJsonToApplyCouponResponse(it)
                 if (applyCouponStatusResultJson?.returnCode == "OK") {
                     setCouponInfoToListView()
                 }
@@ -106,13 +106,13 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
     private fun setCouponInfoToListView(): Unit {
         startProgressDialog()
-        MioManager.updateCoupon(activity, execFunc = { it ->
+        MioUtil.updateCoupon(activity, execFunc = { it ->
 
             // ExpandableListView のそれぞれの Group 要素の展開状況を控えておく
             val groupNum: Int? = couponListView.expandableListAdapter?.groupCount
             val expandStatus: List<Boolean> = if (groupNum != null) (0 until groupNum).map { couponListView.isGroupExpanded(it) } else ArrayList()
 
-            val couponInfoJson: CouponInfoJson? = MioManager.parseJsonToCoupon(it)
+            val couponInfoJson: CouponInfoJson? = MioUtil.parseJsonToCoupon(it)
 
             // 親要素のリスト
             val parents = ArrayList<CouponListItemParent>()
