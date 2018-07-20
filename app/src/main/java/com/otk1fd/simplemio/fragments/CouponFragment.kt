@@ -148,9 +148,9 @@ class CouponFragment : Fragment(), View.OnClickListener {
                 updateApplyButtonIsEnable()
             },
                     getCouponStatus = { serviceCode -> couponStatus.getOrDefault(serviceCode, false) })
+
             couponListView.setAdapter(couponExpandableListAdapter)
 
-            stopProgressDialog()
             couponInfoJson?.let { setCouponStatus(it) }
 
             // 控えておいた ExpandableListView の展開状況を復元する
@@ -164,6 +164,10 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
             oldCouponStatus = couponStatus.clone()
             updateApplyButtonIsEnable()
+
+            stopProgressDialog()
+        }, errorFunc = {
+            stopProgressDialog()
         })
     }
 
