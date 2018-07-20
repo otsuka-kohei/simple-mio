@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
+import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
@@ -57,7 +58,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         fragmentTransaction.commit()
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
         toolbar.title = couponFragmentName
+
+        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
+        val actionBarDrawerToggle = ActionBarDrawerToggle(
+                this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close)
+        drawerLayout.addDrawerListener(actionBarDrawerToggle)
+        actionBarDrawerToggle.syncState()
 
         // トークンが存在するか，有効かを確認
         val token = MioUtil.loadToken(this)

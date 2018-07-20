@@ -11,6 +11,9 @@
     <string name="preference_key_token">token</string>
     <string name="preference_key_useMBOnly">useMBOnly</string>
 
+    <string name="drawer_open">ドロワーを開く</string>
+    <string name="drawer_close">ドロワーを閉じる</string>
+
     <string name="about">
         simple mio IIJ mio クーポンマネージャ\n
         &#169; 2018 otk1fd\n
