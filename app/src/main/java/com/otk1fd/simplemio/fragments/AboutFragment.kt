@@ -1,16 +1,17 @@
 package com.otk1fd.simplemio.fragments
 
 import android.app.Fragment
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebView
 import android.widget.Button
 import android.widget.TextView
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.Util
+import com.otk1fd.simplemio.activity.OpenSourceActivity
 import com.otk1fd.simplemio.mio.MioUtil
 
 /**
@@ -21,7 +22,7 @@ class AboutFragment : Fragment(), View.OnClickListener {
     //フラグメント上で発生するイベント（OnClickListenerとか）は極力フラグメントの中で済ませた方がいいと思う
     private lateinit var logoutButton: Button
     private lateinit var aboutTextView: TextView
-    private lateinit var openSourceWebView: WebView
+    private lateinit var openSourceTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,11 +44,8 @@ class AboutFragment : Fragment(), View.OnClickListener {
         aboutTextView = activity.findViewById(R.id.aboutTextView)
         aboutTextView.text = activity.getString(R.string.about)
 
-        openSourceWebView = activity.findViewById(R.id.openSourceWebView)
-        openSourceWebView.settings.useWideViewPort = true
-        openSourceWebView.settings.loadWithOverviewMode = true
-        openSourceWebView.settings.builtInZoomControls = true
-        openSourceWebView.loadUrl("file:///android_asset/openSourse.html")
+        openSourceTextView = activity.findViewById(R.id.openSourceTitleTextView)
+        openSourceTextView.setOnClickListener(this)
 
     }
 
@@ -65,6 +63,11 @@ class AboutFragment : Fragment(), View.OnClickListener {
                                     activity.finish()
                                 })
                     })
+        }
+
+        if (v == openSourceTextView) {
+            val intent = Intent(activity, OpenSourceActivity::class.java)
+            activity.startActivity(intent)
         }
     }
 }
