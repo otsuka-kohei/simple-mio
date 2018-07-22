@@ -4,32 +4,6 @@
         <SwitchPreference
             android:key="@string/preference_key_useMBOnly"
             android:title="常にMB表示する"
-            android:summary="クーポン残量でGB表を使わず，常にMB表示します。" />
+            android:summary="クーポン残量でGB単位での表示を行わず、常にMB単位で表示します。" />
     </PreferenceCategory>
-
-    <!--
-    <PreferenceCategory android:title="ナビゲーション">
-        <ListPreference
-            android:dialogTitle="案内をスキップする数"
-            android:entries="@array/entries_list_preference_navigation_skip"
-            android:entryValues="@array/entryvalues_list_preference_navigation_skip"
-            android:key="list_navigation_skip"
-            android:summary="長い直線経路上に複数のタグが設置してある場合に案内を間引く頻度を指定します"
-            android:title="連続した直線経路上の案内スキップ数"></ListPreference>
-    </PreferenceCategory>
-    <PreferenceCategory android:title="ログ">
-        <MultiSelectListPreference
-            android:dialogTitle="保存するログの種類を選択"
-            android:entries="@array/entries_multi_log"
-            android:entryValues="@array/entryvalues_multi_log"
-            android:key="multi_log"
-            android:summary="保存されるログの種類を指定します"
-            android:title="保存するログの種類"></MultiSelectListPreference>
-        <CheckBoxPreference
-            android:key="checkbox_log"
-            android:summary="アプリ起動時に端末に保存されているログを消去します"
-            android:title="アプリ起動時にログをリセットする"></CheckBoxPreference>
-    </PreferenceCategory>
-    -->
-
 </PreferenceScreen>

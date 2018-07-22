@@ -9,7 +9,7 @@
             android:checkable="true"
             android:title="クーポン" />
     </group>
-    <group>
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_config"
             android:checkable="true"
