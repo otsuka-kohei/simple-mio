@@ -14,6 +14,7 @@ import com.otk1fd.simplemio.Util
 import com.otk1fd.simplemio.activity.OpenSourceActivity
 import com.otk1fd.simplemio.mio.MioUtil
 
+
 /**
  * Created by otk1fd on 2018/02/24.
  */
@@ -22,6 +23,7 @@ class AboutFragment : Fragment(), View.OnClickListener {
     //フラグメント上で発生するイベント（OnClickListenerとか）は極力フラグメントの中で済ませた方がいいと思う
     private lateinit var logoutButton: Button
     private lateinit var aboutTextView: TextView
+    private lateinit var sendFeedbackTextView: TextView
     private lateinit var openSourceTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +45,9 @@ class AboutFragment : Fragment(), View.OnClickListener {
 
         aboutTextView = activity.findViewById(R.id.aboutTextView)
         aboutTextView.text = activity.getString(R.string.about)
+
+        sendFeedbackTextView = activity.findViewById(R.id.sendFeedbackTextView)
+        sendFeedbackTextView.setOnClickListener(this)
 
         openSourceTextView = activity.findViewById(R.id.openSourceTitleTextView)
         openSourceTextView.setOnClickListener(this)
@@ -67,6 +72,11 @@ class AboutFragment : Fragment(), View.OnClickListener {
 
         if (v == openSourceTextView) {
             val intent = Intent(activity, OpenSourceActivity::class.java)
+            activity.startActivity(intent)
+        }
+
+        if (v == sendFeedbackTextView) {
+            val intent = Intent(Intent.ACTION_APP_ERROR)
             activity.startActivity(intent)
         }
     }
