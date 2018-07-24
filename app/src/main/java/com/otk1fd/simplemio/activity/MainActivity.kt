@@ -19,6 +19,7 @@ import com.otk1fd.simplemio.Util.Companion.showAlertDialog
 import com.otk1fd.simplemio.fragments.AboutFragment
 import com.otk1fd.simplemio.fragments.ConfigFragment
 import com.otk1fd.simplemio.fragments.CouponFragment
+import com.otk1fd.simplemio.fragments.HistoryFragment
 import com.otk1fd.simplemio.mio.MioUtil
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -26,14 +27,12 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private val couponFragment: CouponFragment = CouponFragment()
+    private val historyFragment: HistoryFragment = HistoryFragment()
     private val configFragment: ConfigFragment = ConfigFragment()
     private val aboutFragment: AboutFragment = AboutFragment()
 
     private lateinit var navigationView: NavigationView
 
-    private val couponFragmentName = "クーポン"
-    private val configFragmentName = "設定"
-    private val aboutFragmentName = "このアプリについて"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         MioUtil.setUp(this, { startOAuth() })
@@ -43,7 +42,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
-        toolbar.title = couponFragmentName
+        toolbar.title = getString(R.string.menu_coupon)
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val actionBarDrawerToggle = ActionBarDrawerToggle(
@@ -90,15 +89,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         when (item.itemId) {
             R.id.nav_coupon -> {
                 fragment = couponFragment
-                fragmentName = couponFragmentName
+                fragmentName = getString(R.string.menu_coupon)
+            }
+            R.id.nav_history -> {
+                fragment = historyFragment
+                fragmentName = getString(R.string.menu_history)
             }
             R.id.nav_config -> {
                 fragment = configFragment
-                fragmentName = configFragmentName
+                fragmentName = getString(R.string.menu_config)
             }
             R.id.nav_about -> {
                 fragment = aboutFragment
-                fragmentName = aboutFragmentName
+                fragmentName = getString(R.string.menu_about)
             }
         }
 
