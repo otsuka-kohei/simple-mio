@@ -164,7 +164,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 if (state != "success") {
                     Toast.makeText(this, "正しく認証することができませんでした。", Toast.LENGTH_LONG).show()
                 } else {
-                    MioUtil.saveToken(this, token)
+                    Util.saveToken(this, token)
                 }
             }
         }

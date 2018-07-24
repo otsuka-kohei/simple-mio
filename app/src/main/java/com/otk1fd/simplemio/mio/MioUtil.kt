@@ -26,13 +26,6 @@ object MioUtil {
         this.loginFunc = loginFunc
     }
 
-    fun saveToken(activity: Activity, token: String) {
-        val preference = activity.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
-        val editor = preference.edit()
-        editor.putString(activity.getString(R.string.preference_key_token), token)
-        editor.apply()
-    }
-
     fun loadToken(activity: Activity): String {
         val preference = activity.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
         return preference.getString(activity.getString(R.string.preference_key_token), "")
@@ -169,6 +162,11 @@ object MioUtil {
 
     fun parseJsonToCoupon(json: JSONObject): CouponInfoJson? {
         val adapter = Moshi.Builder().build().adapter(CouponInfoJson::class.java)
+        return adapter.fromJson(json.toString())
+    }
+
+    fun parseJsonToHistory(json: JSONObject): PacketLogInfoJson? {
+        val adapter = Moshi.Builder().build().adapter(PacketLogInfoJson::class.java)
         return adapter.fromJson(json.toString())
     }
 
