@@ -25,5 +25,6 @@
         &#169; 2018 otk1fd\n
         https://github.com/otsuka-kohei/simple-mio
     </string>
+    <string name="title_activity_history">HistoryActivity</string>
 
 </resources>

@@ -34,8 +34,8 @@ class CouponExpandableListAdapter(val context: Context, val parents: List<Coupon
         val parentView: View = getBasicParentView()
 
         val volumeTextView: TextView = parentView.findViewById(R.id.couponVolumeTextView)
-        val hddServiceCodeTextView: TextView = parentView.findViewById(R.id.couponHddServiceCodeTextView)
-        val planTextView: TextView = parentView.findViewById(R.id.couponPlanTextView)
+        val hddServiceCodeTextView: TextView = parentView.findViewById(R.id.historyHddServiceCodeTextView)
+        val planTextView: TextView = parentView.findViewById(R.id.historyPlanTextView)
 
         val couponListItemParent: CouponListItemParent = parents[p0]
 

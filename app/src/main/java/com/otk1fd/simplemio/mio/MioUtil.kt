@@ -176,4 +176,13 @@ object MioUtil {
         val adapter = Moshi.Builder().build().adapter(ApplyCouponStatusResultJson::class.java)
         return adapter.fromJson(json.toString())
     }
+
+    fun getJapanesePlanName(plan: String): String {
+        if (plan == "Family Share") return "ファミリーシェアプラン"
+        if (plan == "Minimum Start") return "ミニマムスタートプラン"
+        if (plan == "Light Start") return "ライトスタートプラン"
+        if (plan == "Eco Minimum") return "エコプランミニマム"
+        if (plan == "Eco Standard") return "エコプランスタンダード"
+        return ""
+    }
 }

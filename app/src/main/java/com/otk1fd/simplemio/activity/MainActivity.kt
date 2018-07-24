@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        val toolbar: Toolbar = findViewById(R.id.historyToolbar)
         setSupportActionBar(toolbar)
         toolbar.title = getString(R.string.menu_coupon)
 
@@ -109,7 +109,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         fragmentTransaction.replace(R.id.fragment, fragment)
         fragmentTransaction.commit()
 
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        val toolbar: Toolbar = findViewById(R.id.historyToolbar)
         toolbar.title = fragmentName
 
         navigationView.isEnabled = true
