@@ -6,6 +6,7 @@ import android.support.v7.widget.Toolbar
 import android.webkit.WebView
 import com.otk1fd.simplemio.R
 
+
 class OpenSourceActivity : AppCompatActivity() {
 
     private lateinit var openSourceWebView: WebView
@@ -16,12 +17,22 @@ class OpenSourceActivity : AppCompatActivity() {
         setContentView(R.layout.activity_open_source)
 
         val toolbar: Toolbar = findViewById(R.id.openSourceToolbar)
-        toolbar.title = "オープンソースライセンス"
+
+        setSupportActionBar(toolbar)
+
+        supportActionBar?.title = "オープンソースライセンス"
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_close)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         openSourceWebView = findViewById(R.id.openSourceWebView)
         openSourceWebView.settings.useWideViewPort = true
         openSourceWebView.settings.loadWithOverviewMode = true
         openSourceWebView.settings.builtInZoomControls = true
         openSourceWebView.loadUrl("file:///android_asset/openSourse.html")
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return false
     }
 }
