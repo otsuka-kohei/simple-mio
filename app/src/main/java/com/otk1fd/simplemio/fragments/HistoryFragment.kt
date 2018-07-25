@@ -15,7 +15,7 @@ import com.otk1fd.simplemio.mio.MioUtil
 import com.otk1fd.simplemio.ui.HistoryExpandableListAdapter
 import com.otk1fd.simplemio.ui.listview_item.HistoryListItemChild
 import com.otk1fd.simplemio.ui.listview_item.HistoryListItemParent
-import kotlinx.android.synthetic.main.content_history.*
+import kotlinx.android.synthetic.main.fragment_history.*
 
 
 /**
@@ -57,16 +57,19 @@ class HistoryFragment : Fragment() {
 
             false
         }
-        
+
         historySwipeRefreshLayout.setOnRefreshListener {
-            setCouponInfoToListView()
+            Log.d("History", "refresh")
+            setServiceListToListView()
         }
 
         historySwipeRefreshLayout.isRefreshing = true
     }
 
-    private fun setCouponInfoToListView() {
+    private fun setServiceListToListView() {
+        Log.d("History", "start setting")
         MioUtil.updateCoupon(activity, execFunc = { it ->
+            Log.d("History", "start mioUtil")
 
             val couponInfoJson: CouponInfoJson? = MioUtil.parseJsonToCoupon(it)
 
