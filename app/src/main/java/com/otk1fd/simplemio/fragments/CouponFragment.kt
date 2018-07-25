@@ -1,7 +1,6 @@
 package com.otk1fd.simplemio.fragments
 
 import android.app.Fragment
-import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -20,6 +19,7 @@ import com.otk1fd.simplemio.mio.MioUtil
 import com.otk1fd.simplemio.ui.CouponExpandableListAdapter
 import com.otk1fd.simplemio.ui.listview_item.CouponListItemChild
 import com.otk1fd.simplemio.ui.listview_item.CouponListItemParent
+import kotlinx.android.synthetic.main.fragment_coupon.*
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -31,20 +31,13 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
     //フラグメント上で発生するイベント（OnClickListenerとか）は極力フラグメントの中で済ませた方がいいと思う
 
-    private lateinit var updateButton: Button
     private lateinit var applyButton: Button
     private lateinit var couponListView: ExpandableListView
-    private lateinit var progressDialog: ProgressDialog
 
     private val couponStatus = HashMap<String, Boolean>()
     private var oldCouponStatus = couponStatus.clone()
 
     lateinit var startOAuthWithDialog: () -> Unit
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -55,21 +48,22 @@ class CouponFragment : Fragment(), View.OnClickListener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        updateButton = activity.findViewById(R.id.updateButton)
-        updateButton.setOnClickListener(this)
-
         applyButton = activity.findViewById(R.id.applyButton)
         applyButton.setOnClickListener(this)
         applyButton.isEnabled = false
 
         couponListView = activity.findViewById(R.id.couponListView)
         // ExpandableListView が展開されたときに自動スクロールするようにする
-        couponListView.setOnGroupClickListener() { parent, v, groupPosition, id ->
+        couponListView.setOnGroupClickListener { parent, v, groupPosition, id ->
             couponListView.smoothScrollToPosition(groupPosition)
             false
         }
 
-        progressDialog = ProgressDialog(activity)
+        couponSwipeRefreshLayout.setOnRefreshListener {
+            setCouponInfoToListView()
+        }
+
+        couponSwipeRefreshLayout.isRefreshing = true
     }
 
     override fun onResume() {
@@ -79,10 +73,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
     }
 
     override fun onClick(v: View?) {
-        if (v == updateButton) {
-            setCouponInfoToListView()
-        } else if (v == applyButton) {
-            startProgressDialog()
+        if (v == applyButton) {
             MioUtil.applyCouponStatus(activity, couponStatus, execFunc = { it ->
                 val applyCouponStatusResultJson: ApplyCouponStatusResultJson? = MioUtil.parseJsonToApplyCouponResponse(it)
                 if (applyCouponStatusResultJson?.returnCode == "OK") {
@@ -99,13 +90,11 @@ class CouponFragment : Fragment(), View.OnClickListener {
                     Util.showAlertDialog(activity, "エラー", "予期しないエラーが発生しました。",
                             "了解")
                 }
-                stopProgressDialog()
             })
         }
     }
 
-    private fun setCouponInfoToListView(): Unit {
-        startProgressDialog()
+    private fun setCouponInfoToListView() {
         MioUtil.updateCoupon(activity, execFunc = { it ->
 
             // ExpandableListView のそれぞれの Group 要素の展開状況を控えておく
@@ -165,9 +154,9 @@ class CouponFragment : Fragment(), View.OnClickListener {
             oldCouponStatus = couponStatus.clone()
             updateApplyButtonIsEnable()
 
-            stopProgressDialog()
+            couponSwipeRefreshLayout.isRefreshing = false
         }, errorFunc = {
-            stopProgressDialog()
+            couponSwipeRefreshLayout.isRefreshing = false
         })
     }
 
@@ -177,19 +166,6 @@ class CouponFragment : Fragment(), View.OnClickListener {
         Log.d("coupon status", couponStatus.toString())
         Log.d("coupon diff", couponStatus.equals(oldCouponStatus).toString())
         applyButton.isEnabled = !couponStatus.equals(oldCouponStatus)
-    }
-
-    private fun startProgressDialog(): Unit {
-        Log.d("progress", "start")
-        progressDialog.setTitle("読み込み中");
-        progressDialog.setMessage("少々お待ちください")
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER)
-        progressDialog.show()
-    }
-
-    private fun stopProgressDialog(): Unit {
-        Log.d("progress", "stop")
-        progressDialog.dismiss()
     }
 
     private fun getVolume(couponInfo: CouponInfo): String {

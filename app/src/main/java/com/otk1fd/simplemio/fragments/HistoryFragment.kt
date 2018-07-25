@@ -1,7 +1,6 @@
 package com.otk1fd.simplemio.fragments
 
 import android.app.Fragment
-import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -16,6 +15,7 @@ import com.otk1fd.simplemio.mio.MioUtil
 import com.otk1fd.simplemio.ui.HistoryExpandableListAdapter
 import com.otk1fd.simplemio.ui.listview_item.HistoryListItemChild
 import com.otk1fd.simplemio.ui.listview_item.HistoryListItemParent
+import kotlinx.android.synthetic.main.content_history.*
 
 
 /**
@@ -26,7 +26,6 @@ class HistoryFragment : Fragment() {
     //フラグメント上で発生するイベント（OnClickListenerとか）は極力フラグメントの中で済ませた方がいいと思う
 
     private lateinit var historyListView: ExpandableListView
-    private lateinit var progressDialog: ProgressDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -39,11 +38,11 @@ class HistoryFragment : Fragment() {
 
         historyListView = activity.findViewById(R.id.historyListView)
         // ExpandableListView が展開されたときに自動スクロールするようにする
-        historyListView.setOnGroupClickListener() { parent, v, groupPosition, id ->
+        historyListView.setOnGroupClickListener { parent, v, groupPosition, id ->
             historyListView.smoothScrollToPosition(groupPosition)
             false
         }
-        historyListView.setOnChildClickListener() { parent, v, groupPosition, childPosition, id ->
+        historyListView.setOnChildClickListener { parent, v, groupPosition, childPosition, id ->
             val adapter = parent.expandableListAdapter
             val parent = adapter.getGroup(groupPosition) as HistoryListItemParent
             val child = adapter.getChild(groupPosition, childPosition) as HistoryListItemChild
@@ -58,14 +57,15 @@ class HistoryFragment : Fragment() {
 
             false
         }
+        
+        historySwipeRefreshLayout.setOnRefreshListener {
+            setCouponInfoToListView()
+        }
 
-        progressDialog = ProgressDialog(activity)
-
-        setCouponInfoToListView()
+        historySwipeRefreshLayout.isRefreshing = true
     }
 
-    private fun setCouponInfoToListView(): Unit {
-        startProgressDialog()
+    private fun setCouponInfoToListView() {
         MioUtil.updateCoupon(activity, execFunc = { it ->
 
             val couponInfoJson: CouponInfoJson? = MioUtil.parseJsonToCoupon(it)
@@ -103,23 +103,9 @@ class HistoryFragment : Fragment() {
 
             historyListView.setAdapter(historyExpandableListAdapter)
 
-            stopProgressDialog()
+            historySwipeRefreshLayout.isRefreshing = false
         }, errorFunc = {
-            stopProgressDialog()
+            historySwipeRefreshLayout.isRefreshing = false
         })
-    }
-
-
-    private fun startProgressDialog(): Unit {
-        Log.d("progress", "start")
-        progressDialog.setTitle("読み込み中")
-        progressDialog.setMessage("少々お待ちください")
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER)
-        progressDialog.show()
-    }
-
-    private fun stopProgressDialog(): Unit {
-        Log.d("progress", "stop")
-        progressDialog.dismiss()
     }
 }
