@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.github.mikephil.charting.utils.ViewPortHandler
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.mio.MioUtil
@@ -17,7 +20,6 @@ class HistoryActivity : AppCompatActivity() {
 
     private lateinit var lineChart: LineChart
     private lateinit var progressDialog: ProgressDialog
-    private var dateList = ArrayList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,14 +45,18 @@ class HistoryActivity : AppCompatActivity() {
     }
 
     private fun initLineChart() {
-        val xAxis = lineChart.xAxis
-        xAxis.setValueFormatter() { original: String, index: Int, viewPortHandler: ViewPortHandler -> dateList[index] }
+
     }
-    
+
 
     private fun setDataToLineChart(hddServiceCode: String, serviceCode: String) {
+        val dateList = ArrayList<String>()
+
+        val xAxis = lineChart.xAxis
+        xAxis.setValueFormatter() { original: String, index: Int, viewPortHandler: ViewPortHandler -> dateList[index] }
+
         startProgressDialog()
-        MioUtil.updateCoupon(this, execFunc = { it ->
+        MioUtil.updatePacket(this, execFunc = { it ->
             val packetLogInfoJson: PacketLogInfoJson? = MioUtil.parseJsonToHistory(it)
 
             val packetLogInfoList = packetLogInfoJson?.packetLogInfo.orEmpty()
@@ -67,11 +73,22 @@ class HistoryActivity : AppCompatActivity() {
             }
 
             val entries = ArrayList<Entry>()
+            dateList.clear()
 
             for ((index, log) in packetLog.withIndex()) {
-                entries.add(Entry(index.toFloat(), log.withCoupon))
+                entries.add(Entry(log.withCoupon.toFloat(), index))
+                dateList.add(log.date)
             }
 
+            val dataSet = LineDataSet(entries, "coupon use")
+            dataSet.color = R.color.colorPrimary
+
+            val dataSets = ArrayList<ILineDataSet>()
+            dataSets.add(dataSet)
+
+            val lineData = LineData(dateList, dataSets)
+            lineChart.data = lineData
+            lineChart.invalidate()
 
 
             stopProgressDialog()
