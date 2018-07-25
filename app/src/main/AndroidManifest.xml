@@ -35,12 +35,12 @@
         </activity>
         <activity
             android:name=".activity.OpenSourceActivity"
-            android:screenOrientation="portrait"
+            android:label="@string/title_activity_open_source"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.HistoryActivity"
             android:label="@string/title_activity_history"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
