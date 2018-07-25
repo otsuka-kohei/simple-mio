@@ -1,6 +1,7 @@
 package com.otk1fd.simplemio
 
 import android.app.Activity
+import android.content.Context
 import android.content.res.Resources
 import android.content.res.XmlResourceParser
 import android.support.v7.app.AlertDialog
@@ -30,6 +31,13 @@ class Util {
             alertDialog.show()
         }
 
+        fun saveToken(activity: Activity, token: String) {
+            val preference = activity.applicationContext.getSharedPreferences(activity.applicationContext.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
+            val editor = preference.edit()
+            editor.putString(activity.applicationContext.getString(R.string.preference_key_token), token)
+            editor.apply()
+        }
+
         /*
         /app/src/main/res/xml/developper_id.xml にデベロッパIDを設定します．
 
@@ -40,7 +48,7 @@ class Util {
         </resources>
          */
         fun getDeveloperId(activity: Activity): String {
-            val resources: Resources = activity.resources
+            val resources: Resources = activity.applicationContext.resources
             val xmlResourceParser: XmlResourceParser = resources.getXml(R.xml.developper_id)
 
             var eventType = xmlResourceParser.eventType

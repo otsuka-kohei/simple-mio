@@ -5,21 +5,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
-import android.widget.Switch
 import android.widget.TextView
 import com.otk1fd.simplemio.R
-import com.otk1fd.simplemio.ui.listview_item.CouponListItemChild
-import com.otk1fd.simplemio.ui.listview_item.CouponListItemParent
+import com.otk1fd.simplemio.ui.listview_item.HistoryListItemChild
+import com.otk1fd.simplemio.ui.listview_item.HistoryListItemParent
 
 
-class CouponExpandableListAdapter(val context: Context, val parents: List<CouponListItemParent>, val children: List<List<CouponListItemChild>>, val setCouponStatus: (serviceCode: String, status: Boolean) -> Unit, val getCouponStatus: (serviceCode: String) -> Boolean) : BaseExpandableListAdapter() {
+class HistoryExpandableListAdapter(val context: Context, val parents: List<HistoryListItemParent>, val children: List<List<HistoryListItemChild>>) : BaseExpandableListAdapter() {
 
     private fun getBasicChildView(): View {
-        return LayoutInflater.from(context).inflate(R.layout.item_child_coupon, null)
+        return LayoutInflater.from(context).inflate(R.layout.item_child_history, null)
     }
 
     private fun getBasicParentView(): View {
-        return LayoutInflater.from(context).inflate(R.layout.item_parent_coupon, null)
+        return LayoutInflater.from(context).inflate(R.layout.item_parent_history, null)
     }
 
     override fun isChildSelectable(p0: Int, p1: Int): Boolean {
@@ -33,15 +32,13 @@ class CouponExpandableListAdapter(val context: Context, val parents: List<Coupon
     override fun getGroupView(p0: Int, p1: Boolean, p2: View?, p3: ViewGroup?): View {
         val parentView: View = getBasicParentView()
 
-        val volumeTextView: TextView = parentView.findViewById(R.id.couponVolumeTextView)
         val hddServiceCodeTextView: TextView = parentView.findViewById(R.id.historyHddServiceCodeTextView)
         val planTextView: TextView = parentView.findViewById(R.id.historyPlanTextView)
 
-        val couponListItemParent: CouponListItemParent = parents[p0]
+        val historyListItemParent: HistoryListItemParent = parents[p0]
 
-        hddServiceCodeTextView.text = couponListItemParent.hddServiceCode
-        planTextView.text = couponListItemParent.plan
-        volumeTextView.text = couponListItemParent.volume
+        hddServiceCodeTextView.text = historyListItemParent.hddServiceCode
+        planTextView.text = historyListItemParent.plan
 
         return parentView
     }
@@ -64,19 +61,13 @@ class CouponExpandableListAdapter(val context: Context, val parents: List<Coupon
         val phoneNumberTextView: TextView = childView.findViewById(R.id.couponPhoneNumberTextView)
         val serviceCodeTextView: TextView = childView.findViewById(R.id.couponServiceCodeTextView)
         val typeTextView: TextView = childView.findViewById(R.id.couponTypeTextView)
-        val couponSwitch: Switch = childView.findViewById(R.id.couponSwitch)
 
-        val couponListItemChild: CouponListItemChild = children[p0][p1]
-
-        couponSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
-            setCouponStatus(couponListItemChild.serviceCode, isChecked)
-        }
+        val historyListItemChild: HistoryListItemChild = children[p0][p1]
 
 
-        phoneNumberTextView.text = couponListItemChild.phoneNumber
-        serviceCodeTextView.text = couponListItemChild.serviceCode
-        typeTextView.text = couponListItemChild.type
-        couponSwitch.isChecked = getCouponStatus(couponListItemChild.serviceCode)
+        phoneNumberTextView.text = historyListItemChild.phoneNumber
+        serviceCodeTextView.text = historyListItemChild.serviceCode
+        typeTextView.text = historyListItemChild.type
 
         return childView
     }

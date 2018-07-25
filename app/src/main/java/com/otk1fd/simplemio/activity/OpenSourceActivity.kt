@@ -2,9 +2,9 @@ package com.otk1fd.simplemio.activity
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.webkit.WebView
 import com.otk1fd.simplemio.R
+import kotlinx.android.synthetic.main.activity_open_source.*
 
 
 class OpenSourceActivity : AppCompatActivity() {
@@ -14,11 +14,7 @@ class OpenSourceActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_open_source)
-
-        val toolbar: Toolbar = findViewById(R.id.openSourceToolbar)
-
-        setSupportActionBar(toolbar)
+        setSupportActionBar(openSourceToolbar)
 
         supportActionBar?.title = "オープンソースライセンス"
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_close)

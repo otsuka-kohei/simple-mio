@@ -26,13 +26,6 @@ object MioUtil {
         this.loginFunc = loginFunc
     }
 
-    fun saveToken(activity: Activity, token: String) {
-        val preference = activity.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
-        val editor = preference.edit()
-        editor.putString(activity.getString(R.string.preference_key_token), token)
-        editor.apply()
-    }
-
     fun loadToken(activity: Activity): String {
         val preference = activity.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
         return preference.getString(activity.getString(R.string.preference_key_token), "")
@@ -172,8 +165,22 @@ object MioUtil {
         return adapter.fromJson(json.toString())
     }
 
+    fun parseJsonToHistory(json: JSONObject): PacketLogInfoJson? {
+        val adapter = Moshi.Builder().build().adapter(PacketLogInfoJson::class.java)
+        return adapter.fromJson(json.toString())
+    }
+
     fun parseJsonToApplyCouponResponse(json: JSONObject): ApplyCouponStatusResultJson? {
         val adapter = Moshi.Builder().build().adapter(ApplyCouponStatusResultJson::class.java)
         return adapter.fromJson(json.toString())
+    }
+
+    fun getJapanesePlanName(plan: String): String {
+        if (plan == "Family Share") return "ファミリーシェアプラン"
+        if (plan == "Minimum Start") return "ミニマムスタートプラン"
+        if (plan == "Light Start") return "ライトスタートプラン"
+        if (plan == "Eco Minimum") return "エコプランミニマム"
+        if (plan == "Eco Standard") return "エコプランスタンダード"
+        return ""
     }
 }

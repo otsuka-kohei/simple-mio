@@ -7,17 +7,24 @@
         <item
             android:id="@+id/nav_coupon"
             android:checkable="true"
-            android:title="クーポン" />
-    </group>
-    <group android:checkableBehavior="single">
+            android:title="@string/menu_coupon" />
         <item
-            android:id="@+id/nav_config"
+            android:id="@+id/nav_history"
             android:checkable="true"
-            android:title="設定" />
-        <item
-            android:id="@+id/nav_about"
-            android:checkable="true"
-            android:title="このアプリについて" />
+            android:title="@string/menu_history" />
     </group>
+
+    <item android:title="その他">
+        <menu android:checkableBehavior="single">
+            <item
+                android:id="@+id/nav_config"
+                android:checkable="true"
+                android:title="@string/menu_config" />
+            <item
+                android:id="@+id/nav_about"
+                android:checkable="true"
+                android:title="@string/menu_about" />
+        </menu>
+    </item>
 
 </menu>

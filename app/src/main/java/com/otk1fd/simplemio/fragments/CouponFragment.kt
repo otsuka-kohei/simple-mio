@@ -218,8 +218,8 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
             for (coupon in couponList) {
                 val expire: String = coupon.expire ?: "197001"
-                val expireYear: Int = expire.subSequence(0, 4).toString().toInt()
-                val expireMonth: Int = expire.subSequence(4, 6).toString().toInt()
+                val expireYear: Int = expire.substring(0, 4).toInt()
+                val expireMonth: Int = expire.substring(4, 6).toInt()
 
                 if (expireYear < nowYear && expireMonth < nowMonth) {
                     break

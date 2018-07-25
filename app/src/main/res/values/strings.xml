@@ -14,10 +14,19 @@
     <string name="drawer_open">ドロワーを開く</string>
     <string name="drawer_close">ドロワーを閉じる</string>
 
+    <string name="menu_coupon">クーポン"</string>
+    <string name="menu_history">使用履歴</string>
+    <string name="menu_config">設定</string>
+    <string name="menu_about">このアプリについて</string>
+
+
     <string name="about">
         simple mio IIJ mio クーポンマネージャ\n
         &#169; 2018 otk1fd\n
         https://github.com/otsuka-kohei/simple-mio
     </string>
+
+    <string name="title_activity_open_source">OpenSourceActivity</string>
+    <string name="title_activity_history">HistoryActivity</string>
 
 </resources>
