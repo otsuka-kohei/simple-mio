@@ -3,10 +3,10 @@ package com.otk1fd.simplemio.fragments
 import android.app.Fragment
 import android.content.Context
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ExpandableListView
 import android.widget.Toast
 import com.otk1fd.simplemio.R
@@ -30,7 +30,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
     //フラグメント上で発生するイベント（OnClickListenerとか）は極力フラグメントの中で済ませた方がいいと思う
 
-    private lateinit var applyButton: Button
+    private lateinit var applyButton: FloatingActionButton
     private lateinit var couponListView: ExpandableListView
 
     private val couponStatus = HashMap<String, Boolean>()
@@ -49,7 +49,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
         applyButton = activity.findViewById(R.id.applyButton)
         applyButton.setOnClickListener(this)
-        applyButton.isEnabled = false
+        applyButton.hide()
 
         couponListView = activity.findViewById(R.id.couponListView)
         // ExpandableListView が展開されたときに自動スクロールするようにする
@@ -159,7 +159,11 @@ class CouponFragment : Fragment(), View.OnClickListener {
     }
 
     private fun updateApplyButtonIsEnable() {
-        applyButton.isEnabled = couponStatus != oldCouponStatus
+        if (couponStatus != oldCouponStatus) {
+            applyButton.show()
+        } else {
+            applyButton.hide()
+        }
     }
 
     private fun getVolume(couponInfo: CouponInfo): String {
@@ -205,8 +209,6 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
             return volume.toString() + "MB"
         }
-
-        return "1GB"
     }
 
     private fun getJapanesePlanName(plan: String): String {
