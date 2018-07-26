@@ -128,14 +128,14 @@ class HistoryActivity : AppCompatActivity() {
         return dataSet
     }
 
-    private fun startProgressDialog(): Unit {
+    private fun startProgressDialog() {
         progressDialog.setTitle("読み込み中")
         progressDialog.setMessage("少々お待ちください")
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER)
         progressDialog.show()
     }
 
-    private fun stopProgressDialog(): Unit {
+    private fun stopProgressDialog() {
         progressDialog.dismiss()
     }
 

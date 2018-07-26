@@ -1,12 +1,13 @@
 package com.otk1fd.simplemio.fragments
 
 import android.app.Fragment
+import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ExpandableListView
 import android.widget.Toast
 import com.otk1fd.simplemio.R
@@ -30,8 +31,9 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
     //フラグメント上で発生するイベント（OnClickListenerとか）は極力フラグメントの中で済ませた方がいいと思う
 
-    private lateinit var applyButton: Button
+    private lateinit var applyButton: FloatingActionButton
     private lateinit var couponListView: ExpandableListView
+    private lateinit var progressDialog: ProgressDialog
 
     private val couponStatus = HashMap<String, Boolean>()
     private var oldCouponStatus = couponStatus.clone()
@@ -49,7 +51,9 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
         applyButton = activity.findViewById(R.id.applyButton)
         applyButton.setOnClickListener(this)
-        applyButton.isEnabled = false
+        applyButton.hide()
+
+        progressDialog = ProgressDialog(activity)
 
         couponListView = activity.findViewById(R.id.couponListView)
         // ExpandableListView が展開されたときに自動スクロールするようにする
@@ -72,11 +76,13 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         if (v == applyButton) {
+            startProgressDialog()
             MioUtil.applyCouponStatus(activity, couponStatus, execFunc = { it ->
                 val applyCouponStatusResultJson: ApplyCouponStatusResultJson? = MioUtil.parseJsonToApplyCouponResponse(it)
                 if (applyCouponStatusResultJson?.returnCode == "OK") {
                     setCouponInfoToListView()
                 }
+                stopProgressDialog()
             }, errorFunc = {
                 val errorCode = it.networkResponse.statusCode
 
@@ -88,6 +94,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
                     Util.showAlertDialog(activity, "エラー", "予期しないエラーが発生しました。",
                             "了解")
                 }
+                stopProgressDialog()
             })
         }
     }
@@ -132,7 +139,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
             val couponExpandableListAdapter = CouponExpandableListAdapter(activity, parents, childrenList, setCouponStatus = { serviceCode, status ->
                 couponStatus[serviceCode] = status
-                updateApplyButtonIsEnable()
+                updateApplyButtonShow()
             },
                     getCouponStatus = { serviceCode -> couponStatus.getOrDefault(serviceCode, false) })
 
@@ -150,7 +157,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
             }
 
             oldCouponStatus = couponStatus.clone()
-            updateApplyButtonIsEnable()
+            updateApplyButtonShow()
 
             couponSwipeRefreshLayout.isRefreshing = false
         }, errorFunc = {
@@ -158,8 +165,12 @@ class CouponFragment : Fragment(), View.OnClickListener {
         })
     }
 
-    private fun updateApplyButtonIsEnable() {
-        applyButton.isEnabled = couponStatus != oldCouponStatus
+    private fun updateApplyButtonShow() {
+        if (couponStatus != oldCouponStatus) {
+            applyButton.show()
+        } else {
+            applyButton.hide()
+        }
     }
 
     private fun getVolume(couponInfo: CouponInfo): String {
@@ -205,8 +216,6 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
             return volume.toString() + "MB"
         }
-
-        return "1GB"
     }
 
     private fun getJapanesePlanName(plan: String): String {
@@ -233,5 +242,16 @@ class CouponFragment : Fragment(), View.OnClickListener {
             }
 
         }
+    }
+
+    private fun startProgressDialog() {
+        progressDialog.setTitle("クーポン設定適用中")
+        progressDialog.setMessage("少々お待ちください")
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER)
+        progressDialog.show()
+    }
+
+    private fun stopProgressDialog() {
+        progressDialog.dismiss()
     }
 }
