@@ -63,13 +63,18 @@ class HistoryFragment : Fragment() {
             setServiceListToListView()
         }
 
-        historySwipeRefreshLayout.isRefreshing = true
+        historySwipeRefreshLayout.post {
+            historySwipeRefreshLayout.isRefreshing = true
+            setServiceListToListView()
+        }
     }
 
     private fun setServiceListToListView() {
-        Log.d("History", "start setting")
         MioUtil.updateCoupon(activity, execFunc = { it ->
-            Log.d("History", "start mioUtil")
+
+            // ExpandableListView のそれぞれの Group 要素の展開状況を控えておく
+            val groupNum: Int? = historyListView.expandableListAdapter?.groupCount
+            val expandStatus: List<Boolean> = if (groupNum != null) (0 until groupNum).map { historyListView.isGroupExpanded(it) } else ArrayList()
 
             val couponInfoJson: CouponInfoJson? = MioUtil.parseJsonToCoupon(it)
 
@@ -105,6 +110,15 @@ class HistoryFragment : Fragment() {
             val historyExpandableListAdapter = HistoryExpandableListAdapter(activity, parents, childrenList)
 
             historyListView.setAdapter(historyExpandableListAdapter)
+
+            // 控えておいた ExpandableListView の展開状況を復元する
+            if (groupNum != null) {
+                for (i in 0 until groupNum) {
+                    if (expandStatus[i]) {
+                        historyListView.expandGroup(i)
+                    }
+                }
+            }
 
             historySwipeRefreshLayout.isRefreshing = false
         }, errorFunc = {

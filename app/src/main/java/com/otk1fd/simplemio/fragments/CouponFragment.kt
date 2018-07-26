@@ -3,7 +3,6 @@ package com.otk1fd.simplemio.fragments
 import android.app.Fragment
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -63,13 +62,12 @@ class CouponFragment : Fragment(), View.OnClickListener {
             setCouponInfoToListView()
         }
 
-        couponSwipeRefreshLayout.isRefreshing = true
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        setCouponInfoToListView()
+        // 自動で更新を開始
+        // なぜ couponSwipeRefreshLayout.isRefreshing = true だけで動かないのかは謎
+        couponSwipeRefreshLayout.post {
+            couponSwipeRefreshLayout.isRefreshing = true
+            setCouponInfoToListView()
+        }
     }
 
     override fun onClick(v: View?) {
@@ -161,11 +159,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
     }
 
     private fun updateApplyButtonIsEnable() {
-        Log.d("coupon status", "hoge")
-        Log.d("old coupon status", oldCouponStatus.toString())
-        Log.d("coupon status", couponStatus.toString())
-        Log.d("coupon diff", couponStatus.equals(oldCouponStatus).toString())
-        applyButton.isEnabled = !couponStatus.equals(oldCouponStatus)
+        applyButton.isEnabled = couponStatus != oldCouponStatus
     }
 
     private fun getVolume(couponInfo: CouponInfo): String {
