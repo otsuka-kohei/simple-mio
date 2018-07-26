@@ -145,6 +145,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     public override fun onResume() {
         super.onResume()
 
+        val notLogined = MioUtil.loadToken(this) == ""
+        if (notLogined) {
+            startOAuthWithDialog()
+        }
+
         val intent = intent
         val action = intent.action
 
@@ -166,7 +171,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 if (state != "success") {
                     Toast.makeText(this, "正しく認証することができませんでした。", Toast.LENGTH_LONG).show()
                 } else {
-                    Util.saveToken(this, token)
+                    MioUtil.saveToken(this, token)
                 }
             }
         }

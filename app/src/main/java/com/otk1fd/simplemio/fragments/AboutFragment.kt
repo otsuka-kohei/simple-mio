@@ -56,7 +56,6 @@ class AboutFragment : Fragment(), View.OnClickListener {
                         Util.showAlertDialog(activity, "ログアウト完了", "IIJmioからログアウトしました．\nアプリを終了します",
                                 "はい",
                                 positiveFunc = {
-                                    MioUtil.deleteToken(activity)
                                     activity.finish()
                                 })
                     })

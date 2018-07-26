@@ -1,7 +1,6 @@
 package com.otk1fd.simplemio
 
 import android.app.Activity
-import android.content.Context
 import android.content.res.Resources
 import android.content.res.XmlResourceParser
 import android.support.v7.app.AlertDialog
@@ -29,13 +28,6 @@ class Util {
             if (neutralButtonText != "") alertDialog.setNeutralButton(neutralButtonText, { dialog, which -> neutralFunc() })
             if (negativeButtonText != "") alertDialog.setNegativeButton(negativeButtonText, { dialog, which -> negativeFunc() })
             alertDialog.show()
-        }
-
-        fun saveToken(activity: Activity, token: String) {
-            val preference = activity.applicationContext.getSharedPreferences(activity.applicationContext.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
-            val editor = preference.edit()
-            editor.putString(activity.applicationContext.getString(R.string.preference_key_token), token)
-            editor.apply()
         }
 
         /*
