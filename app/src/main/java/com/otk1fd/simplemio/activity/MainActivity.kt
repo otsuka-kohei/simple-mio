@@ -62,16 +62,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.fragment, defaultFragment)
         fragmentTransaction.commit()
-
-        // トークンが存在するか，有効かを確認
-        val token = MioUtil.loadToken(this)
-
-        if (token == "") {
-            Log.d("token", "notoken")
-            showAlertDialog(this, "ログイン", "IIJmioでのログインが必要です\nブラウザを開いてログインページに移動してもよろしいですか？",
-                    "はい", negativeButtonText = "いいえ",
-                    positiveFunc = { startOAuth() }, negativeFunc = { this.finish() })
-        }
     }
 
     override fun onBackPressed() {
@@ -145,17 +135,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     public override fun onResume() {
         super.onResume()
 
-        val notLogined = MioUtil.loadToken(this) == ""
-        if (notLogined) {
-            startOAuthWithDialog()
-        }
-
         val intent = intent
         val action = intent.action
 
         if (action == Intent.ACTION_VIEW) {
             val uri: Uri? = intent.data
-            if (uri != null) {
+            if (uri != null && uri.toString().contains("simplemio")) {
 
                 // 受け取るURIが
                 // simplemio://callback#access_token=token&state=success&token_type=Bearer&expires_in=7776000
@@ -173,6 +158,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 } else {
                     MioUtil.saveToken(this, token)
                 }
+
+                couponFragment.restartRefresh()
+            }
+        } else {
+            // トークンが存在しない場合はログインする
+            if (MioUtil.loadToken(this) == "") {
+                Log.d("resume without login", "please login")
+                startOAuthWithDialog()
             }
         }
     }

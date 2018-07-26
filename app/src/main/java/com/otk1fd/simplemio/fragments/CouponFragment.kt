@@ -66,7 +66,6 @@ class CouponFragment : Fragment(), View.OnClickListener {
         }
 
         // 自動で更新を開始
-        // なぜ couponSwipeRefreshLayout.isRefreshing = true だけで動かないのかは謎
         couponSwipeRefreshLayout.post {
             couponSwipeRefreshLayout.isRefreshing = true
             setCouponInfoToListView()
@@ -249,5 +248,13 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
     private fun stopProgressDialog() {
         progressDialog.dismiss()
+    }
+
+    fun restartRefresh() {
+        couponSwipeRefreshLayout.post {
+            couponSwipeRefreshLayout.isRefreshing = false
+            couponSwipeRefreshLayout.isRefreshing = true
+            setCouponInfoToListView()
+        }
     }
 }
