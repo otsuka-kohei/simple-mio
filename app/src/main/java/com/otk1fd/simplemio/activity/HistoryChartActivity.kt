@@ -12,6 +12,7 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.mio.MioUtil
 import com.otk1fd.simplemio.mio.PacketLog
@@ -53,6 +54,12 @@ class HistoryActivity : AppCompatActivity() {
         lineChart.xAxis.valueFormatter = XAxisValueFormatterForDate(dateList)
         lineChart.xAxis.granularity = 7f
 
+        lineChart.axisLeft.valueFormatter = YAxisValueFormatterForUnitMB()
+        lineChart.axisLeft.axisMinimum = 0f
+
+        lineChart.axisRight.valueFormatter = YAxisValueFormatterForUnitMB()
+        lineChart.axisRight.axisMinimum = 0f
+
         val description = Description()
         description.text = ""
         lineChart.description = description
@@ -78,6 +85,7 @@ class HistoryActivity : AppCompatActivity() {
 
             stopProgressDialog()
         }, errorFunc = {
+            HttpErrorHandler.handleHttpError(it)
             stopProgressDialog()
         })
 
@@ -147,11 +155,6 @@ class HistoryActivity : AppCompatActivity() {
 }
 
 private class XAxisValueFormatterForDate(val xValueStrings: List<String>) : IAxisValueFormatter {
-
-    /** this is only needed if numbers are returned, else return 0  */
-    val decimalDigits: Int
-        get() = 0
-
     override fun getFormattedValue(value: Float, axis: AxisBase): String {
         // "value" represents the position of the label on the axis (x or y)
 
@@ -160,5 +163,12 @@ private class XAxisValueFormatterForDate(val xValueStrings: List<String>) : IAxi
         val monthStr = dateStr.substring(4, 6)
         val dayStr = dateStr.substring(6, 8)
         return "$yearStr/$monthStr/$dayStr"
+    }
+}
+
+private class YAxisValueFormatterForUnitMB() : IAxisValueFormatter {
+    override fun getFormattedValue(value: Float, axis: AxisBase): String {
+        // "value" represents the position of the label on the axis (x or y)
+        return "${value.toInt()}MB"
     }
 }
