@@ -90,6 +90,11 @@ class CouponFragment : Fragment(), View.OnClickListener {
     }
 
     private fun setCouponInfoToListView() {
+        val notLogined = MioUtil.loadToken(activity) == ""
+        if (notLogined) {
+            return
+        }
+
         MioUtil.updateCoupon(activity, execFunc = { it ->
 
             // ExpandableListView のそれぞれの Group 要素の展開状況を控えておく
