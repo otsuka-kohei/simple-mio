@@ -132,6 +132,8 @@ class HistoryActivity : AppCompatActivity() {
         dataSet.setDrawValues(false)
         dataSet.lineWidth = 4.0f
         dataSet.circleSize = 4.0f
+        dataSet.highLightColor = color
+        dataSet.highlightLineWidth = 1.0f
 
         return dataSet
     }
