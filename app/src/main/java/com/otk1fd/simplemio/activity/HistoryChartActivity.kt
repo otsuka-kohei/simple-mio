@@ -17,7 +17,7 @@ import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.mio.MioUtil
 import com.otk1fd.simplemio.mio.PacketLog
 import com.otk1fd.simplemio.mio.PacketLogInfoJson
-import kotlinx.android.synthetic.main.activity_history.*
+import kotlinx.android.synthetic.main.activity_history_chart.*
 
 
 class HistoryActivity : AppCompatActivity() {
@@ -32,7 +32,7 @@ class HistoryActivity : AppCompatActivity() {
         val hddServiceCode = intent.getStringExtra("hddServiceCode")
         val serviceCode = intent.getStringExtra("serviceCode")
 
-        setContentView(R.layout.activity_history)
+        setContentView(R.layout.activity_history_chart)
 
         setSupportActionBar(historyToolbar)
 
