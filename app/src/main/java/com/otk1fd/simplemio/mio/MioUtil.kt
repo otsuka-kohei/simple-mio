@@ -19,11 +19,9 @@ import org.json.JSONObject
 object MioUtil {
 
     private lateinit var queue: RequestQueue
-    private lateinit var loginFunc: () -> Unit
 
-    fun setUp(activity: Activity, loginFunc: () -> Unit) {
+    fun setUp(activity: Activity) {
         queue = Volley.newRequestQueue(activity)
-        this.loginFunc = loginFunc
     }
 
     fun loadToken(activity: Activity): String {

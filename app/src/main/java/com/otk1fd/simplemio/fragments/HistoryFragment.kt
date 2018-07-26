@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ExpandableListView
+import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.activity.HistoryActivity
 import com.otk1fd.simplemio.mio.CouponInfoJson
@@ -122,6 +123,7 @@ class HistoryFragment : Fragment() {
 
             historySwipeRefreshLayout.isRefreshing = false
         }, errorFunc = {
+            HttpErrorHandler.handleHttpError(it)
             historySwipeRefreshLayout.isRefreshing = false
         })
     }

@@ -9,9 +9,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ExpandableListView
-import android.widget.Toast
+import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
-import com.otk1fd.simplemio.Util
 import com.otk1fd.simplemio.mio.ApplyCouponStatusResultJson
 import com.otk1fd.simplemio.mio.CouponInfo
 import com.otk1fd.simplemio.mio.CouponInfoJson
@@ -84,16 +83,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
                 }
                 stopProgressDialog()
             }, errorFunc = {
-                val errorCode = it.networkResponse.statusCode
-
-                if (errorCode == 403) {
-                    startOAuthWithDialog()
-                } else if (errorCode == 429) {
-                    Toast.makeText(activity, "1分以上時間を空けてからもう一度お試しください", Toast.LENGTH_LONG).show()
-                } else {
-                    Util.showAlertDialog(activity, "エラー", "予期しないエラーが発生しました。",
-                            "了解")
-                }
+                HttpErrorHandler.handleHttpError(it)
                 stopProgressDialog()
             })
         }
@@ -161,6 +151,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
             couponSwipeRefreshLayout.isRefreshing = false
         }, errorFunc = {
+            HttpErrorHandler.handleHttpError(it)
             couponSwipeRefreshLayout.isRefreshing = false
         })
     }
