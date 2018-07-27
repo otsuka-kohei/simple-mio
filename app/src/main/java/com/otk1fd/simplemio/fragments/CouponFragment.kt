@@ -64,6 +64,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
         couponSwipeRefreshLayout.setOnRefreshListener {
             setCouponInfoByHttp()
         }
+        couponSwipeRefreshLayout.setColorSchemeColors(activity.applicationContext.getColor(R.color.colorPrimary))
 
         // 自動で更新を開始
         couponSwipeRefreshLayout.post {
