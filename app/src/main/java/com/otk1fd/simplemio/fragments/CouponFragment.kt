@@ -62,13 +62,13 @@ class CouponFragment : Fragment(), View.OnClickListener {
         }
 
         couponSwipeRefreshLayout.setOnRefreshListener {
-            setCouponInfoToListView()
+            setCouponInfoByHttp()
         }
 
         // 自動で更新を開始
         couponSwipeRefreshLayout.post {
             couponSwipeRefreshLayout.isRefreshing = true
-            setCouponInfoToListView()
+            setCouponInfoByHttp()
         }
     }
 
@@ -78,7 +78,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
             MioUtil.applyCouponStatus(activity, couponStatus, execFunc = { it ->
                 val applyCouponStatusResultJson: ApplyCouponStatusResultJson? = MioUtil.parseJsonToApplyCouponResponse(it)
                 if (applyCouponStatusResultJson?.returnCode == "OK") {
-                    setCouponInfoToListView()
+                    setCouponInfoByHttp()
                 }
                 stopProgressDialog()
             }, errorFunc = {
@@ -88,7 +88,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    private fun setCouponInfoToListView() {
+    private fun setCouponInfoByHttp() {
         val notLogined = MioUtil.loadToken(activity) == ""
         if (notLogined) {
             return
@@ -96,68 +96,80 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
         MioUtil.updateCoupon(activity, execFunc = { it ->
 
-            // ExpandableListView のそれぞれの Group 要素の展開状況を控えておく
-            val groupNum: Int? = couponListView.expandableListAdapter?.groupCount
-            val expandStatus: List<Boolean> = if (groupNum != null) (0 until groupNum).map { couponListView.isGroupExpanded(it) } else ArrayList()
-
             val couponInfoJson: CouponInfoJson? = MioUtil.parseJsonToCoupon(it)
 
-            // 親要素のリスト
-            val parents = ArrayList<CouponListItemParent>()
-            // 子要素のリスト（親ごとに分類するため，リストのリストになる）
-            val childrenList = ArrayList<List<CouponListItemChild>>()
+            MioUtil.cacheJson(activity, it, activity.applicationContext.getString(R.string.preference_key_cache_coupon))
 
-            val couponInfoList = couponInfoJson?.couponInfo.orEmpty()
-            for (couponInfo in couponInfoList) {
-                val parent = CouponListItemParent(couponInfo.hddServiceCode, getJapanesePlanName(couponInfo.plan), getVolume(couponInfo))
-                parents.add(parent)
-
-                val children = ArrayList<CouponListItemChild>()
-
-                val hdoInfoList = couponInfo.hdoInfo.orEmpty()
-                for (hdoInfo in hdoInfoList) {
-                    val type: String = if (hdoInfo.voice) "音声" else if (hdoInfo.sms) "SMS" else "データ"
-                    val child = CouponListItemChild(hdoInfo.number, hdoInfo.hdoServiceCode, type, hdoInfo.couponUse)
-                    children.add(child)
-                }
-
-                val hduInfoList = couponInfo.hduInfo.orEmpty()
-                for (hduInfo in hduInfoList) {
-                    val type: String = if (hduInfo.voice) "音声" else if (hduInfo.sms) "SMS" else "データ"
-                    val child = CouponListItemChild(hduInfo.number, hduInfo.hduServiceCode, type, hduInfo.couponUse)
-                    children.add(child)
-                }
-
-                childrenList.add(children)
-            }
-
-            val couponExpandableListAdapter = CouponExpandableListAdapter(activity, parents, childrenList, setCouponStatus = { serviceCode, status ->
-                couponStatus[serviceCode] = status
-                updateApplyButtonShow()
-            },
-                    getCouponStatus = { serviceCode -> couponStatus.getOrDefault(serviceCode, false) })
-
-            couponListView.setAdapter(couponExpandableListAdapter)
-
-            couponInfoJson?.let { setCouponStatus(it) }
-
-            // 控えておいた ExpandableListView の展開状況を復元する
-            if (groupNum != null) {
-                for (i in 0 until groupNum) {
-                    if (expandStatus[i]) {
-                        couponListView.expandGroup(i)
-                    }
-                }
-            }
-
-            oldCouponStatus = couponStatus.clone()
-            updateApplyButtonShow()
+            couponInfoJson?.let { setCouponInfo(it) }
 
             couponSwipeRefreshLayout.isRefreshing = false
         }, errorFunc = {
-            HttpErrorHandler.handleHttpError(it)
+            HttpErrorHandler.handleHttpError(it) { setCouponInfoByCache() }
             couponSwipeRefreshLayout.isRefreshing = false
         })
+    }
+
+    private fun setCouponInfoByCache() {
+        val couponInfoJson = MioUtil.parseJsonToCoupon(MioUtil.loadJsonCache(activity, activity.applicationContext.getString(R.string.preference_key_cache_coupon)))
+        couponInfoJson?.let { setCouponInfo(it) }
+    }
+
+    private fun setCouponInfo(couponInfoJson: CouponInfoJson) {
+        // ExpandableListView のそれぞれの Group 要素の展開状況を控えておく
+        val groupNum: Int? = couponListView.expandableListAdapter?.groupCount
+        val expandStatus: List<Boolean> = if (groupNum != null) (0 until groupNum).map { couponListView.isGroupExpanded(it) } else ArrayList()
+
+        // 親要素のリスト
+        val parents = ArrayList<CouponListItemParent>()
+        // 子要素のリスト（親ごとに分類するため，リストのリストになる）
+        val childrenList = ArrayList<List<CouponListItemChild>>()
+
+        val couponInfoList = couponInfoJson.couponInfo
+        for (couponInfo in couponInfoList) {
+            val parent = CouponListItemParent(couponInfo.hddServiceCode, getJapanesePlanName(couponInfo.plan), getVolume(couponInfo))
+            parents.add(parent)
+
+            val children = ArrayList<CouponListItemChild>()
+
+            val hdoInfoList = couponInfo.hdoInfo.orEmpty()
+            for (hdoInfo in hdoInfoList) {
+                val type: String = if (hdoInfo.voice) "音声" else if (hdoInfo.sms) "SMS" else "データ"
+                val child = CouponListItemChild(hdoInfo.number, hdoInfo.hdoServiceCode, type, hdoInfo.couponUse)
+                children.add(child)
+            }
+
+            val hduInfoList = couponInfo.hduInfo.orEmpty()
+            for (hduInfo in hduInfoList) {
+                val type: String = if (hduInfo.voice) "音声" else if (hduInfo.sms) "SMS" else "データ"
+                val child = CouponListItemChild(hduInfo.number, hduInfo.hduServiceCode, type, hduInfo.couponUse)
+                children.add(child)
+            }
+
+            childrenList.add(children)
+        }
+
+        val couponExpandableListAdapter = CouponExpandableListAdapter(activity, parents, childrenList, setCouponStatus = { serviceCode, status ->
+            couponStatus[serviceCode] = status
+            updateApplyButtonShow()
+        },
+                getCouponStatus = { serviceCode -> couponStatus.getOrDefault(serviceCode, false) })
+
+        couponListView.setAdapter(couponExpandableListAdapter)
+
+        couponInfoJson.let { setCouponStatus(it) }
+
+        // 控えておいた ExpandableListView の展開状況を復元する
+        if (groupNum != null) {
+            for (i in 0 until groupNum) {
+                if (expandStatus[i]) {
+                    couponListView.expandGroup(i)
+                }
+            }
+        }
+
+        oldCouponStatus = couponStatus.clone()
+        updateApplyButtonShow()
+
     }
 
     private fun updateApplyButtonShow() {
@@ -254,7 +266,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
         couponSwipeRefreshLayout.post {
             couponSwipeRefreshLayout.isRefreshing = false
             couponSwipeRefreshLayout.isRefreshing = true
-            setCouponInfoToListView()
+            setCouponInfoByHttp()
         }
     }
 }

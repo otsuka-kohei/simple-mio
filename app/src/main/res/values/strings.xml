@@ -11,6 +11,9 @@
     <string name="preference_key_token">token</string>
     <string name="preference_key_useMBOnly">useMBOnly</string>
 
+    <string name="preference_key_cache_coupon">couponCache</string>
+    <string name="preference_key_cache_history">historyCache</string>
+
     <string name="drawer_open">ドロワーを開く</string>
     <string name="drawer_close">ドロワーを閉じる</string>
 
