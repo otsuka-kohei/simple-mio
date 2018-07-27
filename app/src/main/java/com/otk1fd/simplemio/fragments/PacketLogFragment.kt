@@ -20,7 +20,7 @@ import com.otk1fd.simplemio.ui.listview_item.HistoryListItemParent
 /**
  * Created by otk1fd on 2018/02/24.
  */
-class HistoryFragment : Fragment() {
+class PacketLogFragment : Fragment() {
 
     //フラグメント上で発生するイベント（OnClickListenerとか）は極力フラグメントの中で済ませた方がいいと思う
 
@@ -56,6 +56,12 @@ class HistoryFragment : Fragment() {
 
             false
         }
+
+        setServiceListByCache()
+    }
+
+    override fun onStart() {
+        super.onStart()
 
         setServiceListByCache()
     }

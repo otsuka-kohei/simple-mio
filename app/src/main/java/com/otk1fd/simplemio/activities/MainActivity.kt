@@ -20,7 +20,7 @@ import com.otk1fd.simplemio.Util.Companion.showAlertDialog
 import com.otk1fd.simplemio.fragments.AboutFragment
 import com.otk1fd.simplemio.fragments.ConfigFragment
 import com.otk1fd.simplemio.fragments.CouponFragment
-import com.otk1fd.simplemio.fragments.HistoryFragment
+import com.otk1fd.simplemio.fragments.PacketLogFragment
 import com.otk1fd.simplemio.mio.MioUtil
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -28,7 +28,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private val couponFragment: CouponFragment = CouponFragment()
-    private val historyFragment: HistoryFragment = HistoryFragment()
+    private val packetLogFragment: PacketLogFragment = PacketLogFragment()
     private val configFragment: ConfigFragment = ConfigFragment()
     private val aboutFragment: AboutFragment = AboutFragment()
 
@@ -125,7 +125,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 fragmentName = getString(R.string.menu_coupon)
             }
             R.id.nav_history -> {
-                fragment = historyFragment
+                fragment = packetLogFragment
                 fragmentName = getString(R.string.menu_history)
             }
             R.id.nav_config -> {
