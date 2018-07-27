@@ -1,4 +1,4 @@
-package com.otk1fd.simplemio.activity
+package com.otk1fd.simplemio.activities
 
 import android.app.ProgressDialog
 import android.os.Bundle

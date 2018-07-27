@@ -265,7 +265,6 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
     fun restartRefresh() {
         couponSwipeRefreshLayout.post {
-            couponSwipeRefreshLayout.isRefreshing = false
             couponSwipeRefreshLayout.isRefreshing = true
             setCouponInfoByHttp()
         }

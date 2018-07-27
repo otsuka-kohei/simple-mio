@@ -1,4 +1,4 @@
-package com.otk1fd.simplemio.activity
+package com.otk1fd.simplemio.activities
 
 import android.app.Fragment
 import android.content.Intent
@@ -44,7 +44,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val toolbar: Toolbar = findViewById(R.id.packetLogToolbar)
         setSupportActionBar(toolbar)
-        toolbar.title = getString(R.string.menu_coupon)
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val actionBarDrawerToggle = ActionBarDrawerToggle(
@@ -57,6 +56,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navigationView.menu.getItem(0).isChecked = true
 
         couponFragment.startOAuthWithDialog = { startOAuthWithDialog() }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        supportActionBar?.title = getString(R.string.menu_coupon)
 
         val defaultFragment = couponFragment
         val fragmentTransaction = fragmentManager.beginTransaction()
