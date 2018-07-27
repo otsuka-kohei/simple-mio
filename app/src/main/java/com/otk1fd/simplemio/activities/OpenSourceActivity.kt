@@ -26,6 +26,11 @@ class OpenSourceActivity : AppCompatActivity() {
         openSourceWebView.settings.useWideViewPort = true
         openSourceWebView.settings.loadWithOverviewMode = true
         openSourceWebView.settings.builtInZoomControls = true
+    }
+
+    override fun onStart() {
+        super.onStart()
+        
         openSourceWebView.loadUrl("file:///android_asset/openSourse.html")
     }
 
