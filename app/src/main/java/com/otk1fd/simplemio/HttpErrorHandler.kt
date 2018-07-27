@@ -27,7 +27,7 @@ object HttpErrorHandler {
         when (errorCode) {
             429 -> {
                 if (getError) {
-                    showErrorMessageFunc("アクセス数制限のため、最新のデータを取得できませんでした。\n少しお待ちの上，再度お試しください。")
+                    showErrorMessageFunc("アクセス数制限のため、最新のデータを取得できませんでした。\n少しお待ちの上、再度お試しください。")
                     recoveryFunc()
                 } else {
                     showErrorMessageFunc("クーポン切り替えは、1分以上時間を空けてから再度お試しください。")
