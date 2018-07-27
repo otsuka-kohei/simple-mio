@@ -17,10 +17,10 @@ import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.mio.MioUtil
 import com.otk1fd.simplemio.mio.PacketLog
 import com.otk1fd.simplemio.mio.PacketLogInfoJson
-import kotlinx.android.synthetic.main.activity_history_chart.*
+import kotlinx.android.synthetic.main.activity_packet_log_chart.*
 
 
-class HistoryActivity : AppCompatActivity() {
+class PacketLogActivity : AppCompatActivity() {
 
     private lateinit var lineChart: LineChart
     private lateinit var progressDialog: ProgressDialog
@@ -32,9 +32,9 @@ class HistoryActivity : AppCompatActivity() {
         val hddServiceCode = intent.getStringExtra("hddServiceCode")
         val serviceCode = intent.getStringExtra("serviceCode")
 
-        setContentView(R.layout.activity_history_chart)
+        setContentView(R.layout.activity_packet_log_chart)
 
-        setSupportActionBar(historyToolbar)
+        setSupportActionBar(packetLogToolbar)
 
         supportActionBar?.title = serviceCode + "の使用履歴"
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_close)
@@ -46,7 +46,7 @@ class HistoryActivity : AppCompatActivity() {
 
         initLineChart()
 
-        setDataToLineChart(hddServiceCode, serviceCode)
+        setDataToLineChartByHttp(hddServiceCode, serviceCode)
     }
 
     private fun initLineChart() {
@@ -67,28 +67,39 @@ class HistoryActivity : AppCompatActivity() {
     }
 
 
-    private fun setDataToLineChart(hddServiceCode: String, serviceCode: String) {
+    private fun setDataToLineChartByHttp(hddServiceCode: String, serviceCode: String) {
         startProgressDialog()
         MioUtil.updatePacket(this, execFunc = { it ->
-            val packetLogInfoJson: PacketLogInfoJson? = MioUtil.parseJsonToHistory(it)
+            val packetLogInfoJson: PacketLogInfoJson? = MioUtil.parseJsonToPacketLog(it)
 
-            val couponUseDataSet = getLineDataFromJson(packetLogInfoJson, hddServiceCode, serviceCode, true, R.color.historyChartWithCoupon, "クーポンON", true)
-            val notCouponUseDataSet = getLineDataFromJson(packetLogInfoJson, hddServiceCode, serviceCode, false, R.color.historyChartWithoutCoupon, "クーポンOFF")
+            MioUtil.cacheJson(this, it, this.applicationContext.getString(R.string.preference_key_cache_packet_log))
 
-            val dataSets = ArrayList<ILineDataSet>()
-            dataSets.add(couponUseDataSet)
-            dataSets.add(notCouponUseDataSet)
-
-            val lineData = LineData(dataSets)
-            lineChart.data = lineData
-            lineChart.invalidate()
+            packetLogInfoJson?.let { setDataToLineChart(it, hddServiceCode, serviceCode) }
 
             stopProgressDialog()
         }, errorFunc = {
-            HttpErrorHandler.handleHttpError(it)
+            HttpErrorHandler.handleHttpError(it) { setDataToLineChartByCache(hddServiceCode, serviceCode) }
             stopProgressDialog()
         })
+    }
 
+    private fun setDataToLineChartByCache(hddServiceCode: String, serviceCode: String) {
+        val packetLogInfoJson = MioUtil.parseJsonToPacketLog(MioUtil.loadJsonCache(this, this.applicationContext.getString(R.string.preference_key_cache_packet_log)))
+        packetLogInfoJson?.let { setDataToLineChart(it, hddServiceCode, serviceCode) }
+    }
+
+    private fun setDataToLineChart(packetLogInfoJson: PacketLogInfoJson, hddServiceCode: String, serviceCode: String) {
+
+        val couponUseDataSet = getLineDataFromJson(packetLogInfoJson, hddServiceCode, serviceCode, true, R.color.packetLogChartWithCoupon, "クーポンON", true)
+        val notCouponUseDataSet = getLineDataFromJson(packetLogInfoJson, hddServiceCode, serviceCode, false, R.color.packetLogChartWithoutCoupon, "クーポンOFF")
+
+        val dataSets = ArrayList<ILineDataSet>()
+        dataSets.add(couponUseDataSet)
+        dataSets.add(notCouponUseDataSet)
+
+        val lineData = LineData(dataSets)
+        lineChart.data = lineData
+        lineChart.invalidate()
     }
 
     private fun getLineDataFromJson(packetLogInfoJson: PacketLogInfoJson?, hddServiceCode: String, serviceCode: String, couponUse: Boolean, colorResourceId: Int, label: String, setDateList: Boolean = false): LineDataSet {

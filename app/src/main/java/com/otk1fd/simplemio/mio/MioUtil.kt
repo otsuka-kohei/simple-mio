@@ -177,7 +177,7 @@ object MioUtil {
         return couponInfoJson
     }
 
-    fun parseJsonToHistory(json: JSONObject): PacketLogInfoJson? {
+    fun parseJsonToPacketLog(json: JSONObject): PacketLogInfoJson? {
         val adapter = Moshi.Builder().build().adapter(PacketLogInfoJson::class.java)
         var packetLogInfoJson: PacketLogInfoJson?
 

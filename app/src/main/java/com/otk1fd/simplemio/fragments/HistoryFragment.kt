@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ExpandableListView
 import com.otk1fd.simplemio.R
-import com.otk1fd.simplemio.activity.HistoryActivity
+import com.otk1fd.simplemio.activity.PacketLogActivity
 import com.otk1fd.simplemio.mio.CouponInfoJson
 import com.otk1fd.simplemio.mio.MioUtil
 import com.otk1fd.simplemio.ui.HistoryExpandableListAdapter
@@ -49,7 +49,7 @@ class HistoryFragment : Fragment() {
             val serviceCode = child.serviceCode
 
             Log.d("history", "hddServiceCode : $hddServiceCode    serviceCode : $serviceCode")
-            val intent = Intent(activity, HistoryActivity::class.java)
+            val intent = Intent(activity, PacketLogActivity::class.java)
             intent.putExtra("hddServiceCode", hddServiceCode)
             intent.putExtra("serviceCode", serviceCode)
             activity.startActivity(intent)

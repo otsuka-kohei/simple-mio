@@ -82,7 +82,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
                 }
                 stopProgressDialog()
             }, errorFunc = {
-                HttpErrorHandler.handleHttpError(it)
+                HttpErrorHandler.handleHttpError(it, getError = false)
                 stopProgressDialog()
             })
         }
