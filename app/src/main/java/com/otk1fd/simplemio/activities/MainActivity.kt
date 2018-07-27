@@ -55,12 +55,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navigationView.setNavigationItemSelectedListener(this)
         navigationView.menu.getItem(0).isChecked = true
 
-        couponFragment.startOAuthWithDialog = { startOAuthWithDialog() }
-    }
-
-    override fun onStart() {
-        super.onStart()
-
         supportActionBar?.title = getString(R.string.menu_coupon)
 
         val defaultFragment = couponFragment

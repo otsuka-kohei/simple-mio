@@ -39,7 +39,7 @@ class PacketLogActivity : AppCompatActivity() {
 
         setSupportActionBar(packetLogToolbar)
 
-        supportActionBar?.title = serviceCode + "の使用履歴"
+        supportActionBar?.title = serviceCode + "のデータ通信量履歴"
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_close)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 

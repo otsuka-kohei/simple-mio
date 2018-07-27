@@ -37,8 +37,6 @@ class CouponFragment : Fragment(), View.OnClickListener {
     private val couponStatus = HashMap<String, Boolean>()
     private var oldCouponStatus = couponStatus.clone()
 
-    lateinit var startOAuthWithDialog: () -> Unit
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
