@@ -72,9 +72,12 @@ class CouponFragment : Fragment(), View.OnClickListener {
         super.onResume()
 
         // 自動で更新を開始
-        couponSwipeRefreshLayout.post {
-            couponSwipeRefreshLayout.isRefreshing = true
-            setCouponInfoByHttp()
+        // ログイン済みか確認
+        if (MioUtil.loadToken(activity) != "") {
+            couponSwipeRefreshLayout.post {
+                couponSwipeRefreshLayout.isRefreshing = true
+                setCouponInfoByHttp()
+            }
         }
     }
 
@@ -103,11 +106,6 @@ class CouponFragment : Fragment(), View.OnClickListener {
     }
 
     private fun setCouponInfoByHttp() {
-        val notLogined = MioUtil.loadToken(activity) == ""
-        if (notLogined) {
-            return
-        }
-
         MioUtil.updateCoupon(activity, execFunc = { it ->
 
             val couponInfoJson: CouponInfoJson? = MioUtil.parseJsonToCoupon(it)
