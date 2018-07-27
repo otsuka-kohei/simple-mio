@@ -106,8 +106,9 @@ class PacketLogActivity : AppCompatActivity() {
         val notCouponUseDataSet = getLineDataFromJson(packetLogInfoJson, hddServiceCode, serviceCode, false, R.color.packetLogChartWithoutCoupon, "クーポンOFF")
 
         val dataSets = ArrayList<ILineDataSet>()
-        dataSets.add(couponUseDataSet)
+        // クーポンOFF時のグラフを先に描画し，そのあとクーポンON時のグラフを表示する
         dataSets.add(notCouponUseDataSet)
+        dataSets.add(couponUseDataSet)
 
         val lineData = LineData(dataSets)
         lineChart.data = lineData
