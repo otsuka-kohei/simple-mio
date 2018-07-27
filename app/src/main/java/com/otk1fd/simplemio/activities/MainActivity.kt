@@ -69,6 +69,42 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         fragmentTransaction.commit()
     }
 
+    public override fun onResume() {
+        super.onResume()
+
+        val intent = intent
+        val action = intent.action
+
+        if (action == Intent.ACTION_VIEW) {
+            val uri: Uri? = intent.data
+            if (uri != null && uri.toString().contains("simplemio")) {
+
+                // 受け取るURIが
+                // simplemio://callback#access_token=token&state=success&token_type=Bearer&expires_in=7776000
+                // となっていて，正しくエンコードできないので # を ? に置き換える
+
+                var uriStr = uri.toString()
+                uriStr = uriStr.replace('#', '?')
+                val validUri = Uri.parse(uriStr)
+
+                val token = validUri.getQueryParameter("access_token")
+                val state = validUri.getQueryParameter("state")
+
+                if (state != "success") {
+                    Toast.makeText(this, "正しく認証することができませんでした。", Toast.LENGTH_LONG).show()
+                } else {
+                    MioUtil.saveToken(this, token)
+                }
+            }
+        } else {
+            // トークンが存在しない場合はログインする
+            if (MioUtil.loadToken(this) == "") {
+                Log.d("resume without login", "please login")
+                startOAuthWithDialog()
+            }
+        }
+    }
+
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
@@ -135,44 +171,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
         startActivity(intent)
-    }
-
-    public override fun onResume() {
-        super.onResume()
-
-        val intent = intent
-        val action = intent.action
-
-        if (action == Intent.ACTION_VIEW) {
-            val uri: Uri? = intent.data
-            if (uri != null && uri.toString().contains("simplemio")) {
-
-                // 受け取るURIが
-                // simplemio://callback#access_token=token&state=success&token_type=Bearer&expires_in=7776000
-                // となっていて，正しくエンコードできないので # を ? に置き換える
-
-                var uriStr = uri.toString()
-                uriStr = uriStr.replace('#', '?')
-                val validUri = Uri.parse(uriStr)
-
-                val token = validUri.getQueryParameter("access_token")
-                val state = validUri.getQueryParameter("state")
-
-                if (state != "success") {
-                    Toast.makeText(this, "正しく認証することができませんでした。", Toast.LENGTH_LONG).show()
-                } else {
-                    MioUtil.saveToken(this, token)
-                }
-
-                couponFragment.restartRefresh()
-            }
-        } else {
-            // トークンが存在しない場合はログインする
-            if (MioUtil.loadToken(this) == "") {
-                Log.d("resume without login", "please login")
-                startOAuthWithDialog()
-            }
-        }
     }
 
     public override fun onNewIntent(intent: Intent) {
