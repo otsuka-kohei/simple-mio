@@ -2,6 +2,7 @@ package com.otk1fd.simplemio.mio
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import com.android.volley.*
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
@@ -32,7 +33,7 @@ object MioUtil {
     }
 
     fun loadToken(activity: Activity): String {
-        val preference = activity.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
+        val preference = activity.applicationContext.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
         return preference.getString(activity.getString(R.string.preference_key_token), "")
     }
 
@@ -167,17 +168,47 @@ object MioUtil {
 
     fun parseJsonToCoupon(json: JSONObject): CouponInfoJson? {
         val adapter = Moshi.Builder().build().adapter(CouponInfoJson::class.java)
-        return adapter.fromJson(json.toString())
+        var couponInfoJson: CouponInfoJson?
+        try {
+            couponInfoJson = adapter.fromJson(json.toString())
+        } catch (e: Exception) {
+            couponInfoJson = null
+        }
+        return couponInfoJson
     }
 
-    fun parseJsonToHistory(json: JSONObject): PacketLogInfoJson? {
+    fun parseJsonToPacketLog(json: JSONObject): PacketLogInfoJson? {
         val adapter = Moshi.Builder().build().adapter(PacketLogInfoJson::class.java)
-        return adapter.fromJson(json.toString())
+        var packetLogInfoJson: PacketLogInfoJson?
+
+        try {
+            packetLogInfoJson = adapter.fromJson(json.toString())
+        } catch (e: Exception) {
+            packetLogInfoJson = null
+        }
+        return packetLogInfoJson
     }
 
     fun parseJsonToApplyCouponResponse(json: JSONObject): ApplyCouponStatusResultJson? {
         val adapter = Moshi.Builder().build().adapter(ApplyCouponStatusResultJson::class.java)
         return adapter.fromJson(json.toString())
+    }
+
+    fun cacheJson(activity: Activity, jsonObject: JSONObject, key: String) {
+        val jsonString = jsonObject.toString()
+
+        val preference = activity.applicationContext.getSharedPreferences(activity.applicationContext.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
+        val editor = preference.edit()
+        editor.putString(key, jsonString)
+        Log.d("cache json", jsonString)
+        editor.apply()
+    }
+
+    fun loadJsonCache(activity: Activity, key: String): JSONObject {
+        val preference = activity.applicationContext.getSharedPreferences(activity.applicationContext.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
+        val jsonString = preference.getString(key, "{}")
+        Log.d("load cache json", jsonString)
+        return JSONObject(jsonString)
     }
 
     fun getJapanesePlanName(plan: String): String {

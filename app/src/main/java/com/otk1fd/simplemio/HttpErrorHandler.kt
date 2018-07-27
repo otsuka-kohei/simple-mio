@@ -15,9 +15,10 @@ object HttpErrorHandler {
         this.showErrorMessageFunc = showErrorMessageFunc
     }
 
-    fun handleHttpError(volleyError: VolleyError?) {
+    fun handleHttpError(volleyError: VolleyError?, getError: Boolean = true, recoveryFunc: () -> Unit = {}) {
         if (volleyError == null || volleyError.networkResponse == null) {
-            showErrorMessageFunc("不明なエラーが発生しました。\n少しお待ちの上，再度お試しください。")
+            showErrorMessageFunc("不明なエラーが発生しました。\n少しお待ちの上、再度お試しください。")
+            recoveryFunc()
             return
         }
 
@@ -25,19 +26,27 @@ object HttpErrorHandler {
 
         when (errorCode) {
             429 -> {
-                showErrorMessageFunc("1分以上時間を空けてからもう一度お試しください。")
+                if (getError) {
+                    showErrorMessageFunc("アクセス数制限のため、最新のデータを取得できませんでした。\n少しお待ちの上，再度お試しください。")
+                    recoveryFunc()
+                } else {
+                    showErrorMessageFunc("クーポン切り替えは、1分以上時間を空けてから再度お試しください。")
+                }
             }
             403 -> {
                 loginFunc()
             }
             500 -> {
-                showErrorMessageFunc("IIJ mioのサーバでエラーが発生しました。\nしばらくお待ちの上、再度お試しください。")
+                showErrorMessageFunc("IIJ mioのサーバでエラーが発生し、最新のデータを取得できませんでした。\nしばらくお待ちの上、再度お試しください。")
+                recoveryFunc()
             }
             503 -> {
-                showErrorMessageFunc("IIJ mioのサーバがメンテナンス中です。\nしばらくお待ちの上、再度お試しください。")
+                showErrorMessageFunc("IIJ mioのサーバがメンテナンス中のため、最新のデータを取得できませんでした。\nしばらくお待ちの上、再度お試しください。")
+                recoveryFunc()
             }
             else -> {
-                showErrorMessageFunc("予期しないエラーが発生しました。\nしばらく待ってもこのエラーが発生する場合は、本アプリ開発者にお問い合わせください。")
+                showErrorMessageFunc("エラーが発生し、最新のデータを取得できませんでした。\nばらくお待ちの上、再度お試しください。")
+                recoveryFunc()
             }
         }
     }
