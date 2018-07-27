@@ -66,12 +66,28 @@ class CouponFragment : Fragment(), View.OnClickListener {
         }
         couponSwipeRefreshLayout.setColorSchemeColors(activity.applicationContext.getColor(R.color.colorPrimary))
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+
         // 自動で更新を開始
-        couponSwipeRefreshLayout.post {
-            couponSwipeRefreshLayout.isRefreshing = true
-            setCouponInfoByHttp()
+        // ログイン済みか確認
+        if (MioUtil.loadToken(activity) != "") {
+            couponSwipeRefreshLayout.post {
+                couponSwipeRefreshLayout.isRefreshing = true
+                setCouponInfoByHttp()
+            }
         }
     }
+
+    override fun onPause() {
+        super.onPause()
+
+        couponSwipeRefreshLayout.isRefreshing = false
+        stopProgressDialog()
+    }
+
 
     override fun onClick(v: View?) {
         if (v == applyButton) {
@@ -90,11 +106,6 @@ class CouponFragment : Fragment(), View.OnClickListener {
     }
 
     private fun setCouponInfoByHttp() {
-        val notLogined = MioUtil.loadToken(activity) == ""
-        if (notLogined) {
-            return
-        }
-
         MioUtil.updateCoupon(activity, execFunc = { it ->
 
             val couponInfoJson: CouponInfoJson? = MioUtil.parseJsonToCoupon(it)
@@ -261,13 +272,5 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
     private fun stopProgressDialog() {
         progressDialog.dismiss()
-    }
-
-    fun restartRefresh() {
-        couponSwipeRefreshLayout.post {
-            couponSwipeRefreshLayout.isRefreshing = false
-            couponSwipeRefreshLayout.isRefreshing = true
-            setCouponInfoByHttp()
-        }
     }
 }

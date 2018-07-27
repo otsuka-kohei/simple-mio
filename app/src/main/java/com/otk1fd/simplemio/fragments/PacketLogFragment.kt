@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ExpandableListView
 import com.otk1fd.simplemio.R
-import com.otk1fd.simplemio.activity.PacketLogActivity
+import com.otk1fd.simplemio.activities.PacketLogActivity
 import com.otk1fd.simplemio.mio.CouponInfoJson
 import com.otk1fd.simplemio.mio.MioUtil
 import com.otk1fd.simplemio.ui.HistoryExpandableListAdapter
@@ -20,7 +20,7 @@ import com.otk1fd.simplemio.ui.listview_item.HistoryListItemParent
 /**
  * Created by otk1fd on 2018/02/24.
  */
-class HistoryFragment : Fragment() {
+class PacketLogFragment : Fragment() {
 
     //フラグメント上で発生するイベント（OnClickListenerとか）は極力フラグメントの中で済ませた方がいいと思う
 
@@ -56,6 +56,12 @@ class HistoryFragment : Fragment() {
 
             false
         }
+
+        setServiceListByCache()
+    }
+
+    override fun onStart() {
+        super.onStart()
 
         setServiceListByCache()
     }

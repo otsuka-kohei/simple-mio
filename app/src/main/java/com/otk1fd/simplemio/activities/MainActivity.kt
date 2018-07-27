@@ -1,4 +1,4 @@
-package com.otk1fd.simplemio.activity
+package com.otk1fd.simplemio.activities
 
 import android.app.Fragment
 import android.content.Intent
@@ -20,7 +20,7 @@ import com.otk1fd.simplemio.Util.Companion.showAlertDialog
 import com.otk1fd.simplemio.fragments.AboutFragment
 import com.otk1fd.simplemio.fragments.ConfigFragment
 import com.otk1fd.simplemio.fragments.CouponFragment
-import com.otk1fd.simplemio.fragments.HistoryFragment
+import com.otk1fd.simplemio.fragments.PacketLogFragment
 import com.otk1fd.simplemio.mio.MioUtil
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -28,7 +28,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private val couponFragment: CouponFragment = CouponFragment()
-    private val historyFragment: HistoryFragment = HistoryFragment()
+    private val packetLogFragment: PacketLogFragment = PacketLogFragment()
     private val configFragment: ConfigFragment = ConfigFragment()
     private val aboutFragment: AboutFragment = AboutFragment()
 
@@ -44,7 +44,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val toolbar: Toolbar = findViewById(R.id.packetLogToolbar)
         setSupportActionBar(toolbar)
-        toolbar.title = getString(R.string.menu_coupon)
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val actionBarDrawerToggle = ActionBarDrawerToggle(
@@ -57,11 +56,53 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navigationView.menu.getItem(0).isChecked = true
 
         couponFragment.startOAuthWithDialog = { startOAuthWithDialog() }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        supportActionBar?.title = getString(R.string.menu_coupon)
 
         val defaultFragment = couponFragment
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.fragment, defaultFragment)
         fragmentTransaction.commit()
+    }
+
+    public override fun onResume() {
+        super.onResume()
+
+        val intent = intent
+        val action = intent.action
+
+        if (action == Intent.ACTION_VIEW) {
+            val uri: Uri? = intent.data
+            if (uri != null && uri.toString().contains("simplemio")) {
+
+                // 受け取るURIが
+                // simplemio://callback#access_token=token&state=success&token_type=Bearer&expires_in=7776000
+                // となっていて，正しくエンコードできないので # を ? に置き換える
+
+                var uriStr = uri.toString()
+                uriStr = uriStr.replace('#', '?')
+                val validUri = Uri.parse(uriStr)
+
+                val token = validUri.getQueryParameter("access_token")
+                val state = validUri.getQueryParameter("state")
+
+                if (state != "success") {
+                    Toast.makeText(this, "正しく認証することができませんでした。", Toast.LENGTH_LONG).show()
+                } else {
+                    MioUtil.saveToken(this, token)
+                }
+            }
+        } else {
+            // トークンが存在しない場合はログインする
+            if (MioUtil.loadToken(this) == "") {
+                Log.d("resume without login", "please login")
+                startOAuthWithDialog()
+            }
+        }
     }
 
     override fun onBackPressed() {
@@ -84,7 +125,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 fragmentName = getString(R.string.menu_coupon)
             }
             R.id.nav_history -> {
-                fragment = historyFragment
+                fragment = packetLogFragment
                 fragmentName = getString(R.string.menu_history)
             }
             R.id.nav_config -> {
@@ -130,44 +171,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
         startActivity(intent)
-    }
-
-    public override fun onResume() {
-        super.onResume()
-
-        val intent = intent
-        val action = intent.action
-
-        if (action == Intent.ACTION_VIEW) {
-            val uri: Uri? = intent.data
-            if (uri != null && uri.toString().contains("simplemio")) {
-
-                // 受け取るURIが
-                // simplemio://callback#access_token=token&state=success&token_type=Bearer&expires_in=7776000
-                // となっていて，正しくエンコードできないので # を ? に置き換える
-
-                var uriStr = uri.toString()
-                uriStr = uriStr.replace('#', '?')
-                val validUri = Uri.parse(uriStr)
-
-                val token = validUri.getQueryParameter("access_token")
-                val state = validUri.getQueryParameter("state")
-
-                if (state != "success") {
-                    Toast.makeText(this, "正しく認証することができませんでした。", Toast.LENGTH_LONG).show()
-                } else {
-                    MioUtil.saveToken(this, token)
-                }
-
-                couponFragment.restartRefresh()
-            }
-        } else {
-            // トークンが存在しない場合はログインする
-            if (MioUtil.loadToken(this) == "") {
-                Log.d("resume without login", "please login")
-                startOAuthWithDialog()
-            }
-        }
     }
 
     public override fun onNewIntent(intent: Intent) {

@@ -1,4 +1,4 @@
-package com.otk1fd.simplemio.activity
+package com.otk1fd.simplemio.activities
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -26,6 +26,11 @@ class OpenSourceActivity : AppCompatActivity() {
         openSourceWebView.settings.useWideViewPort = true
         openSourceWebView.settings.loadWithOverviewMode = true
         openSourceWebView.settings.builtInZoomControls = true
+    }
+
+    override fun onStart() {
+        super.onStart()
+        
         openSourceWebView.loadUrl("file:///android_asset/openSourse.html")
     }
 

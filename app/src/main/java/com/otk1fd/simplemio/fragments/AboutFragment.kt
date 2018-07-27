@@ -11,7 +11,7 @@ import android.widget.Button
 import android.widget.TextView
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.Util
-import com.otk1fd.simplemio.activity.OpenSourceActivity
+import com.otk1fd.simplemio.activities.OpenSourceActivity
 import com.otk1fd.simplemio.mio.MioUtil
 
 

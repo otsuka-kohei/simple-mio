@@ -1,4 +1,4 @@
-package com.otk1fd.simplemio.activity
+package com.otk1fd.simplemio.activities
 
 import android.app.ProgressDialog
 import android.os.Bundle
@@ -26,11 +26,14 @@ class PacketLogActivity : AppCompatActivity() {
     private lateinit var progressDialog: ProgressDialog
     private val dateList = ArrayList<String>()
 
+    private lateinit var hddServiceCode: String
+    private lateinit var serviceCode: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val hddServiceCode = intent.getStringExtra("hddServiceCode")
-        val serviceCode = intent.getStringExtra("serviceCode")
+        hddServiceCode = intent.getStringExtra("hddServiceCode")
+        serviceCode = intent.getStringExtra("serviceCode")
 
         setContentView(R.layout.activity_packet_log_chart)
 
@@ -45,8 +48,18 @@ class PacketLogActivity : AppCompatActivity() {
         lineChart = findViewById(R.id.lineChartView)
 
         initLineChart()
+    }
+
+    override fun onResume() {
+        super.onResume()
 
         setDataToLineChartByHttp(hddServiceCode, serviceCode)
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        stopProgressDialog()
     }
 
     private fun initLineChart() {
@@ -63,7 +76,6 @@ class PacketLogActivity : AppCompatActivity() {
         val description = Description()
         description.text = ""
         lineChart.description = description
-
     }
 
 
