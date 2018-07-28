@@ -17,7 +17,7 @@ object HttpErrorHandler {
 
     fun handleHttpError(volleyError: VolleyError?, getError: Boolean = true, recoveryFunc: () -> Unit = {}) {
         if (volleyError == null || volleyError.networkResponse == null) {
-            showErrorMessageFunc("不明なエラーが発生しました。\n少しお待ちの上、再度お試しください。")
+            showErrorMessageFunc("エラーが発生し、最新のデータを取得できませんでした。\n少しお待ちの上、再度お試しください。")
             recoveryFunc()
             return
         }
