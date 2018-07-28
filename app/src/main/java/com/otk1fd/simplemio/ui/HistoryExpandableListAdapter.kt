@@ -32,8 +32,8 @@ class HistoryExpandableListAdapter(val context: Context, val parents: List<Histo
     override fun getGroupView(p0: Int, p1: Boolean, p2: View?, p3: ViewGroup?): View {
         val parentView: View = getBasicParentView()
 
-        val hddServiceCodeTextView: TextView = parentView.findViewById(R.id.historyHddServiceCodeTextView)
-        val planTextView: TextView = parentView.findViewById(R.id.historyPlanTextView)
+        val hddServiceCodeTextView: TextView = parentView.findViewById(R.id.hddServiceCodeTextView)
+        val planTextView: TextView = parentView.findViewById(R.id.planTextView)
 
         val historyListItemParent: HistoryListItemParent = parents[p0]
 
@@ -59,8 +59,8 @@ class HistoryExpandableListAdapter(val context: Context, val parents: List<Histo
         val childView: View = getBasicChildView()
 
         val phoneNumberTextView: TextView = childView.findViewById(R.id.couponPhoneNumberTextView)
-        val serviceCodeTextView: TextView = childView.findViewById(R.id.couponServiceCodeTextView)
-        val typeTextView: TextView = childView.findViewById(R.id.couponTypeTextView)
+        val serviceCodeTextView: TextView = childView.findViewById(R.id.serviceCodeTextView)
+        val typeTextView: TextView = childView.findViewById(R.id.typeTextView)
 
         val historyListItemChild: HistoryListItemChild = children[p0][p1]
 

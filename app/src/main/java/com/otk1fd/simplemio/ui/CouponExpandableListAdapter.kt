@@ -33,9 +33,9 @@ class CouponExpandableListAdapter(val context: Context, val parents: List<Coupon
     override fun getGroupView(p0: Int, p1: Boolean, p2: View?, p3: ViewGroup?): View {
         val parentView: View = getBasicParentView()
 
-        val volumeTextView: TextView = parentView.findViewById(R.id.couponVolumeTextView)
-        val hddServiceCodeTextView: TextView = parentView.findViewById(R.id.historyHddServiceCodeTextView)
-        val planTextView: TextView = parentView.findViewById(R.id.historyPlanTextView)
+        val volumeTextView: TextView = parentView.findViewById(R.id.volumeTextView)
+        val hddServiceCodeTextView: TextView = parentView.findViewById(R.id.hddServiceCodeTextView)
+        val planTextView: TextView = parentView.findViewById(R.id.planTextView)
 
         val couponListItemParent: CouponListItemParent = parents[p0]
 
@@ -62,8 +62,8 @@ class CouponExpandableListAdapter(val context: Context, val parents: List<Coupon
         val childView: View = getBasicChildView()
 
         val phoneNumberTextView: TextView = childView.findViewById(R.id.couponPhoneNumberTextView)
-        val serviceCodeTextView: TextView = childView.findViewById(R.id.couponServiceCodeTextView)
-        val typeTextView: TextView = childView.findViewById(R.id.couponTypeTextView)
+        val serviceCodeTextView: TextView = childView.findViewById(R.id.serviceCodeTextView)
+        val typeTextView: TextView = childView.findViewById(R.id.typeTextView)
         val couponSwitch: Switch = childView.findViewById(R.id.couponSwitch)
 
         val couponListItemChild: CouponListItemChild = children[p0][p1]
