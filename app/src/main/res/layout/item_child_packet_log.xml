@@ -11,31 +11,35 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout2"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/simNameTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/simNameTextView"
+        app:layout_goneMarginTop="16dp" />
 
     <TextView
         android:id="@+id/simNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@+id/phoneNumberTextView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="spread" />
 
     <android.support.constraint.ConstraintLayout
-        android:layout_width="wrap_content"
+        android:id="@+id/constraintLayout2"
+        android:layout_width="246dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/phoneNumberTextView"
-        app:layout_constraintVertical_bias="0.508">
+        app:layout_constraintTop_toBottomOf="@+id/phoneNumberTextView">
 
         <TextView
             android:id="@+id/typeTextView"
@@ -58,7 +62,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/typeTextView"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </android.support.constraint.ConstraintLayout>

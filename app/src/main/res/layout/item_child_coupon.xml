@@ -41,10 +41,14 @@
             android:id="@+id/simNameTextView"
             android:layout_width="wrap_content"
             android:layout_height="20dp"
+            android:layout_marginBottom="8dp"
             android:text="TextView"
+            app:layout_constraintBottom_toTopOf="@+id/phoneNumberTextView"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="spread_inside" />
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/innerConstraintLayout"
@@ -53,7 +57,7 @@
             android:layout_marginTop="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/phoneNumberTextView">
 
@@ -88,9 +92,10 @@
             android:id="@+id/phoneNumberTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:text="TextView"
+            app:layout_constraintBottom_toTopOf="@+id/innerConstraintLayout"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/simNameTextView" />
 
