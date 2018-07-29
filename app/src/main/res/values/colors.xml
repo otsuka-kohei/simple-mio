@@ -7,8 +7,8 @@
     <color name="colorAccent">#FF4081</color>
     -->
     <color name="colorPrimary">#8F82BC</color>
-    <color name="colorPrimaryDark">#8F82BC</color>
-    <color name="colorAccent">#8F82BC</color>
+    <color name="colorPrimaryDark">#7065A3</color>
+    <color name="colorAccent">#745399</color>
     <color name="colorPrimaryLight">#D2D0E8</color>
 
     <color name="packetLogChartWithCoupon">#C92E36</color>
