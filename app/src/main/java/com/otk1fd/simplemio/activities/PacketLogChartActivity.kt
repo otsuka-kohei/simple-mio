@@ -14,6 +14,7 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
+import com.otk1fd.simplemio.Util
 import com.otk1fd.simplemio.mio.MioUtil
 import com.otk1fd.simplemio.mio.PacketLog
 import com.otk1fd.simplemio.mio.PacketLogInfoJson
@@ -39,7 +40,9 @@ class PacketLogActivity : AppCompatActivity() {
 
         setSupportActionBar(packetLogToolbar)
 
-        supportActionBar?.title = serviceCode + "のデータ通信量履歴"
+        val simName = Util.loadSimName(this, serviceCode)
+
+        supportActionBar?.title = """${if (simName != "") simName else serviceCode}のデータ通信量履歴"""
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_close)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
