@@ -5,12 +5,15 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
+import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ExpandableListView
 import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
+import com.otk1fd.simplemio.Util
 import com.otk1fd.simplemio.mio.ApplyCouponStatusResultJson
 import com.otk1fd.simplemio.mio.CouponInfo
 import com.otk1fd.simplemio.mio.CouponInfoJson
@@ -56,6 +59,20 @@ class CouponFragment : Fragment(), View.OnClickListener {
         // ExpandableListView が展開されたときに自動スクロールするようにする
         couponListView.setOnGroupClickListener { parent, v, groupPosition, id ->
             couponListView.smoothScrollToPosition(groupPosition)
+            return@setOnGroupClickListener false
+        }
+
+        couponListView.setOnItemLongClickListener { adapterView, view, i, l ->
+            val groupPosition = ExpandableListView.getPackedPositionGroup(l)
+            val childPosition = ExpandableListView.getPackedPositionChild(l)
+
+            val packedPositionType = ExpandableListView.getPackedPositionType(l)
+            if (packedPositionType == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+                val adapter = couponListView.expandableListAdapter
+                val child = adapter.getChild(groupPosition, childPosition) as CouponListItemChild
+                val serviceCode = child.serviceCode
+                showEditTextDialogToSetSimName(serviceCode)
+            }
             false
         }
 
@@ -84,6 +101,25 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
         couponSwipeRefreshLayout.isRefreshing = false
         stopProgressDialog()
+    }
+
+    private fun showEditTextDialogToSetSimName(serviceCode: String) {
+        val simNameEditText = EditText(activity)
+
+        val dialog = AlertDialog.Builder(activity)
+
+        dialog.setTitle("SIMの名前を入力してください")
+        dialog.setView(simNameEditText)
+
+        dialog.setPositiveButton("完了") { dialog, whichButton ->
+            Util.saveSimName(activity, serviceCode, simNameEditText.text.toString())
+            setCouponInfoByCache()
+        }
+
+        dialog.setNegativeButton("キャンセル") { dialog, whichButton ->
+        }
+
+        dialog.show()
     }
 
 
@@ -179,7 +215,6 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
         oldCouponStatus = couponStatus.clone()
         updateApplyButtonShow()
-
     }
 
     private fun updateApplyButtonShow() {

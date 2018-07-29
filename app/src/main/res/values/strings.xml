@@ -14,6 +14,8 @@
     <string name="preference_key_cache_coupon">couponCache</string>
     <string name="preference_key_cache_packet_log">packetLogCache</string>
 
+    <string name="sim_name_preference_file_name">simNamePreference</string>
+
     <string name="drawer_open">ドロワーを開く</string>
     <string name="drawer_close">ドロワーを閉じる</string>
 

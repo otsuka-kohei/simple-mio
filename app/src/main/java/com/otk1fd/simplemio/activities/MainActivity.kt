@@ -16,7 +16,7 @@ import android.widget.Toast
 import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.Util
-import com.otk1fd.simplemio.Util.Companion.showAlertDialog
+import com.otk1fd.simplemio.Util.showAlertDialog
 import com.otk1fd.simplemio.fragments.AboutFragment
 import com.otk1fd.simplemio.fragments.ConfigFragment
 import com.otk1fd.simplemio.fragments.CouponFragment

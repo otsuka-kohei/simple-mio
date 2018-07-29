@@ -1,6 +1,6 @@
 package com.otk1fd.simplemio.ui
 
-import android.content.Context
+import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,14 +11,14 @@ import com.otk1fd.simplemio.ui.listview_item.HistoryListItemChild
 import com.otk1fd.simplemio.ui.listview_item.HistoryListItemParent
 
 
-class HistoryExpandableListAdapter(val context: Context, val parents: List<HistoryListItemParent>, val children: List<List<HistoryListItemChild>>) : BaseExpandableListAdapter() {
+class HistoryExpandableListAdapter(val activity: Activity, val parents: List<HistoryListItemParent>, val children: List<List<HistoryListItemChild>>) : BaseExpandableListAdapter() {
 
     private fun getBasicChildView(): View {
-        return LayoutInflater.from(context).inflate(R.layout.item_child_history, null)
+        return LayoutInflater.from(activity).inflate(R.layout.item_child_history, null)
     }
 
     private fun getBasicParentView(): View {
-        return LayoutInflater.from(context).inflate(R.layout.item_parent_history, null)
+        return LayoutInflater.from(activity).inflate(R.layout.item_parent_history, null)
     }
 
     override fun isChildSelectable(p0: Int, p1: Int): Boolean {
@@ -58,7 +58,7 @@ class HistoryExpandableListAdapter(val context: Context, val parents: List<Histo
     override fun getChildView(p0: Int, p1: Int, p2: Boolean, p3: View?, p4: ViewGroup?): View {
         val childView: View = getBasicChildView()
 
-        val phoneNumberTextView: TextView = childView.findViewById(R.id.couponPhoneNumberTextView)
+        val phoneNumberTextView: TextView = childView.findViewById(R.id.phoneNumberTextView)
         val serviceCodeTextView: TextView = childView.findViewById(R.id.serviceCodeTextView)
         val typeTextView: TextView = childView.findViewById(R.id.typeTextView)
 
