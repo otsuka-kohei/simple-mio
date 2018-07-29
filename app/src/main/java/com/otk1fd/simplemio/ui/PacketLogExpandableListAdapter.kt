@@ -5,22 +5,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
-import android.widget.Switch
 import android.widget.TextView
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.Util
-import com.otk1fd.simplemio.ui.listview_item.CouponListItemChild
-import com.otk1fd.simplemio.ui.listview_item.CouponListItemParent
+import com.otk1fd.simplemio.ui.listview_item.PacketLogListItemChild
+import com.otk1fd.simplemio.ui.listview_item.PacketLogListItemParent
 
 
-class CouponExpandableListAdapter(val activity: Activity, val parents: List<CouponListItemParent>, val children: List<List<CouponListItemChild>>, val setCouponStatus: (serviceCode: String, status: Boolean) -> Unit, val getCouponStatus: (serviceCode: String) -> Boolean) : BaseExpandableListAdapter() {
+class PacketLogExpandableListAdapter(val activity: Activity, val parents: List<PacketLogListItemParent>, val children: List<List<PacketLogListItemChild>>) : BaseExpandableListAdapter() {
 
     private fun getBasicChildView(): View {
-        return LayoutInflater.from(activity).inflate(R.layout.item_child_coupon, null)
+        return LayoutInflater.from(activity).inflate(R.layout.item_child_packet_log, null)
     }
 
     private fun getBasicParentView(): View {
-        return LayoutInflater.from(activity).inflate(R.layout.item_parent_coupon, null)
+        return LayoutInflater.from(activity).inflate(R.layout.item_parent_packet_log, null)
     }
 
     override fun isChildSelectable(p0: Int, p1: Int): Boolean {
@@ -34,15 +33,13 @@ class CouponExpandableListAdapter(val activity: Activity, val parents: List<Coup
     override fun getGroupView(p0: Int, p1: Boolean, p2: View?, p3: ViewGroup?): View {
         val parentView: View = getBasicParentView()
 
-        val volumeTextView: TextView = parentView.findViewById(R.id.volumeTextView)
         val hddServiceCodeTextView: TextView = parentView.findViewById(R.id.hddServiceCodeTextView)
         val planTextView: TextView = parentView.findViewById(R.id.planTextView)
 
-        val couponListItemParent: CouponListItemParent = parents[p0]
+        val packetLogListItemParent: PacketLogListItemParent = parents[p0]
 
-        hddServiceCodeTextView.text = couponListItemParent.hddServiceCode
-        planTextView.text = couponListItemParent.plan
-        volumeTextView.text = couponListItemParent.volume
+        hddServiceCodeTextView.text = packetLogListItemParent.hddServiceCode
+        planTextView.text = packetLogListItemParent.plan
 
         return parentView
     }
@@ -65,21 +62,16 @@ class CouponExpandableListAdapter(val activity: Activity, val parents: List<Coup
         val phoneNumberTextView: TextView = childView.findViewById(R.id.phoneNumberTextView)
         val serviceCodeTextView: TextView = childView.findViewById(R.id.serviceCodeTextView)
         val typeTextView: TextView = childView.findViewById(R.id.typeTextView)
-        val couponSwitch: Switch = childView.findViewById(R.id.couponSwitch)
         val simNameTestView: TextView = childView.findViewById(R.id.simNameTextView)
 
-        val couponListItemChild: CouponListItemChild = children[p0][p1]
+        val packetLogListItemChild: PacketLogListItemChild = children[p0][p1]
 
-        couponSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
-            setCouponStatus(couponListItemChild.serviceCode, isChecked)
-        }
 
-        phoneNumberTextView.text = couponListItemChild.phoneNumber
-        serviceCodeTextView.text = couponListItemChild.serviceCode
-        typeTextView.text = couponListItemChild.type
-        couponSwitch.isChecked = getCouponStatus(couponListItemChild.serviceCode)
+        phoneNumberTextView.text = packetLogListItemChild.phoneNumber
+        serviceCodeTextView.text = packetLogListItemChild.serviceCode
+        typeTextView.text = packetLogListItemChild.type
 
-        val simmName = Util.loadSimName(activity, couponListItemChild.serviceCode)
+        val simmName = Util.loadSimName(activity, packetLogListItemChild.serviceCode)
         if (simmName != "") {
             simNameTestView.visibility = View.VISIBLE
             simNameTestView.text = simmName

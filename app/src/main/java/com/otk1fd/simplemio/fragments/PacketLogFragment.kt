@@ -12,9 +12,9 @@ import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.activities.PacketLogActivity
 import com.otk1fd.simplemio.mio.CouponInfoJson
 import com.otk1fd.simplemio.mio.MioUtil
-import com.otk1fd.simplemio.ui.HistoryExpandableListAdapter
-import com.otk1fd.simplemio.ui.listview_item.HistoryListItemChild
-import com.otk1fd.simplemio.ui.listview_item.HistoryListItemParent
+import com.otk1fd.simplemio.ui.PacketLogExpandableListAdapter
+import com.otk1fd.simplemio.ui.listview_item.PacketLogListItemChild
+import com.otk1fd.simplemio.ui.listview_item.PacketLogListItemParent
 
 
 /**
@@ -24,31 +24,31 @@ class PacketLogFragment : Fragment() {
 
     //フラグメント上で発生するイベント（OnClickListenerとか）は極力フラグメントの中で済ませた方がいいと思う
 
-    private lateinit var historyListView: ExpandableListView
+    private lateinit var packetLogListView: ExpandableListView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_history, container, false)
+        return inflater.inflate(R.layout.fragment_packet_log, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        historyListView = activity.findViewById(R.id.historyListView)
+        packetLogListView = activity.findViewById(R.id.packetLogListView)
         // ExpandableListView が展開されたときに自動スクロールするようにする
-        historyListView.setOnGroupClickListener { parent, v, groupPosition, id ->
-            historyListView.smoothScrollToPosition(groupPosition)
+        packetLogListView.setOnGroupClickListener { parent, v, groupPosition, id ->
+            packetLogListView.smoothScrollToPosition(groupPosition)
             false
         }
-        historyListView.setOnChildClickListener { parent, v, groupPosition, childPosition, id ->
+        packetLogListView.setOnChildClickListener { parent, v, groupPosition, childPosition, id ->
             val adapter = parent.expandableListAdapter
-            val parent = adapter.getGroup(groupPosition) as HistoryListItemParent
-            val child = adapter.getChild(groupPosition, childPosition) as HistoryListItemChild
+            val parent = adapter.getGroup(groupPosition) as PacketLogListItemParent
+            val child = adapter.getChild(groupPosition, childPosition) as PacketLogListItemChild
             val hddServiceCode = parent.hddServiceCode
             val serviceCode = child.serviceCode
 
-            Log.d("history", "hddServiceCode : $hddServiceCode    serviceCode : $serviceCode")
+            Log.d("packetLog", "hddServiceCode : $hddServiceCode    serviceCode : $serviceCode")
             val intent = Intent(activity, PacketLogActivity::class.java)
             intent.putExtra("hddServiceCode", hddServiceCode)
             intent.putExtra("serviceCode", serviceCode)
@@ -73,48 +73,48 @@ class PacketLogFragment : Fragment() {
 
     private fun setServiceList(couponInfoJson: CouponInfoJson) {
         // ExpandableListView のそれぞれの Group 要素の展開状況を控えておく
-        val groupNum: Int? = historyListView.expandableListAdapter?.groupCount
-        val expandStatus: List<Boolean> = if (groupNum != null) (0 until groupNum).map { historyListView.isGroupExpanded(it) } else ArrayList()
+        val groupNum: Int? = packetLogListView.expandableListAdapter?.groupCount
+        val expandStatus: List<Boolean> = if (groupNum != null) (0 until groupNum).map { packetLogListView.isGroupExpanded(it) } else ArrayList()
 
 
         // 親要素のリスト
-        val parents = ArrayList<HistoryListItemParent>()
+        val parents = ArrayList<PacketLogListItemParent>()
         // 子要素のリスト（親ごとに分類するため，リストのリストになる）
-        val childrenList = ArrayList<List<HistoryListItemChild>>()
+        val childrenList = ArrayList<List<PacketLogListItemChild>>()
 
         val couponInfoList = couponInfoJson.couponInfo.orEmpty()
         for (couponInfo in couponInfoList) {
-            val parent = HistoryListItemParent(couponInfo.hddServiceCode, MioUtil.getJapanesePlanName(couponInfo.plan))
+            val parent = PacketLogListItemParent(couponInfo.hddServiceCode, MioUtil.getJapanesePlanName(couponInfo.plan))
             parents.add(parent)
 
-            val children = ArrayList<HistoryListItemChild>()
+            val children = ArrayList<PacketLogListItemChild>()
 
             val hdoInfoList = couponInfo.hdoInfo.orEmpty()
             for (hdoInfo in hdoInfoList) {
                 val type: String = if (hdoInfo.voice) "音声" else if (hdoInfo.sms) "SMS" else "データ"
-                val child = HistoryListItemChild(hdoInfo.number, hdoInfo.hdoServiceCode, type)
+                val child = PacketLogListItemChild(hdoInfo.number, hdoInfo.hdoServiceCode, type)
                 children.add(child)
             }
 
             val hduInfoList = couponInfo.hduInfo.orEmpty()
             for (hduInfo in hduInfoList) {
                 val type: String = if (hduInfo.voice) "音声" else if (hduInfo.sms) "SMS" else "データ"
-                val child = HistoryListItemChild(hduInfo.number, hduInfo.hduServiceCode, type)
+                val child = PacketLogListItemChild(hduInfo.number, hduInfo.hduServiceCode, type)
                 children.add(child)
             }
 
             childrenList.add(children)
         }
 
-        val historyExpandableListAdapter = HistoryExpandableListAdapter(activity, parents, childrenList)
+        val packetLogExpandableListAdapter = PacketLogExpandableListAdapter(activity, parents, childrenList)
 
-        historyListView.setAdapter(historyExpandableListAdapter)
+        packetLogListView.setAdapter(packetLogExpandableListAdapter)
 
         // 控えておいた ExpandableListView の展開状況を復元する
         if (groupNum != null) {
             for (i in 0 until groupNum) {
                 if (expandStatus[i]) {
-                    historyListView.expandGroup(i)
+                    packetLogListView.expandGroup(i)
                 }
             }
         }
