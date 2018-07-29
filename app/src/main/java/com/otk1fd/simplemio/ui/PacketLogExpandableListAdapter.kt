@@ -7,18 +7,19 @@ import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
 import android.widget.TextView
 import com.otk1fd.simplemio.R
-import com.otk1fd.simplemio.ui.listview_item.HistoryListItemChild
-import com.otk1fd.simplemio.ui.listview_item.HistoryListItemParent
+import com.otk1fd.simplemio.Util
+import com.otk1fd.simplemio.ui.listview_item.PacketLogListItemChild
+import com.otk1fd.simplemio.ui.listview_item.PacketLogListItemParent
 
 
-class HistoryExpandableListAdapter(val activity: Activity, val parents: List<HistoryListItemParent>, val children: List<List<HistoryListItemChild>>) : BaseExpandableListAdapter() {
+class PacketLogExpandableListAdapter(val activity: Activity, val parents: List<PacketLogListItemParent>, val children: List<List<PacketLogListItemChild>>) : BaseExpandableListAdapter() {
 
     private fun getBasicChildView(): View {
-        return LayoutInflater.from(activity).inflate(R.layout.item_child_history, null)
+        return LayoutInflater.from(activity).inflate(R.layout.item_child_packet_log, null)
     }
 
     private fun getBasicParentView(): View {
-        return LayoutInflater.from(activity).inflate(R.layout.item_parent_history, null)
+        return LayoutInflater.from(activity).inflate(R.layout.item_parent_packet_log, null)
     }
 
     override fun isChildSelectable(p0: Int, p1: Int): Boolean {
@@ -35,10 +36,10 @@ class HistoryExpandableListAdapter(val activity: Activity, val parents: List<His
         val hddServiceCodeTextView: TextView = parentView.findViewById(R.id.hddServiceCodeTextView)
         val planTextView: TextView = parentView.findViewById(R.id.planTextView)
 
-        val historyListItemParent: HistoryListItemParent = parents[p0]
+        val packetLogListItemParent: PacketLogListItemParent = parents[p0]
 
-        hddServiceCodeTextView.text = historyListItemParent.hddServiceCode
-        planTextView.text = historyListItemParent.plan
+        hddServiceCodeTextView.text = packetLogListItemParent.hddServiceCode
+        planTextView.text = packetLogListItemParent.plan
 
         return parentView
     }
@@ -61,13 +62,22 @@ class HistoryExpandableListAdapter(val activity: Activity, val parents: List<His
         val phoneNumberTextView: TextView = childView.findViewById(R.id.phoneNumberTextView)
         val serviceCodeTextView: TextView = childView.findViewById(R.id.serviceCodeTextView)
         val typeTextView: TextView = childView.findViewById(R.id.typeTextView)
+        val simNameTestView: TextView = childView.findViewById(R.id.simNameTextView)
 
-        val historyListItemChild: HistoryListItemChild = children[p0][p1]
+        val packetLogListItemChild: PacketLogListItemChild = children[p0][p1]
 
 
-        phoneNumberTextView.text = historyListItemChild.phoneNumber
-        serviceCodeTextView.text = historyListItemChild.serviceCode
-        typeTextView.text = historyListItemChild.type
+        phoneNumberTextView.text = packetLogListItemChild.phoneNumber
+        serviceCodeTextView.text = packetLogListItemChild.serviceCode
+        typeTextView.text = packetLogListItemChild.type
+
+        val simmName = Util.loadSimName(activity, packetLogListItemChild.serviceCode)
+        if (simmName != "") {
+            simNameTestView.visibility = View.VISIBLE
+            simNameTestView.text = simmName
+        } else {
+            simNameTestView.visibility = View.GONE
+        }
 
         return childView
     }

@@ -1,6 +1,6 @@
 package com.otk1fd.simplemio.ui.listview_item
 
-data class HistoryListItemChild(
+data class PacketLogListItemChild(
         val phoneNumber: String,
         val serviceCode: String,
         val type: String)

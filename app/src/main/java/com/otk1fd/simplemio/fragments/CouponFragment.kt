@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ExpandableListView
+import android.widget.TextView
 import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.Util
@@ -110,6 +111,11 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
         dialog.setTitle("SIMの名前を入力してください")
         dialog.setView(simNameEditText)
+
+        simNameEditText.setSingleLine()
+        val defaultSimName = Util.loadSimName(activity, serviceCode)
+        simNameEditText.setText(defaultSimName, TextView.BufferType.NORMAL)
+        simNameEditText.setSelection(simNameEditText.text.length)
 
         dialog.setPositiveButton("完了") { dialog, whichButton ->
             Util.saveSimName(activity, serviceCode, simNameEditText.text.toString())
