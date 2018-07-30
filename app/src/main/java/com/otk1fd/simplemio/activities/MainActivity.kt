@@ -27,22 +27,17 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    private val couponFragment: CouponFragment = CouponFragment()
-    private val packetLogFragment: PacketLogFragment = PacketLogFragment()
-    private val configFragment: ConfigFragment = ConfigFragment()
-    private val aboutFragment: AboutFragment = AboutFragment()
-
     private lateinit var navigationView: NavigationView
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
         MioUtil.setUp(this)
         HttpErrorHandler.setUp(loginFunc = { startOAuthWithDialog() }, showErrorMessageFunc = { errorMessage -> Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show() })
 
-        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val toolbar: Toolbar = findViewById(R.id.packetLogToolbar)
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
@@ -57,7 +52,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         supportActionBar?.title = getString(R.string.menu_coupon)
 
-        val defaultFragment = couponFragment
+        val defaultFragment = CouponFragment()
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.fragment, defaultFragment)
         fragmentTransaction.commit()
@@ -112,31 +107,41 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         var fragment: Fragment? = null
         var fragmentName = ""
+        val fragmentTransaction = fragmentManager.beginTransaction()
 
         when (item.itemId) {
             R.id.nav_coupon -> {
-                fragment = couponFragment
                 fragmentName = getString(R.string.menu_coupon)
+                fragment = fragmentManager.findFragmentByTag(fragmentName)
+                if (fragment == null) {
+                    fragment = CouponFragment()
+                }
             }
             R.id.nav_history -> {
-                fragment = packetLogFragment
-                fragmentName = getString(R.string.menu_history)
+                fragmentName = getString(R.string.menu_packet_log)
+                if (fragment == null) {
+                    fragment = PacketLogFragment()
+                }
             }
             R.id.nav_config -> {
-                fragment = configFragment
                 fragmentName = getString(R.string.menu_config)
+                if (fragment == null) {
+                    fragment = ConfigFragment()
+                }
             }
             R.id.nav_about -> {
-                fragment = aboutFragment
                 fragmentName = getString(R.string.menu_about)
+                if (fragment == null) {
+                    fragment = AboutFragment()
+                }
             }
         }
 
-        val fragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.fragment, fragment)
+
+        fragmentTransaction.replace(R.id.fragment, fragment, fragmentName)
         fragmentTransaction.commit()
 
-        val toolbar: Toolbar = findViewById(R.id.packetLogToolbar)
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
         toolbar.title = fragmentName
 
         navigationView.isEnabled = true

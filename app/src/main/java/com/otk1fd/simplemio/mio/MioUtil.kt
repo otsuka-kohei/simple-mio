@@ -2,7 +2,6 @@ package com.otk1fd.simplemio.mio
 
 import android.app.Activity
 import android.content.Context
-import android.util.Log
 import com.android.volley.*
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
@@ -200,14 +199,12 @@ object MioUtil {
         val preference = activity.applicationContext.getSharedPreferences(activity.applicationContext.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
         val editor = preference.edit()
         editor.putString(key, jsonString)
-        Log.d("cache json", jsonString)
         editor.apply()
     }
 
     fun loadJsonCache(activity: Activity, key: String): JSONObject {
         val preference = activity.applicationContext.getSharedPreferences(activity.applicationContext.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
         val jsonString = preference.getString(key, "{}")
-        Log.d("load cache json", jsonString)
         return JSONObject(jsonString)
     }
 

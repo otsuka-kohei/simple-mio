@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="16dp"
-    android:paddingLeft="40dp"
+    android:paddingLeft="32dp"
+    android:paddingRight="16dp"
     android:paddingTop="16dp">
 
 
@@ -28,7 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
         android:focusable="false"
         app:layout_constraintBottom_toBottomOf="parent"

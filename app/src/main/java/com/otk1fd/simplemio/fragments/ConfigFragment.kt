@@ -2,6 +2,7 @@ package com.otk1fd.simplemio.fragments
 
 import android.os.Bundle
 import android.preference.PreferenceFragment
+import android.util.Log
 import com.otk1fd.simplemio.R
 
 
@@ -10,11 +11,13 @@ import com.otk1fd.simplemio.R
  */
 class ConfigFragment : PreferenceFragment() {
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d("PreferenceFragment", "unti")
+        super.onCreate(savedInstanceState)
         preferenceManager.sharedPreferencesName = activity.getString(R.string.preference_file_name)
-
         // /app/res/xml/preference.xml に定義されている設定画面を適用
         addPreferencesFromResource(R.xml.preference)
     }
+
+
 }

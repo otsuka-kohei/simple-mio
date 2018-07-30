@@ -28,7 +28,7 @@ class AboutFragment : Fragment(), View.OnClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        Log.d("onCreateView", "before return")
+        Log.d("About", "before return")
         return inflater.inflate(R.layout.fragment_about, container, false)
     }
 
