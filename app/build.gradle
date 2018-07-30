@@ -8,7 +8,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.otk1fd.simplemio"
-        minSdkVersion 24
+        minSdkVersion 21
         targetSdkVersion 27
         versionCode 23
         versionName '1.1.15'
@@ -28,6 +28,7 @@ android {
         // but continue the build even when errors are found:
         abortOnError false
     }
+    buildToolsVersion '28.0.1'
 }
 
 dependencies {
