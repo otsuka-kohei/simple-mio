@@ -2,6 +2,7 @@ package com.otk1fd.simplemio.activities
 
 import android.app.ProgressDialog
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.AxisBase
@@ -151,7 +152,7 @@ class PacketLogActivity : AppCompatActivity() {
             }
         }
 
-        val color = getColor(colorResourceId)
+        val color = ContextCompat.getColor(this, R.color.colorPrimary)
         val dataSet = LineDataSet(entries, label)
         dataSet.color = color
         dataSet.setCircleColor(color)
