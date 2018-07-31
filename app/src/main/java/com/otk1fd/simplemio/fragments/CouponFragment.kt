@@ -122,7 +122,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
         dialog.setPositiveButton("完了") { dialog, whichButton ->
             var simnName = simNameEditText.text.toString()
-            simnName = simnName.replace("\n", "")
+            simnName = simnName.replace("\n", " ")
             Util.saveSimName(activity, serviceCode, simnName)
             setCouponInfoByCache()
         }
