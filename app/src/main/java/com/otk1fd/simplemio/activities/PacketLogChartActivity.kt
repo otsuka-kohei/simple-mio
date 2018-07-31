@@ -20,6 +20,7 @@ import com.otk1fd.simplemio.mio.MioUtil
 import com.otk1fd.simplemio.mio.PacketLog
 import com.otk1fd.simplemio.mio.PacketLogInfoJson
 import kotlinx.android.synthetic.main.activity_packet_log_chart.*
+import org.json.JSONObject
 
 
 class PacketLogActivity : AppCompatActivity() {
@@ -100,8 +101,11 @@ class PacketLogActivity : AppCompatActivity() {
     }
 
     private fun setDataToLineChartByCache(hddServiceCode: String, serviceCode: String) {
-        val packetLogInfoJson = MioUtil.parseJsonToPacketLog(MioUtil.loadJsonCache(this, this.applicationContext.getString(R.string.preference_key_cache_packet_log)))
-        packetLogInfoJson?.let { setDataToLineChart(it, hddServiceCode, serviceCode) }
+        val jsonString = MioUtil.loadJsonStringFromCache(this, this.applicationContext.getString(R.string.preference_key_cache_packet_log))
+        if (jsonString != "{}") {
+            val packetLogInfoJson = MioUtil.parseJsonToPacketLog(JSONObject(jsonString))
+            packetLogInfoJson?.let { setDataToLineChart(it, hddServiceCode, serviceCode) }
+        }
     }
 
     private fun setDataToLineChart(packetLogInfoJson: PacketLogInfoJson, hddServiceCode: String, serviceCode: String) {
@@ -115,6 +119,7 @@ class PacketLogActivity : AppCompatActivity() {
         dataSets.add(couponUseDataSet)
 
         val lineData = LineData(dataSets)
+
         lineChart.data = lineData
         lineChart.invalidate()
     }
@@ -152,7 +157,7 @@ class PacketLogActivity : AppCompatActivity() {
             }
         }
 
-        val color = ContextCompat.getColor(this, R.color.colorPrimary)
+        val color = ContextCompat.getColor(this, colorResourceId)
         val dataSet = LineDataSet(entries, label)
         dataSet.color = color
         dataSet.setCircleColor(color)

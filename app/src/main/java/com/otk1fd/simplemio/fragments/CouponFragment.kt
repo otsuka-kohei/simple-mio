@@ -24,6 +24,7 @@ import com.otk1fd.simplemio.mio.MioUtil
 import com.otk1fd.simplemio.ui.CouponExpandableListAdapter
 import com.otk1fd.simplemio.ui.listview_item.CouponListItemChild
 import com.otk1fd.simplemio.ui.listview_item.CouponListItemParent
+import org.json.JSONObject
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -166,8 +167,11 @@ class CouponFragment : Fragment(), View.OnClickListener {
     }
 
     private fun setCouponInfoByCache() {
-        val couponInfoJson = MioUtil.parseJsonToCoupon(MioUtil.loadJsonCache(activity, activity.applicationContext.getString(R.string.preference_key_cache_coupon)))
-        couponInfoJson?.let { setCouponInfo(it) }
+        val jsonString = MioUtil.loadJsonStringFromCache(activity, activity.applicationContext.getString(R.string.preference_key_cache_coupon))
+        if (jsonString != "{}") {
+            val couponInfoJson = MioUtil.parseJsonToCoupon(JSONObject(jsonString))
+            couponInfoJson?.let { setCouponInfo(it) }
+        }
     }
 
     private fun setCouponInfo(couponInfoJson: CouponInfoJson) {

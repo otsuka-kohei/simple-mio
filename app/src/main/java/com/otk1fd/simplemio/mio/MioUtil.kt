@@ -202,10 +202,13 @@ object MioUtil {
         editor.apply()
     }
 
-    fun loadJsonCache(activity: Activity, key: String): JSONObject {
+    fun loadJsonStringFromCache(activity: Activity, key: String): String {
         val preference = activity.applicationContext.getSharedPreferences(activity.applicationContext.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
-        val jsonString = preference.getString(key, "{}")
-        return JSONObject(jsonString)
+        return preference.getString(key, "{}")
+    }
+
+    fun isJsonValid(jsonObject: JSONObject): Boolean {
+        return !jsonObject.isNull("returnCode")
     }
 
     fun getJapanesePlanName(plan: String): String {

@@ -15,6 +15,7 @@ import com.otk1fd.simplemio.mio.MioUtil
 import com.otk1fd.simplemio.ui.PacketLogExpandableListAdapter
 import com.otk1fd.simplemio.ui.listview_item.PacketLogListItemChild
 import com.otk1fd.simplemio.ui.listview_item.PacketLogListItemParent
+import org.json.JSONObject
 
 
 /**
@@ -65,8 +66,11 @@ class PacketLogFragment : Fragment() {
     }
 
     private fun setServiceListByCache() {
-        val couponInfoJson = MioUtil.parseJsonToCoupon(MioUtil.loadJsonCache(activity, activity.applicationContext.getString(R.string.preference_key_cache_coupon)))
-        couponInfoJson?.let { setServiceList(it) }
+        val jsonString = MioUtil.loadJsonStringFromCache(activity, activity.applicationContext.getString(R.string.preference_key_cache_coupon))
+        if (jsonString != "{}") {
+            val couponInfoJson = MioUtil.parseJsonToCoupon(JSONObject(jsonString))
+            couponInfoJson?.let { setServiceList(it) }
+        }
     }
 
     private fun setServiceList(couponInfoJson: CouponInfoJson) {
