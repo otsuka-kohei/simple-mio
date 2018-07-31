@@ -22,8 +22,6 @@ import com.otk1fd.simplemio.ui.listview_item.PacketLogListItemParent
  */
 class PacketLogFragment : Fragment() {
 
-    //フラグメント上で発生するイベント（OnClickListenerとか）は極力フラグメントの中で済ませた方がいいと思う
-
     private lateinit var packetLogListView: ExpandableListView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,

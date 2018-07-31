@@ -20,7 +20,6 @@ import com.otk1fd.simplemio.mio.MioUtil
  */
 class AboutFragment : Fragment(), View.OnClickListener {
 
-    //フラグメント上で発生するイベント（OnClickListenerとか）は極力フラグメントの中で済ませた方がいいと思う
     private lateinit var logoutButton: Button
     private lateinit var aboutTextView: TextView
     private lateinit var openSourceTextView: TextView

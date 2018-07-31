@@ -5,6 +5,8 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
+import android.support.v4.content.ContextCompat
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
@@ -22,7 +24,6 @@ import com.otk1fd.simplemio.mio.MioUtil
 import com.otk1fd.simplemio.ui.CouponExpandableListAdapter
 import com.otk1fd.simplemio.ui.listview_item.CouponListItemChild
 import com.otk1fd.simplemio.ui.listview_item.CouponListItemParent
-import kotlinx.android.synthetic.main.fragment_coupon.*
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -32,14 +33,13 @@ import kotlin.collections.ArrayList
  */
 class CouponFragment : Fragment(), View.OnClickListener {
 
-    //フラグメント上で発生するイベント（OnClickListenerとか）は極力フラグメントの中で済ませた方がいいと思う
-
     private lateinit var applyButton: FloatingActionButton
     private lateinit var couponListView: ExpandableListView
     private lateinit var progressDialog: ProgressDialog
+    private lateinit var couponSwipeRefreshLayout: SwipeRefreshLayout
 
-    private val couponStatus = HashMap<String, Boolean>()
-    private var oldCouponStatus = couponStatus.clone()
+    private val couponStatus = HashMap<String, Boolean>().withDefault { false }
+    private var oldCouponStatus = cloneHashMapWithDefault(couponStatus)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -77,10 +77,12 @@ class CouponFragment : Fragment(), View.OnClickListener {
             false
         }
 
+        couponSwipeRefreshLayout = activity.findViewById(R.id.couponSwipeRefreshLayout)
+
         couponSwipeRefreshLayout.setOnRefreshListener {
             setCouponInfoByHttp()
         }
-        couponSwipeRefreshLayout.setColorSchemeColors(activity.applicationContext.getColor(R.color.colorPrimary))
+        couponSwipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(activity, R.color.colorPrimary))
 
     }
 
@@ -206,7 +208,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
             couponStatus[serviceCode] = status
             updateApplyButtonShow()
         },
-                getCouponStatus = { serviceCode -> couponStatus.getOrDefault(serviceCode, false) })
+                getCouponStatus = { serviceCode -> couponStatus.getValue(serviceCode) })
 
         couponListView.setAdapter(couponExpandableListAdapter)
 
@@ -221,7 +223,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
             }
         }
 
-        oldCouponStatus = couponStatus.clone()
+        oldCouponStatus = cloneHashMapWithDefault(couponStatus)
         updateApplyButtonShow()
     }
 
@@ -313,5 +315,14 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
     private fun stopProgressDialog() {
         progressDialog.dismiss()
+    }
+
+    private fun <K, V> cloneHashMapWithDefault(srcMap: MutableMap<K, V>): HashMap<K, V> {
+        val map = HashMap<K, V>()
+        val keys = srcMap.keys
+        for (key in keys) {
+            map[key] = srcMap.getValue(key)
+        }
+        return map
     }
 }
