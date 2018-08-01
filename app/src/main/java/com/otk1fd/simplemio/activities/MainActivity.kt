@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val defaultFragment = CouponFragment()
         val fragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.fragment, defaultFragment)
+        fragmentTransaction.replace(R.id.fragmentLayout, defaultFragment)
         fragmentTransaction.commit()
     }
 
@@ -119,18 +119,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             R.id.nav_history -> {
                 fragmentName = getString(R.string.menu_packet_log)
+                fragment = fragmentManager.findFragmentByTag(fragmentName)
                 if (fragment == null) {
                     fragment = PacketLogFragment()
                 }
             }
             R.id.nav_config -> {
                 fragmentName = getString(R.string.menu_config)
+                fragment = fragmentManager.findFragmentByTag(fragmentName)
                 if (fragment == null) {
                     fragment = ConfigFragment()
                 }
             }
             R.id.nav_about -> {
                 fragmentName = getString(R.string.menu_about)
+                fragment = fragmentManager.findFragmentByTag(fragmentName)
                 if (fragment == null) {
                     fragment = AboutFragment()
                 }
@@ -138,7 +141,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
 
-        fragmentTransaction.replace(R.id.fragment, fragment, fragmentName)
+        fragmentTransaction.replace(R.id.fragmentLayout, fragment, fragmentName)
         fragmentTransaction.commit()
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
