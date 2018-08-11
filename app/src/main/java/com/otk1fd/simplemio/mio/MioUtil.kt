@@ -134,6 +134,10 @@ object MioUtil {
             }
         }
 
+        jsonRequest.retryPolicy = DefaultRetryPolicy(10000,
+                10,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+
         queue.add(jsonRequest)
         queue.start()
     }
@@ -160,6 +164,10 @@ object MioUtil {
                 return "application/json"
             }
         }
+
+        jsonRequest.retryPolicy = DefaultRetryPolicy(10000,
+                10,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         queue.add(jsonRequest)
         queue.start()
