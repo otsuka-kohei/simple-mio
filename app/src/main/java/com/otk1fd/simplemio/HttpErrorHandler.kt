@@ -16,8 +16,8 @@ object HttpErrorHandler {
     }
 
     fun handleHttpError(volleyError: VolleyError?, getError: Boolean = true, recoveryFunc: () -> Unit = {}) {
-        if (volleyError == null || volleyError.networkResponse == null) {
-            showErrorMessageFunc("エラーが発生し、最新のデータを取得できませんでした。\n少しお待ちの上、再度お試しください。")
+        if (volleyError?.networkResponse == null) {
+            showErrorMessageFunc("通信エラーが発生し、最新のデータを取得できませんでした。\n少しお待ちの上、再度お試しください。")
             recoveryFunc()
             return
         }
@@ -37,15 +37,15 @@ object HttpErrorHandler {
                 loginFunc()
             }
             500 -> {
-                showErrorMessageFunc("IIJ mioのサーバでエラーが発生し、最新のデータを取得できませんでした。\nしばらくお待ちの上、再度お試しください。")
+                showErrorMessageFunc("IIJmioのサーバでエラーが発生し、最新のデータを取得できませんでした。\nしばらくお待ちの上、再度お試しください。")
                 recoveryFunc()
             }
             503 -> {
-                showErrorMessageFunc("IIJ mioのサーバがメンテナンス中のため、最新のデータを取得できませんでした。\nしばらくお待ちの上、再度お試しください。")
+                showErrorMessageFunc("IIJmioのサーバがメンテナンス中のため、最新のデータを取得できませんでした。\nしばらくお待ちの上、再度お試しください。")
                 recoveryFunc()
             }
             else -> {
-                showErrorMessageFunc("エラーが発生し、最新のデータを取得できませんでした。\nばらくお待ちの上、再度お試しください。")
+                showErrorMessageFunc("エラーが発生し、最新のデータを取得できませんでした。\nしばらくお待ちの上、再度お試しください。")
                 recoveryFunc()
             }
         }
