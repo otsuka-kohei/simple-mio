@@ -1,17 +1,23 @@
 package com.otk1fd.simplemio.activities
 
+import android.Manifest
 import android.app.Fragment
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.NavigationView
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.telephony.TelephonyManager
 import android.util.Log
 import android.view.MenuItem
+import android.widget.TextView
 import android.widget.Toast
 import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
@@ -49,6 +55,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navigationView = findViewById(R.id.nav_view)
         navigationView.setNavigationItemSelectedListener(this)
         navigationView.menu.getItem(0).isChecked = true
+
+        val navigationHeader = navigationView.getHeaderView(0)
+        val phoneNumberTextView: TextView = navigationHeader.findViewById(R.id.phoneNumberTextView)
+        val telephonyManager: TelephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        val phoneNumberPermissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+        if (phoneNumberPermissionCheck == PackageManager.PERMISSION_GRANTED) {
+            phoneNumberTextView.text = telephonyManager.line1Number
+            Log.d("phonenumber", telephonyManager.line1Number)
+        } else {
+            phoneNumberTextView.text = ""
+        }
 
         supportActionBar?.title = getString(R.string.menu_coupon)
 
