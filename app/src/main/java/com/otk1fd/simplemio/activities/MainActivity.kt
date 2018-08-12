@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.NavigationView
+import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
@@ -17,6 +18,7 @@ import android.support.v7.widget.Toolbar
 import android.telephony.TelephonyManager
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import com.otk1fd.simplemio.HttpErrorHandler
@@ -34,6 +36,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var navigationView: NavigationView
+    private val PERMISSIONS_REQUEST_READ_PHONE_STATE = 12345
+    private var gettingPermission: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,23 +60,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navigationView.setNavigationItemSelectedListener(this)
         navigationView.menu.getItem(0).isChecked = true
 
-        val navigationHeader = navigationView.getHeaderView(0)
-        val phoneNumberTextView: TextView = navigationHeader.findViewById(R.id.phoneNumberTextView)
-        val telephonyManager: TelephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        val phoneNumberPermissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
-        if (phoneNumberPermissionCheck == PackageManager.PERMISSION_GRANTED) {
-            phoneNumberTextView.text = telephonyManager.line1Number
-            Log.d("phonenumber", telephonyManager.line1Number)
-        } else {
-            phoneNumberTextView.text = ""
-        }
-
         supportActionBar?.title = getString(R.string.menu_coupon)
 
         val defaultFragment = CouponFragment()
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.fragmentLayout, defaultFragment)
         fragmentTransaction.commit()
+
+        setPhoneNumberToNavigationHeader()
+    }
+
+    public override fun onStart() {
+        super.onStart()
+        // パーミッション確認
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            gettingPermission = true
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_PHONE_STATE), PERMISSIONS_REQUEST_READ_PHONE_STATE)
+        }
     }
 
     public override fun onResume() {
@@ -103,10 +107,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         } else {
-            // トークンが存在しない場合はログインする
-            if (MioUtil.loadToken(this) == "") {
-                Log.d("resume without login", "please login")
-                startOAuthWithDialog()
+            if (!gettingPermission) {
+                // トークンが存在しない場合はログインする
+                if (MioUtil.loadToken(this) == "") {
+                    startOAuthWithDialog()
+                }
             }
         }
     }
@@ -172,7 +177,29 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return true
     }
 
-    fun startOAuthWithDialog() {
+    private fun setPhoneNumberToNavigationHeader() {
+        val navigationHeader = navigationView.getHeaderView(0)
+        val phoneNumberTextView: TextView = navigationHeader.findViewById(R.id.phoneNumberTextView)
+        val telephonyManager: TelephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+            phoneNumberTextView.visibility = View.VISIBLE
+            phoneNumberTextView.text = telephonyManager.line1Number
+        } else {
+            phoneNumberTextView.visibility = View.GONE
+            phoneNumberTextView.text = ""
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        gettingPermission = false
+        if (requestCode == PERMISSIONS_REQUEST_READ_PHONE_STATE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                setPhoneNumberToNavigationHeader()
+            }
+        }
+    }
+
+    private fun startOAuthWithDialog() {
         showAlertDialog(this, "ログイン", "IIJmioでのログインが必要です\nブラウザを開いてログインページに移動してもよろしいですか？",
                 "はい", negativeButtonText = "いいえ",
                 positiveFunc = { startOAuth() }, negativeFunc = { this.finish() })

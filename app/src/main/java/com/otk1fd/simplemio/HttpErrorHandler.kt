@@ -14,7 +14,7 @@ object HttpErrorHandler {
         this.loginFunc = loginFunc
         this.showErrorMessageFunc = showErrorMessageFunc
     }
-
+    
     fun handleHttpError(volleyError: VolleyError?, getError: Boolean = true, recoveryFunc: () -> Unit = {}) {
         if (volleyError?.networkResponse == null) {
             showErrorMessageFunc("通信エラーが発生し、最新のデータを取得できませんでした。\n少しお待ちの上、再度お試しください。")
