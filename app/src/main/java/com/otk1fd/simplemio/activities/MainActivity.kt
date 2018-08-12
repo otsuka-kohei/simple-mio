@@ -183,7 +183,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         var phoneNumber = ""
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
             val telephonyManager: TelephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-            phoneNumber = telephonyManager.line1Number
+            phoneNumber = telephonyManager.line1Number.orEmpty()
         }
 
         phoneNumberTextView.text = phoneNumber
