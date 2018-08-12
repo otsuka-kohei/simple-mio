@@ -180,13 +180,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun setPhoneNumberToNavigationHeader() {
         val navigationHeader = navigationView.getHeaderView(0)
         val phoneNumberTextView: TextView = navigationHeader.findViewById(R.id.phoneNumberTextView)
-        val telephonyManager: TelephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        var phoneNumber = ""
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+            val telephonyManager: TelephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+            phoneNumber = telephonyManager.line1Number
+        }
+
+        phoneNumberTextView.text = phoneNumber
+
+        if (phoneNumber.isNotBlank()) {
             phoneNumberTextView.visibility = View.VISIBLE
-            phoneNumberTextView.text = telephonyManager.line1Number
         } else {
             phoneNumberTextView.visibility = View.GONE
-            phoneNumberTextView.text = ""
         }
     }
 
