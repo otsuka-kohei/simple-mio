@@ -30,7 +30,9 @@
             android:id="@+id/couponListView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:childDivider="@color/colorPrimaryDark"
             android:divider="@color/colorPrimaryDark"
+            android:dividerHeight="1dp"
             app:layout_constraintBottom_toTopOf="@+id/updateButton" />
     </android.support.v4.widget.SwipeRefreshLayout>
 </android.support.constraint.ConstraintLayout>
