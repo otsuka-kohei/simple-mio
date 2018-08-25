@@ -178,8 +178,9 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
     private fun setCouponInfo(couponInfoJson: CouponInfoJson) {
         // ExpandableListView のそれぞれの Group 要素の展開状況を控えておく
-        val groupNum: Int? = couponListView.expandableListAdapter?.groupCount
-        val expandStatus: List<Boolean> = if (groupNum != null) (0 until groupNum).map { couponListView.isGroupExpanded(it) } else ArrayList()
+        val oldAdapter = couponListView.expandableListAdapter
+        val oldGroupNum: Int = if (oldAdapter == null) 0 else couponListView.expandableListAdapter.groupCount
+        val expandStatus: List<Boolean> = (0 until oldGroupNum).map { couponListView.isGroupExpanded(it) }
 
         // 親要素のリスト
         val parents = ArrayList<CouponListItemParent>()
@@ -220,10 +221,16 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
         couponInfoJson.let { setCouponStatus(it) }
 
-        // 控えておいた ExpandableListView の展開状況を復元する
-        if (groupNum != null) {
+        // すべて展開するように設定されている場合はすべて展開する
+        // そうでなければ，控えておいた ExpandableListView の展開状況を復元する
+        val groupNum: Int = couponExpandableListAdapter.groupCount
+        if (expandAllGroup) {
             for (i in 0 until groupNum) {
-                if (expandStatus[i] || expandAllGroup) {
+                couponListView.expandGroup(i)
+            }
+        } else if (groupNum == oldGroupNum) {
+            for (i in 0 until groupNum) {
+                if (expandStatus[i]) {
                     couponListView.expandGroup(i)
                 }
             }

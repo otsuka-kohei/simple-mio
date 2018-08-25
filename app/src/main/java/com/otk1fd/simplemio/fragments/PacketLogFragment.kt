@@ -81,8 +81,9 @@ class PacketLogFragment : Fragment() {
 
     private fun setServiceList(couponInfoJson: CouponInfoJson) {
         // ExpandableListView のそれぞれの Group 要素の展開状況を控えておく
-        val groupNum: Int? = packetLogListView.expandableListAdapter?.groupCount
-        val expandStatus: List<Boolean> = if (groupNum != null) (0 until groupNum).map { packetLogListView.isGroupExpanded(it) } else ArrayList()
+        val oldAdapter = packetLogListView.expandableListAdapter
+        val oldGroupNum: Int = if (oldAdapter == null) 0 else packetLogListView.expandableListAdapter.groupCount
+        val expandStatus: List<Boolean> = (0 until oldGroupNum).map { packetLogListView.isGroupExpanded(it) }
 
 
         // 親要素のリスト
@@ -118,10 +119,16 @@ class PacketLogFragment : Fragment() {
 
         packetLogListView.setAdapter(packetLogExpandableListAdapter)
 
-        // 控えておいた ExpandableListView の展開状況を復元する
-        if (groupNum != null) {
+        // すべて展開するように設定されている場合はすべて展開する
+        // そうでなければ，控えておいた ExpandableListView の展開状況を復元する
+        val groupNum: Int = packetLogExpandableListAdapter.groupCount
+        if (expandAllGroup) {
             for (i in 0 until groupNum) {
-                if (expandStatus[i] || expandAllGroup) {
+                packetLogListView.expandGroup(i)
+            }
+        } else if (groupNum == oldGroupNum) {
+            for (i in 0 until groupNum) {
+                if (expandStatus[i]) {
                     packetLogListView.expandGroup(i)
                 }
             }
