@@ -42,6 +42,8 @@ class CouponFragment : Fragment(), View.OnClickListener {
     private val couponStatus = HashMap<String, Boolean>().withDefault { false }
     private var oldCouponStatus = cloneHashMapWithDefault(couponStatus)
 
+    private var expandAllGroup = false
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -85,6 +87,8 @@ class CouponFragment : Fragment(), View.OnClickListener {
         }
         couponSwipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(activity, R.color.colorPrimary))
 
+        val preference = activity.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
+        expandAllGroup = preference.getBoolean(activity.getString(R.string.preference_key_expand_all_group), false)
     }
 
     override fun onResume() {
@@ -148,6 +152,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
         }
     }
 
+
     private fun setCouponInfoByHttp() {
         MioUtil.updateCoupon(activity, execFunc = { it ->
             val couponInfoJson: CouponInfoJson? = MioUtil.parseJsonToCoupon(it)
@@ -155,9 +160,9 @@ class CouponFragment : Fragment(), View.OnClickListener {
             MioUtil.cacheJson(activity, it, activity.applicationContext.getString(R.string.preference_key_cache_coupon))
 
             couponInfoJson?.let { setCouponInfo(it) }
-
             couponSwipeRefreshLayout.isRefreshing = false
         }, errorFunc = {
+            // クーポン情報の取得に失敗した場合はキャッシュしているJSONデータをリストに適用する
             HttpErrorHandler.handleHttpError(it) { setCouponInfoByCache() }
             couponSwipeRefreshLayout.isRefreshing = false
         })
@@ -218,7 +223,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
         // 控えておいた ExpandableListView の展開状況を復元する
         if (groupNum != null) {
             for (i in 0 until groupNum) {
-                if (expandStatus[i]) {
+                if (expandStatus[i] || expandAllGroup) {
                     couponListView.expandGroup(i)
                 }
             }

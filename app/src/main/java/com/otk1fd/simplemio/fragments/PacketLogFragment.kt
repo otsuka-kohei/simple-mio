@@ -1,6 +1,7 @@
 package com.otk1fd.simplemio.fragments
 
 import android.app.Fragment
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -24,6 +25,8 @@ import org.json.JSONObject
 class PacketLogFragment : Fragment() {
 
     private lateinit var packetLogListView: ExpandableListView
+
+    private var expandAllGroup = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -57,6 +60,9 @@ class PacketLogFragment : Fragment() {
         }
 
         setServiceListByCache()
+
+        val preference = activity.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
+        expandAllGroup = preference.getBoolean(activity.getString(R.string.preference_key_expand_all_group), false)
     }
 
     override fun onStart() {
@@ -115,12 +121,10 @@ class PacketLogFragment : Fragment() {
         // 控えておいた ExpandableListView の展開状況を復元する
         if (groupNum != null) {
             for (i in 0 until groupNum) {
-                if (expandStatus[i]) {
+                if (expandStatus[i] || expandAllGroup) {
                     packetLogListView.expandGroup(i)
                 }
             }
         }
-
-
     }
 }
