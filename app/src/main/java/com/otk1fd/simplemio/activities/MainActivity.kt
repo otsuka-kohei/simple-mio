@@ -8,7 +8,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.NavigationView
-import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
@@ -21,6 +20,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.edit
 import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.Util
@@ -36,7 +36,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var navigationView: NavigationView
-    private val PERMISSIONS_REQUEST_READ_PHONE_STATE = 12345
     private var gettingPermission: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,28 +57,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         navigationView = findViewById(R.id.nav_view)
         navigationView.setNavigationItemSelectedListener(this)
-        navigationView.menu.getItem(0).isChecked = true
 
+        // ナビゲーションドロワーのデフォルトの項目を選択状態にする
+        navigationView.menu.getItem(0).isChecked = true
         supportActionBar?.title = getString(R.string.menu_coupon)
 
+        // デフォルトのFragmentをセットする
         val defaultFragment = CouponFragment()
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.fragmentLayout, defaultFragment)
         fragmentTransaction.commit()
-
-        setPhoneNumberToNavigationHeader()
     }
 
-    public override fun onStart() {
+    override fun onStart() {
         super.onStart()
-        // パーミッション確認
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            gettingPermission = true
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_PHONE_STATE), PERMISSIONS_REQUEST_READ_PHONE_STATE)
-        }
+
+        updatePhoneNumberOnNavigationHeader()
     }
 
-    public override fun onResume() {
+    override fun onResume() {
         super.onResume()
 
         val intent = intent
@@ -177,13 +173,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return true
     }
 
-    private fun setPhoneNumberToNavigationHeader() {
+    fun updatePhoneNumberOnNavigationHeader(usePreference: Boolean = true, showPhoneNumberParameter: Boolean = false) {
+        val showPhoneNumber = if (usePreference) {
+            getSharedPreferences(getString(R.string.preference_file_name), Context.MODE_PRIVATE).getBoolean(getString(R.string.preference_key_show_phone_number), false)
+        } else {
+            showPhoneNumberParameter
+        }
+
         val navigationHeader = navigationView.getHeaderView(0)
         val phoneNumberTextView: TextView = navigationHeader.findViewById(R.id.phoneNumberTextView)
         var phoneNumber = ""
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+
+        if (showPhoneNumber && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
             val telephonyManager: TelephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
             phoneNumber = telephonyManager.line1Number.orEmpty()
+        } else {
+            getSharedPreferences(getString(R.string.preference_file_name), Context.MODE_PRIVATE).edit { putBoolean(getString(R.string.preference_key_show_phone_number), false) }
         }
 
         phoneNumberTextView.text = phoneNumber
@@ -192,15 +197,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             phoneNumberTextView.visibility = View.VISIBLE
         } else {
             phoneNumberTextView.visibility = View.GONE
-        }
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        gettingPermission = false
-        if (requestCode == PERMISSIONS_REQUEST_READ_PHONE_STATE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                setPhoneNumberToNavigationHeader()
-            }
         }
     }
 
