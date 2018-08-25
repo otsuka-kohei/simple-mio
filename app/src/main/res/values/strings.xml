@@ -9,7 +9,8 @@
 
     <string name="preference_file_name">preference</string>
     <string name="preference_key_token">token</string>
-    <string name="preference_key_useMBOnly">useMBOnly</string>
+    <string name="preference_key_use_MB_only">useMBOnly</string>
+    <string name="preference_key_show_phone_number">showPhoneNumber</string>
 
     <string name="preference_key_cache_coupon">couponCache</string>
     <string name="preference_key_cache_packet_log">packetLogCache</string>

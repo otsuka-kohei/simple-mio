@@ -239,7 +239,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
     private fun getVolume(couponInfo: CouponInfo): String {
         val preference = activity.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
-        val useOnlyMB = preference.getBoolean(activity.getString(R.string.preference_key_useMBOnly), false)
+        val useOnlyMB = preference.getBoolean(activity.getString(R.string.preference_key_use_MB_only), false)
 
         val plan: String = couponInfo.plan
 

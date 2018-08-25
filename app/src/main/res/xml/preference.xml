@@ -2,8 +2,14 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="クーポン切り替え">
         <SwitchPreference
-            android:key="@string/preference_key_useMBOnly"
+            android:key="@string/preference_key_use_MB_only"
             android:title="常にMB単位でクーポン残量表示する"
-            android:summary="クーポン残量でGB単位での表示を行わず、常にMB単位で表示します。" />
+            android:summary="クーポン残量でGB単位ではなく、MB単位で表示します。" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="その他">
+        <SwitchPreference
+            android:key="@string/preference_key_show_phone_number"
+            android:title="メニューに電話番号を表示する"
+            android:summary="メニュー（左上の≡ボタンを押すと表示される画面）に、この端末の電話番号を表示します。" />
     </PreferenceCategory>
 </PreferenceScreen>
