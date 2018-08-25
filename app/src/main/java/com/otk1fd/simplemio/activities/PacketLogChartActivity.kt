@@ -70,13 +70,19 @@ class PacketLogActivity : AppCompatActivity() {
     private fun initLineChart() {
         lineChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
         lineChart.xAxis.valueFormatter = XAxisValueFormatterForDate(dateList)
-        lineChart.xAxis.granularity = 7f
+        lineChart.xAxis.isGranularityEnabled = true
+        lineChart.xAxis.granularity = 1f
+        lineChart.xAxis.labelCount = 3
 
         lineChart.axisLeft.valueFormatter = YAxisValueFormatterForUnitMB()
         lineChart.axisLeft.axisMinimum = 0f
+        lineChart.axisLeft.isGranularityEnabled = true
+        lineChart.axisLeft.granularity = 1f
 
         lineChart.axisRight.valueFormatter = YAxisValueFormatterForUnitMB()
         lineChart.axisRight.axisMinimum = 0f
+        lineChart.axisRight.isGranularityEnabled = true
+        lineChart.axisRight.granularity = 1f
 
         val description = Description()
         description.text = ""
