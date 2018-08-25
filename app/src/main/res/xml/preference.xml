@@ -8,6 +8,10 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="その他">
         <SwitchPreference
+            android:key="@string/preference_key_expand_all_group"
+            android:title="常にリストを展開する"
+            android:summary="クーポン切り替え画面とデータ通信量履歴画面で、常にリストを展開した状態にします。" />
+        <SwitchPreference
             android:key="@string/preference_key_show_phone_number"
             android:title="メニューに電話番号を表示する"
             android:summary="メニュー（左上の≡ボタンを押すと表示される画面）に、この端末の電話番号を表示します。" />

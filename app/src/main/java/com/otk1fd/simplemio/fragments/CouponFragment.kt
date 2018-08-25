@@ -42,6 +42,8 @@ class CouponFragment : Fragment(), View.OnClickListener {
     private val couponStatus = HashMap<String, Boolean>().withDefault { false }
     private var oldCouponStatus = cloneHashMapWithDefault(couponStatus)
 
+    private var expandAllGroup = false
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -85,6 +87,8 @@ class CouponFragment : Fragment(), View.OnClickListener {
         }
         couponSwipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(activity, R.color.colorPrimary))
 
+        val preference = activity.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
+        expandAllGroup = preference.getBoolean(activity.getString(R.string.preference_key_expand_all_group), false)
     }
 
     override fun onResume() {
@@ -148,6 +152,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
         }
     }
 
+
     private fun setCouponInfoByHttp() {
         MioUtil.updateCoupon(activity, execFunc = { it ->
             val couponInfoJson: CouponInfoJson? = MioUtil.parseJsonToCoupon(it)
@@ -155,9 +160,9 @@ class CouponFragment : Fragment(), View.OnClickListener {
             MioUtil.cacheJson(activity, it, activity.applicationContext.getString(R.string.preference_key_cache_coupon))
 
             couponInfoJson?.let { setCouponInfo(it) }
-
             couponSwipeRefreshLayout.isRefreshing = false
         }, errorFunc = {
+            // クーポン情報の取得に失敗した場合はキャッシュしているJSONデータをリストに適用する
             HttpErrorHandler.handleHttpError(it) { setCouponInfoByCache() }
             couponSwipeRefreshLayout.isRefreshing = false
         })
@@ -173,8 +178,9 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
     private fun setCouponInfo(couponInfoJson: CouponInfoJson) {
         // ExpandableListView のそれぞれの Group 要素の展開状況を控えておく
-        val groupNum: Int? = couponListView.expandableListAdapter?.groupCount
-        val expandStatus: List<Boolean> = if (groupNum != null) (0 until groupNum).map { couponListView.isGroupExpanded(it) } else ArrayList()
+        val oldAdapter = couponListView.expandableListAdapter
+        val oldGroupNum: Int = if (oldAdapter == null) 0 else couponListView.expandableListAdapter.groupCount
+        val expandStatus: List<Boolean> = (0 until oldGroupNum).map { couponListView.isGroupExpanded(it) }
 
         // 親要素のリスト
         val parents = ArrayList<CouponListItemParent>()
@@ -215,8 +221,14 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
         couponInfoJson.let { setCouponStatus(it) }
 
-        // 控えておいた ExpandableListView の展開状況を復元する
-        if (groupNum != null) {
+        // すべて展開するように設定されている場合はすべて展開する
+        // そうでなければ，控えておいた ExpandableListView の展開状況を復元する
+        val groupNum: Int = couponExpandableListAdapter.groupCount
+        if (expandAllGroup) {
+            for (i in 0 until groupNum) {
+                couponListView.expandGroup(i)
+            }
+        } else if (groupNum == oldGroupNum) {
             for (i in 0 until groupNum) {
                 if (expandStatus[i]) {
                     couponListView.expandGroup(i)

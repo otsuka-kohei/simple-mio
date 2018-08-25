@@ -1,6 +1,7 @@
 package com.otk1fd.simplemio.fragments
 
 import android.app.Fragment
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -24,6 +25,8 @@ import org.json.JSONObject
 class PacketLogFragment : Fragment() {
 
     private lateinit var packetLogListView: ExpandableListView
+
+    private var expandAllGroup = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -57,6 +60,9 @@ class PacketLogFragment : Fragment() {
         }
 
         setServiceListByCache()
+
+        val preference = activity.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
+        expandAllGroup = preference.getBoolean(activity.getString(R.string.preference_key_expand_all_group), false)
     }
 
     override fun onStart() {
@@ -75,8 +81,9 @@ class PacketLogFragment : Fragment() {
 
     private fun setServiceList(couponInfoJson: CouponInfoJson) {
         // ExpandableListView のそれぞれの Group 要素の展開状況を控えておく
-        val groupNum: Int? = packetLogListView.expandableListAdapter?.groupCount
-        val expandStatus: List<Boolean> = if (groupNum != null) (0 until groupNum).map { packetLogListView.isGroupExpanded(it) } else ArrayList()
+        val oldAdapter = packetLogListView.expandableListAdapter
+        val oldGroupNum: Int = if (oldAdapter == null) 0 else packetLogListView.expandableListAdapter.groupCount
+        val expandStatus: List<Boolean> = (0 until oldGroupNum).map { packetLogListView.isGroupExpanded(it) }
 
 
         // 親要素のリスト
@@ -112,15 +119,19 @@ class PacketLogFragment : Fragment() {
 
         packetLogListView.setAdapter(packetLogExpandableListAdapter)
 
-        // 控えておいた ExpandableListView の展開状況を復元する
-        if (groupNum != null) {
+        // すべて展開するように設定されている場合はすべて展開する
+        // そうでなければ，控えておいた ExpandableListView の展開状況を復元する
+        val groupNum: Int = packetLogExpandableListAdapter.groupCount
+        if (expandAllGroup) {
+            for (i in 0 until groupNum) {
+                packetLogListView.expandGroup(i)
+            }
+        } else if (groupNum == oldGroupNum) {
             for (i in 0 until groupNum) {
                 if (expandStatus[i]) {
                     packetLogListView.expandGroup(i)
                 }
             }
         }
-
-
     }
 }
