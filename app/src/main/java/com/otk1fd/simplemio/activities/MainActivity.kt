@@ -58,6 +58,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navigationView = findViewById(R.id.nav_view)
         navigationView.setNavigationItemSelectedListener(this)
 
+        val item = navigationView.menu.findItem(R.id.nav_coupon)
+        item.isChecked = true
+        onNavigationItemSelected(item)
+
+        /*
         // ナビゲーションドロワーのデフォルトの項目を選択状態にする
         navigationView.menu.getItem(0).isChecked = true
         supportActionBar?.title = getString(R.string.menu_coupon)
@@ -67,6 +72,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.fragmentLayout, defaultFragment)
         fragmentTransaction.commit()
+        */
     }
 
     override fun onStart() {
@@ -165,9 +171,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         toolbar.title = fragmentName
 
-        navigationView.isEnabled = true
-
-        item.isChecked = true
+        //navigationView.isEnabled = true
+        //item.isChecked = true
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
