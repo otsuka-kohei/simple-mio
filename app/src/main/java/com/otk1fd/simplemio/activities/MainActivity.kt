@@ -10,10 +10,8 @@ import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
-import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.telephony.TelephonyManager
 import android.view.MenuItem
 import android.view.View
@@ -30,11 +28,10 @@ import com.otk1fd.simplemio.fragments.CouponFragment
 import com.otk1fd.simplemio.fragments.PacketLogFragment
 import com.otk1fd.simplemio.mio.MioUtil
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.app_bar_main.*
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
-
-    private lateinit var navigationView: NavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,16 +41,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         setContentView(R.layout.activity_main)
 
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val actionBarDrawerToggle = ActionBarDrawerToggle(
                 this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close)
         drawerLayout.addDrawerListener(actionBarDrawerToggle)
         actionBarDrawerToggle.syncState()
 
-        navigationView = findViewById(R.id.nav_view)
         navigationView.setNavigationItemSelectedListener(this)
 
         // デフォルトのFragmentを設定
@@ -106,9 +100,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onBackPressed() {
-        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             // ナビゲーションドロワーが開いていれば閉じる
-            drawer_layout.closeDrawer(GravityCompat.START)
+            drawerLayout.closeDrawer(GravityCompat.START)
         } else {
             super.onBackPressed()
         }
@@ -159,11 +153,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         fragmentTransaction.commit()
 
         // Toolbarにタイトルをセット
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
         toolbar.title = fragmentName
 
         // ドロワーを閉じる
-        drawer_layout.closeDrawer(GravityCompat.START)
+        drawerLayout.closeDrawer(GravityCompat.START)
 
         return true
     }
@@ -184,8 +177,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         // 電話番号表示用のTextViewを取得
-        val navigationHeader = navigationView.getHeaderView(0)
-        val phoneNumberTextView: TextView = navigationHeader.findViewById(R.id.phoneNumberTextView)
         var phoneNumber = ""
 
         // 電話番号の取得がパーミッションで許可されているか
@@ -200,6 +191,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             getSharedPreferences(getString(R.string.preference_file_name), Context.MODE_PRIVATE).edit { putBoolean(getString(R.string.preference_key_show_phone_number), false) }
         }
 
+        val navigationHeader = navigationView.getHeaderView(0)
+        val phoneNumberTextView: TextView = navigationHeader.findViewById(R.id.phoneNumberTextView)
         phoneNumberTextView.text = phoneNumber
 
         // 電話番号が空文字列（表示しないことも含めて）なら電話番号表示用TextViewを非表示にする．

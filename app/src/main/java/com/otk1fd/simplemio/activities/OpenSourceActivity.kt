@@ -18,6 +18,7 @@ class OpenSourceActivity : AppCompatActivity() {
 
         setSupportActionBar(openSourceToolbar)
 
+        //
         supportActionBar?.title = "オープンソースライセンス"
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_close)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
