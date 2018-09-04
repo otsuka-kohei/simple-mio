@@ -31,6 +31,9 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 
 
+/**
+ * ナビゲーションドロワーを利用してFragmentを切り替えて表示する，アプリの基本となるActivity．
+ */
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
