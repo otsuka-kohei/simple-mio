@@ -21,8 +21,7 @@
     <string name="drawer_open">ドロワーを開く</string>
     <string name="drawer_close">ドロワーを閉じる</string>
 
-    <string name="menu_coupon">クーポン切り替え"</string>
-    <string name="menu_packet_log">データ通信量履歴</string>
+    <string name="menu_coupon">クーポン"</string>
     <string name="menu_config">設定</string>
     <string name="menu_about">このアプリについて</string>
 
