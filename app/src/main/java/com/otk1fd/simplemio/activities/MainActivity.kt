@@ -150,7 +150,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         // Toolbarにタイトルをセット
-        toolbar.title = fragmentName
+        supportActionBar?.title = fragmentName
 
         // ドロワーを閉じる
         drawerLayout.closeDrawer(GravityCompat.START)
