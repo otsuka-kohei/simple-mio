@@ -16,7 +16,10 @@ import com.otk1fd.simplemio.ui.listview_item.CouponListItemChild
 import com.otk1fd.simplemio.ui.listview_item.CouponListItemParent
 
 
-class CouponExpandableListAdapter(val activity: Activity, val parents: List<CouponListItemParent>, val children: List<List<CouponListItemChild>>, val setCouponStatus: (serviceCode: String, status: Boolean) -> Unit, val getCouponStatus: (serviceCode: String) -> Boolean) : BaseExpandableListAdapter() {
+class CouponExpandableListAdapter(val activity: Activity, val parents: List<CouponListItemParent>,
+                                  val children: List<List<CouponListItemChild>>,
+                                  val setCouponStatus: (serviceCode: String, status: Boolean) -> Unit,
+                                  val getCouponStatus: (serviceCode: String) -> Boolean) : BaseExpandableListAdapter() {
 
     private fun getBasicChildView(): View {
         return LayoutInflater.from(activity).inflate(R.layout.item_child_coupon, null)
