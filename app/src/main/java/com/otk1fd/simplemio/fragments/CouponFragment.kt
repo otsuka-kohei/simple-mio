@@ -1,19 +1,19 @@
 package com.otk1fd.simplemio.fragments
 
-import android.app.Fragment
 import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
-import android.support.v4.content.ContextCompat
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ExpandableListView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.Util
@@ -53,13 +53,13 @@ class CouponFragment : Fragment(), View.OnClickListener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        applyButton = activity.findViewById(R.id.applyButton)
+        applyButton = activity!!.findViewById(R.id.applyButton)
         applyButton.setOnClickListener(this)
         applyButton.hide()
 
-        progressDialog = ProgressDialog(activity)
+        progressDialog = ProgressDialog(activity!!)
 
-        couponListView = activity.findViewById(R.id.couponListView)
+        couponListView = activity!!.findViewById(R.id.couponListView)
         // ExpandableListView が展開されたときに自動スクロールするようにする
         couponListView.setOnGroupClickListener { parent, v, groupPosition, id ->
             couponListView.smoothScrollToPosition(groupPosition)
@@ -80,15 +80,15 @@ class CouponFragment : Fragment(), View.OnClickListener {
             false
         }
 
-        couponSwipeRefreshLayout = activity.findViewById(R.id.couponSwipeRefreshLayout)
+        couponSwipeRefreshLayout = activity!!.findViewById(R.id.couponSwipeRefreshLayout)
 
         couponSwipeRefreshLayout.setOnRefreshListener {
             setCouponInfoByHttp()
         }
-        couponSwipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(activity, R.color.colorPrimary))
+        couponSwipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(activity!!, R.color.colorPrimary))
 
-        val preference = activity.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
-        expandAllGroup = preference.getBoolean(activity.getString(R.string.preference_key_expand_all_group), false)
+        val preference = activity!!.getSharedPreferences(activity!!.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
+        expandAllGroup = preference.getBoolean(activity!!.getString(R.string.preference_key_expand_all_group), false)
     }
 
     override fun onResume() {
@@ -96,7 +96,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
         // 自動で更新を開始
         // ログイン済みか確認
-        if (MioUtil.loadToken(activity) != "") {
+        if (MioUtil.loadToken(activity!!) != "") {
             couponSwipeRefreshLayout.isRefreshing = true
             setCouponInfoByHttp()
         }
@@ -110,22 +110,22 @@ class CouponFragment : Fragment(), View.OnClickListener {
     }
 
     private fun showEditTextDialogToSetSimName(serviceCode: String) {
-        val simNameEditText = EditText(activity)
+        val simNameEditText = EditText(activity!!)
 
-        val dialog = AlertDialog.Builder(activity)
+        val dialog = AlertDialog.Builder(activity!!)
 
         dialog.setTitle("SIMの名前を入力してください")
         dialog.setView(simNameEditText)
 
         simNameEditText.setSingleLine()
-        val defaultSimName = Util.loadSimName(activity, serviceCode)
+        val defaultSimName = Util.loadSimName(activity!!, serviceCode)
         simNameEditText.setText(defaultSimName, TextView.BufferType.NORMAL)
         simNameEditText.setSelection(simNameEditText.text.length)
 
         dialog.setPositiveButton("完了") { dialog, whichButton ->
             var simnName = simNameEditText.text.toString()
             simnName = simnName.replace("\n", " ")
-            Util.saveSimName(activity, serviceCode, simnName)
+            Util.saveSimName(activity!!, serviceCode, simnName)
             setCouponInfoByCache()
         }
 
@@ -139,7 +139,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
     override fun onClick(v: View?) {
         if (v == applyButton) {
             startProgressDialog()
-            MioUtil.applyCouponStatus(activity, couponStatus, execFunc = { it ->
+            MioUtil.applyCouponStatus(activity!!, couponStatus, execFunc = { it ->
                 val applyCouponStatusResultJson: ApplyCouponStatusResultJson? = MioUtil.parseJsonToApplyCouponResponse(it)
                 if (applyCouponStatusResultJson?.returnCode == "OK") {
                     setCouponInfoByHttp()
@@ -154,10 +154,10 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
 
     private fun setCouponInfoByHttp() {
-        MioUtil.updateCoupon(activity, execFunc = { it ->
+        MioUtil.updateCoupon(activity!!, execFunc = { it ->
             val couponInfoJson: CouponInfoJson? = MioUtil.parseJsonToCoupon(it)
 
-            MioUtil.cacheJson(activity, it, activity.applicationContext.getString(R.string.preference_key_cache_coupon))
+            MioUtil.cacheJson(activity!!, it, activity!!.applicationContext.getString(R.string.preference_key_cache_coupon))
 
             couponInfoJson?.let { setCouponInfo(it) }
             couponSwipeRefreshLayout.isRefreshing = false
@@ -169,7 +169,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
     }
 
     private fun setCouponInfoByCache() {
-        val jsonString = MioUtil.loadJsonStringFromCache(activity, activity.applicationContext.getString(R.string.preference_key_cache_coupon))
+        val jsonString = MioUtil.loadJsonStringFromCache(activity!!, activity!!.applicationContext.getString(R.string.preference_key_cache_coupon))
         if (jsonString != "{}") {
             val couponInfoJson = MioUtil.parseJsonToCoupon(JSONObject(jsonString))
             couponInfoJson?.let { setCouponInfo(it) }
@@ -211,7 +211,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
             childrenList.add(children)
         }
 
-        val couponExpandableListAdapter = CouponExpandableListAdapter(activity, parents, childrenList, setCouponStatus = { serviceCode, status ->
+        val couponExpandableListAdapter = CouponExpandableListAdapter(activity!!, parents, childrenList, setCouponStatus = { serviceCode, status ->
             couponStatus[serviceCode] = status
             updateApplyButtonShow()
         },
@@ -250,8 +250,8 @@ class CouponFragment : Fragment(), View.OnClickListener {
     }
 
     private fun getVolume(couponInfo: CouponInfo): String {
-        val preference = activity.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
-        val useOnlyMB = preference.getBoolean(activity.getString(R.string.preference_key_use_MB_only), false)
+        val preference = activity!!.getSharedPreferences(activity!!.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
+        val useOnlyMB = preference.getBoolean(activity!!.getString(R.string.preference_key_use_MB_only), false)
 
         val plan: String = couponInfo.plan
 

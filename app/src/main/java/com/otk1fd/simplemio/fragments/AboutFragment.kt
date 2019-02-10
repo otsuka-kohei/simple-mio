@@ -1,6 +1,6 @@
 package com.otk1fd.simplemio.fragments
 
-import android.app.Fragment
+
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.fragment.app.Fragment
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.Util
 import com.otk1fd.simplemio.activities.OpenSourceActivity
@@ -34,13 +35,13 @@ class AboutFragment : Fragment(), View.OnClickListener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        logoutButton = activity.findViewById(R.id.logoutButton)
+        logoutButton = activity!!.findViewById(R.id.logoutButton)
         logoutButton.setOnClickListener(this)
 
-        aboutTextView = activity.findViewById(R.id.aboutTextView)
-        aboutTextView.text = activity.getString(R.string.about)
+        aboutTextView = activity!!.findViewById(R.id.aboutTextView)
+        aboutTextView.text = activity!!.getString(R.string.about)
 
-        openSourceTextView = activity.findViewById(R.id.openSourceTitleTextView)
+        openSourceTextView = activity!!.findViewById(R.id.openSourceTitleTextView)
         openSourceTextView.setOnClickListener(this)
 
     }
@@ -48,21 +49,21 @@ class AboutFragment : Fragment(), View.OnClickListener {
     override fun onClick(v: View?) {
         if (v == logoutButton) {
             Log.d("login", "logout")
-            Util.showAlertDialog(activity, "ログアウト", "IIJmioからログアウトしてもよろしいですか？",
+            Util.showAlertDialog(activity!!, "ログアウト", "IIJmioからログアウトしてもよろしいですか？",
                     "はい", negativeButtonText = "いいえ",
                     positiveFunc = {
-                        MioUtil.deleteToken(activity)
-                        Util.showAlertDialog(activity, "ログアウト完了", "IIJmioからログアウトしました．\nアプリを終了します",
+                        MioUtil.deleteToken(activity!!)
+                        Util.showAlertDialog(activity!!, "ログアウト完了", "IIJmioからログアウトしました．\nアプリを終了します",
                                 "はい",
                                 positiveFunc = {
-                                    activity.finish()
+                                    activity!!.finish()
                                 })
                     })
         }
 
         if (v == openSourceTextView) {
-            val intent = Intent(activity, OpenSourceActivity::class.java)
-            activity.startActivity(intent)
+            val intent = Intent(activity!!, OpenSourceActivity::class.java)
+            activity!!.startActivity(intent)
         }
     }
 }

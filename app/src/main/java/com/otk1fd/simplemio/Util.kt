@@ -4,8 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
 import android.content.res.XmlResourceParser
-import android.support.v7.app.AlertDialog
 import android.util.Log
+import androidx.appcompat.app.AlertDialog
 import org.xmlpull.v1.XmlPullParser
 
 

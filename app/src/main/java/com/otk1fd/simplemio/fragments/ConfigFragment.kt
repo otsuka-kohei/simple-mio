@@ -3,12 +3,12 @@ package com.otk1fd.simplemio.fragments
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.preference.Preference
-import android.preference.PreferenceFragment
 import android.preference.SwitchPreference
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.edit
+import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.activities.MainActivity
 
@@ -16,14 +16,18 @@ import com.otk1fd.simplemio.activities.MainActivity
 /**
  * Created by otk1fd on 2018/02/24.
  */
-class ConfigFragment : PreferenceFragment(), Preference.OnPreferenceChangeListener {
+class ConfigFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener {
+
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     private val PERMISSIONS_REQUEST_READ_PHONE_STATE = 12345
     private lateinit var showPhoneNumberKey: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        preferenceManager.sharedPreferencesName = activity.getString(R.string.preference_file_name)
+        preferenceManager.sharedPreferencesName = activity!!.getString(R.string.preference_file_name)
         // /app/res/xml/preference.xml に定義されている設定画面を適用
         addPreferencesFromResource(R.xml.preference)
 
@@ -36,22 +40,22 @@ class ConfigFragment : PreferenceFragment(), Preference.OnPreferenceChangeListen
         super.onResume()
 
         if (preferenceManager.sharedPreferences.getBoolean(showPhoneNumberKey, false)) {
-            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
                 preferenceManager.sharedPreferences.edit { putBoolean(showPhoneNumberKey, false) }
                 (findPreference(showPhoneNumberKey) as SwitchPreference).isChecked = false
             }
         }
 
-        (activity as MainActivity).updatePhoneNumberOnNavigationHeader()
+        (activity!! as MainActivity).updatePhoneNumberOnNavigationHeader()
     }
 
 
     override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {
         if (preference?.key == showPhoneNumberKey) {
-            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.READ_PHONE_STATE), PERMISSIONS_REQUEST_READ_PHONE_STATE)
+            if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(activity!!, arrayOf(Manifest.permission.READ_PHONE_STATE), PERMISSIONS_REQUEST_READ_PHONE_STATE)
             } else {
-                (activity as MainActivity).updatePhoneNumberOnNavigationHeader(usePreference = false, showPhoneNumberParameter = newValue as Boolean)
+                (activity!! as MainActivity).updatePhoneNumberOnNavigationHeader(usePreference = false, showPhoneNumberParameter = newValue as Boolean)
             }
         }
 
