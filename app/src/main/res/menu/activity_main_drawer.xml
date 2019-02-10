@@ -9,11 +9,6 @@
             android:icon="@drawable/ic_sim_card"
             android:checkable="true"
             android:title="@string/menu_coupon" />
-        <item
-            android:id="@+id/nav_history"
-            android:icon="@drawable/ic_timeline"
-            android:checkable="true"
-            android:title="@string/menu_packet_log" />
     </group>
 
     <item android:title="その他">

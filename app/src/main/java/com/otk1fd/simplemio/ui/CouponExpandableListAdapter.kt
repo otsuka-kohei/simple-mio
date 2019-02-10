@@ -1,19 +1,25 @@
 package com.otk1fd.simplemio.ui
 
 import android.app.Activity
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
+import android.widget.Button
 import android.widget.Switch
 import android.widget.TextView
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.Util
+import com.otk1fd.simplemio.activities.PacketLogActivity
 import com.otk1fd.simplemio.ui.listview_item.CouponListItemChild
 import com.otk1fd.simplemio.ui.listview_item.CouponListItemParent
 
 
-class CouponExpandableListAdapter(val activity: Activity, val parents: List<CouponListItemParent>, val children: List<List<CouponListItemChild>>, val setCouponStatus: (serviceCode: String, status: Boolean) -> Unit, val getCouponStatus: (serviceCode: String) -> Boolean) : BaseExpandableListAdapter() {
+class CouponExpandableListAdapter(val activity: Activity, val parents: List<CouponListItemParent>,
+                                  val children: List<List<CouponListItemChild>>,
+                                  val setCouponStatus: (serviceCode: String, status: Boolean) -> Unit,
+                                  val getCouponStatus: (serviceCode: String) -> Boolean) : BaseExpandableListAdapter() {
 
     private fun getBasicChildView(): View {
         return LayoutInflater.from(activity).inflate(R.layout.item_child_coupon, null)
@@ -67,11 +73,23 @@ class CouponExpandableListAdapter(val activity: Activity, val parents: List<Coup
         val typeTextView: TextView = childView.findViewById(R.id.typeTextView)
         val couponSwitch: Switch = childView.findViewById(R.id.couponSwitch)
         val simNameTestView: TextView = childView.findViewById(R.id.simNameTextView)
+        val packetLogButton: Button = childView.findViewById(R.id.packetLogButton)
 
         val couponListItemChild: CouponListItemChild = children[p0][p1]
 
         couponSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
             setCouponStatus(couponListItemChild.serviceCode, isChecked)
+        }
+
+        packetLogButton.setOnClickListener {
+            val couponListItemParent: CouponListItemParent = parents[p0]
+            val hddServiceCode = couponListItemParent.hddServiceCode
+            val serviceCode = couponListItemChild.serviceCode
+
+            val intent = Intent(activity, PacketLogActivity::class.java)
+            intent.putExtra("hddServiceCode", hddServiceCode)
+            intent.putExtra("serviceCode", serviceCode)
+            activity.startActivity(intent)
         }
 
         phoneNumberTextView.text = couponListItemChild.phoneNumber

@@ -25,7 +25,6 @@ import com.otk1fd.simplemio.Util.showAlertDialog
 import com.otk1fd.simplemio.fragments.AboutFragment
 import com.otk1fd.simplemio.fragments.ConfigFragment
 import com.otk1fd.simplemio.fragments.CouponFragment
-import com.otk1fd.simplemio.fragments.PacketLogFragment
 import com.otk1fd.simplemio.mio.MioUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
@@ -125,13 +124,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 fragment = supportFragmentManager.findFragmentByTag(fragmentName)
                 if (fragment == null) {
                     fragment = CouponFragment()
-                }
-            }
-            R.id.nav_history -> {
-                fragmentName = getString(R.string.menu_packet_log)
-                fragment = supportFragmentManager.findFragmentByTag(fragmentName)
-                if (fragment == null) {
-                    fragment = PacketLogFragment()
                 }
             }
             R.id.nav_config -> {

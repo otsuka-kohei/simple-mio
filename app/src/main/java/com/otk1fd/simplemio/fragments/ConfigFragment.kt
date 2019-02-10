@@ -18,15 +18,10 @@ import com.otk1fd.simplemio.activities.MainActivity
  */
 class ConfigFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener {
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     private val PERMISSIONS_REQUEST_READ_PHONE_STATE = 12345
     private lateinit var showPhoneNumberKey: String
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         preferenceManager.sharedPreferencesName = activity!!.getString(R.string.preference_file_name)
         // /app/res/xml/preference.xml に定義されている設定画面を適用
         addPreferencesFromResource(R.xml.preference)

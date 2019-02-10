@@ -3,6 +3,7 @@ package com.otk1fd.simplemio.fragments
 import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,6 +44,16 @@ class CouponFragment : Fragment(), View.OnClickListener {
     private var oldCouponStatus = cloneHashMapWithDefault(couponStatus)
 
     private var expandAllGroup = false
+
+    private var expandState: Parcelable? = null
+    private var firstVisiblePosition: Int? = 0
+    private var childPosition: Int? = 0
+
+
+    private val KEY_EXPAND_STATUS = "KEY_EXPAND_STATUS"
+    private val KEY_FIRST_VISIBLE_POSITION = "KEY_FIRST_VISIBLE_POSITION"
+    private val KEY_POSITION_CHILD = "KEY_POSITION_CHILD"
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -107,6 +118,10 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
         couponSwipeRefreshLayout.isRefreshing = false
         stopProgressDialog()
+
+        expandState = couponListView.onSaveInstanceState()
+        firstVisiblePosition = couponListView.firstVisiblePosition
+        childPosition = couponListView.getChildAt(0).top
     }
 
     private fun showEditTextDialogToSetSimName(serviceCode: String) {
@@ -179,8 +194,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
     private fun setCouponInfo(couponInfoJson: CouponInfoJson) {
         // ExpandableListView のそれぞれの Group 要素の展開状況を控えておく
         val oldAdapter = couponListView.expandableListAdapter
-        val oldGroupNum: Int = if (oldAdapter == null) 0 else couponListView.expandableListAdapter.groupCount
-        val expandStatus: List<Boolean> = (0 until oldGroupNum).map { couponListView.isGroupExpanded(it) }
+        expandState = couponListView.onSaveInstanceState()
 
         // 親要素のリスト
         val parents = ArrayList<CouponListItemParent>()
@@ -228,17 +242,16 @@ class CouponFragment : Fragment(), View.OnClickListener {
             for (i in 0 until groupNum) {
                 couponListView.expandGroup(i)
             }
-        } else if (groupNum == oldGroupNum) {
-            for (i in 0 until groupNum) {
-                if (expandStatus[i]) {
-                    couponListView.expandGroup(i)
-                }
-            }
         }
+
+        expandState?.let { couponListView.onRestoreInstanceState(it) }
 
         oldCouponStatus = cloneHashMapWithDefault(couponStatus)
         updateApplyButtonShow()
 
+        val firstVisiblePositionSet = firstVisiblePosition ?: 0
+        val childPositionSet = childPosition ?: 0
+        couponListView.setSelectionFromTop(firstVisiblePositionSet, childPositionSet)
     }
 
     private fun updateApplyButtonShow() {
