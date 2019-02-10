@@ -1,8 +1,8 @@
 package com.otk1fd.simplemio.activities
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.webkit.WebView
+import androidx.appcompat.app.AppCompatActivity
 import com.otk1fd.simplemio.R
 import kotlinx.android.synthetic.main.activity_open_source.*
 

@@ -1,6 +1,5 @@
 package com.otk1fd.simplemio.fragments
 
-import android.app.Fragment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -8,7 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ExpandableListView
+import androidx.fragment.app.Fragment
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.activities.PacketLogActivity
 import com.otk1fd.simplemio.mio.CouponInfoJson
@@ -16,6 +15,7 @@ import com.otk1fd.simplemio.mio.MioUtil
 import com.otk1fd.simplemio.ui.PacketLogExpandableListAdapter
 import com.otk1fd.simplemio.ui.listview_item.PacketLogListItemChild
 import com.otk1fd.simplemio.ui.listview_item.PacketLogListItemParent
+import kotlinx.android.synthetic.main.fragment_packet_log.*
 import org.json.JSONObject
 
 
@@ -23,8 +23,6 @@ import org.json.JSONObject
  * Created by otk1fd on 2018/02/24.
  */
 class PacketLogFragment : Fragment() {
-
-    private lateinit var packetLogListView: ExpandableListView
 
     private var expandAllGroup = false
 
@@ -37,8 +35,6 @@ class PacketLogFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        packetLogListView = activity.findViewById(R.id.packetLogListView)
-        // ExpandableListView が展開されたときに自動スクロールするようにする
         packetLogListView.setOnGroupClickListener { parent, v, groupPosition, id ->
             packetLogListView.smoothScrollToPosition(groupPosition)
             false
@@ -51,18 +47,18 @@ class PacketLogFragment : Fragment() {
             val serviceCode = child.serviceCode
 
             Log.d("packetLog", "hddServiceCode : $hddServiceCode    serviceCode : $serviceCode")
-            val intent = Intent(activity, PacketLogActivity::class.java)
+            val intent = Intent(activity!!, PacketLogActivity::class.java)
             intent.putExtra("hddServiceCode", hddServiceCode)
             intent.putExtra("serviceCode", serviceCode)
-            activity.startActivity(intent)
+            activity!!.startActivity(intent)
 
             false
         }
 
         setServiceListByCache()
 
-        val preference = activity.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
-        expandAllGroup = preference.getBoolean(activity.getString(R.string.preference_key_expand_all_group), false)
+        val preference = activity!!.getSharedPreferences(activity!!.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
+        expandAllGroup = preference.getBoolean(activity!!.getString(R.string.preference_key_expand_all_group), false)
     }
 
     override fun onStart() {
@@ -72,7 +68,7 @@ class PacketLogFragment : Fragment() {
     }
 
     private fun setServiceListByCache() {
-        val jsonString = MioUtil.loadJsonStringFromCache(activity, activity.applicationContext.getString(R.string.preference_key_cache_coupon))
+        val jsonString = MioUtil.loadJsonStringFromCache(activity!!, activity!!.applicationContext.getString(R.string.preference_key_cache_coupon))
         if (jsonString != "{}") {
             val couponInfoJson = MioUtil.parseJsonToCoupon(JSONObject(jsonString))
             couponInfoJson?.let { setServiceList(it) }
@@ -115,7 +111,7 @@ class PacketLogFragment : Fragment() {
             childrenList.add(children)
         }
 
-        val packetLogExpandableListAdapter = PacketLogExpandableListAdapter(activity, parents, childrenList)
+        val packetLogExpandableListAdapter = PacketLogExpandableListAdapter(activity!!, parents, childrenList)
 
         packetLogListView.setAdapter(packetLogExpandableListAdapter)
 

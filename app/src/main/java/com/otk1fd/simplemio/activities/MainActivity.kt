@@ -1,23 +1,23 @@
 package com.otk1fd.simplemio.activities
 
 import android.Manifest
-import android.app.Fragment
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.support.design.widget.NavigationView
-import android.support.v4.content.ContextCompat
-import android.support.v4.view.GravityCompat
-import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.app.AppCompatActivity
 import android.telephony.TelephonyManager
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.content.edit
+import androidx.core.view.GravityCompat
+import androidx.fragment.app.Fragment
+import com.google.android.material.navigation.NavigationView
 import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.Util
@@ -116,34 +116,34 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         var fragment: Fragment? = null
         var fragmentName = ""
-        val fragmentTransaction = fragmentManager.beginTransaction()
+        val fragmentTransaction = supportFragmentManager.beginTransaction()
 
         // タップしたメニューアイテムのIDによって，表示するFragmentとToolbarに表示するタイトル名を決定する
         when (item.itemId) {
             R.id.nav_coupon -> {
                 fragmentName = getString(R.string.menu_coupon)
-                fragment = fragmentManager.findFragmentByTag(fragmentName)
+                fragment = supportFragmentManager.findFragmentByTag(fragmentName)
                 if (fragment == null) {
                     fragment = CouponFragment()
                 }
             }
             R.id.nav_history -> {
                 fragmentName = getString(R.string.menu_packet_log)
-                fragment = fragmentManager.findFragmentByTag(fragmentName)
+                fragment = supportFragmentManager.findFragmentByTag(fragmentName)
                 if (fragment == null) {
                     fragment = PacketLogFragment()
                 }
             }
             R.id.nav_config -> {
                 fragmentName = getString(R.string.menu_config)
-                fragment = fragmentManager.findFragmentByTag(fragmentName)
+                fragment = supportFragmentManager.findFragmentByTag(fragmentName)
                 if (fragment == null) {
                     fragment = ConfigFragment()
                 }
             }
             R.id.nav_about -> {
                 fragmentName = getString(R.string.menu_about)
-                fragment = fragmentManager.findFragmentByTag(fragmentName)
+                fragment = supportFragmentManager.findFragmentByTag(fragmentName)
                 if (fragment == null) {
                     fragment = AboutFragment()
                 }
@@ -152,8 +152,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
         // Fragmentをセット
-        fragmentTransaction.replace(R.id.fragmentLayout, fragment, fragmentName)
-        fragmentTransaction.commit()
+        fragment?.let {
+            fragmentTransaction.replace(R.id.fragmentLayout, fragment, fragmentName)
+            fragmentTransaction.commit()
+        }
 
         // Toolbarにタイトルをセット
         toolbar.title = fragmentName
