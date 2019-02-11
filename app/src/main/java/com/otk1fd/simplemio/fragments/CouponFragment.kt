@@ -47,12 +47,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
     private var expandState: Parcelable? = null
     private var firstVisiblePosition: Int? = 0
-    private var childPosition: Int? = 0
-
-
-    private val KEY_EXPAND_STATUS = "KEY_EXPAND_STATUS"
-    private val KEY_FIRST_VISIBLE_POSITION = "KEY_FIRST_VISIBLE_POSITION"
-    private val KEY_POSITION_CHILD = "KEY_POSITION_CHILD"
+    private var offsetPosition: Int? = 0
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -94,6 +89,10 @@ class CouponFragment : Fragment(), View.OnClickListener {
         couponSwipeRefreshLayout = activity!!.findViewById(R.id.couponSwipeRefreshLayout)
 
         couponSwipeRefreshLayout.setOnRefreshListener {
+            expandState = couponListView.onSaveInstanceState()
+            firstVisiblePosition = couponListView.firstVisiblePosition
+            offsetPosition = couponListView.getChildAt(0).top
+
             setCouponInfoByHttp()
         }
         couponSwipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(activity!!, R.color.colorPrimary))
@@ -121,7 +120,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
         expandState = couponListView.onSaveInstanceState()
         firstVisiblePosition = couponListView.firstVisiblePosition
-        childPosition = couponListView.getChildAt(0).top
+        offsetPosition = couponListView.getChildAt(0).top
     }
 
     private fun showEditTextDialogToSetSimName(serviceCode: String) {
@@ -246,12 +245,12 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
         expandState?.let { couponListView.onRestoreInstanceState(it) }
 
+        val firstVisiblePositionSet = firstVisiblePosition ?: 0
+        val childPositionSet = offsetPosition ?: 0
+        couponListView.setSelectionFromTop(firstVisiblePositionSet, childPositionSet)
+
         oldCouponStatus = cloneHashMapWithDefault(couponStatus)
         updateApplyButtonShow()
-
-        val firstVisiblePositionSet = firstVisiblePosition ?: 0
-        val childPositionSet = childPosition ?: 0
-        couponListView.setSelectionFromTop(firstVisiblePositionSet, childPositionSet)
     }
 
     private fun updateApplyButtonShow() {
