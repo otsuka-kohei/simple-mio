@@ -2,6 +2,8 @@ package com.otk1fd.simplemio.activities
 
 import android.app.ProgressDialog
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.components.AxisBase
@@ -64,13 +66,28 @@ class PacketLogActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        setDataToLineChartByHttp(hddServiceCode, serviceCode)
+        setDataToLineChartByCache(hddServiceCode, serviceCode)
     }
 
     override fun onPause() {
         super.onPause()
 
         stopProgressDialog()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(com.otk1fd.simplemio.R.menu.packet_log_chart_activity, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.action_reload -> {
+                startProgressDialog()
+                setDataToLineChartByHttp(hddServiceCode, serviceCode)
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     /**
@@ -111,35 +128,6 @@ class PacketLogActivity : AppCompatActivity() {
         lineChartView.description = description
     }
 
-    /**
-     * オンラインで利用履歴データを取得してグラフにセットする．
-     *
-     * @param hddServiceCode セットする利用履歴データのhddサービスコード
-     * @param serviceCode セットする利用履歴データのhdxサービスコード
-     */
-    private fun setDataToLineChartByHttp(hddServiceCode: String, serviceCode: String) {
-        // ぐるぐる回るダイアログを表示する．
-        startProgressDialog()
-
-        MioUtil.updatePacket(this, execFunc = { it ->
-            // 利用履歴のJSONデータ
-            val packetLogInfoJson: PacketLogInfoJson? = MioUtil.parseJsonToPacketLog(it)
-
-            // 取得したJSONデータをキャッシュする．
-            MioUtil.cacheJson(this, it, this.applicationContext.getString(R.string.preference_key_cache_packet_log))
-
-            // 利用履歴データをグラフにセットする．
-            packetLogInfoJson?.let { setDataToLineChart(it, hddServiceCode, serviceCode) }
-
-            // ぐるぐる回るダイアログを閉じる．
-            stopProgressDialog()
-        }, errorFunc = {
-            // エラーハンドラにエラーを投げる．
-            HttpErrorHandler.handleHttpError(it) { setDataToLineChartByCache(hddServiceCode, serviceCode) }
-
-            stopProgressDialog()
-        })
-    }
 
     /**
      * キャッシュから利用履歴データを読み出してグラフにセットする．
@@ -155,7 +143,21 @@ class PacketLogActivity : AppCompatActivity() {
         if (jsonString != "{}") {
             val packetLogInfoJson = MioUtil.parseJsonToPacketLog(JSONObject(jsonString))
             packetLogInfoJson?.let { setDataToLineChart(it, hddServiceCode, serviceCode) }
+        } else {
+            startProgressDialog()
+            setDataToLineChartByHttp(hddServiceCode, serviceCode)
         }
+    }
+
+    private fun setDataToLineChartByHttp(hddServiceCode: String, serviceCode: String) {
+        MioUtil.updatePacket(this, execFunc = {
+            MioUtil.cacheJson(this, it, applicationContext.getString(R.string.preference_key_cache_packet_log))
+            setDataToLineChartByCache(hddServiceCode, serviceCode)
+            stopProgressDialog()
+        }, errorFunc = {
+            HttpErrorHandler.handleHttpError(it) { setDataToLineChartByCache(hddServiceCode, serviceCode) }
+            stopProgressDialog()
+        })
     }
 
     /**
