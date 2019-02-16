@@ -117,6 +117,10 @@ object MioUtil {
     }
 
     private fun httpGet(activity: Activity, url: String, successFunc: (JSONObject) -> Unit, errorFunc: (VolleyError) -> Unit) {
+        val token = loadToken(activity)
+        if (token == "") {
+            return
+        }
 
         val jsonRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
                 Response.Listener<JSONObject> { successFunc(it) },
@@ -128,7 +132,6 @@ object MioUtil {
                 val newHeaders = HashMap<String, String>()
                 newHeaders.putAll(headers)
                 newHeaders["X-IIJmio-Developer"] = Util.getDeveloperId(activity)
-                val token = loadToken(activity)
                 newHeaders["X-IIJmio-Authorization"] = token
                 return newHeaders
             }
@@ -143,6 +146,10 @@ object MioUtil {
     }
 
     private fun httpPut(activity: Activity, url: String, jsonObject: JSONObject, successFunc: (JSONObject) -> Unit, errorFunc: (VolleyError) -> Unit) {
+        val token = loadToken(activity)
+        if (token == "") {
+            return
+        }
 
         val jsonRequest = object : JsonObjectRequest(Request.Method.PUT, url, jsonObject,
                 Response.Listener<JSONObject> { successFunc(it) },
@@ -155,7 +162,6 @@ object MioUtil {
                 val newHeaders = HashMap<String, String>()
                 newHeaders.putAll(headers)
                 newHeaders["X-IIJmio-Developer"] = Util.getDeveloperId(activity)
-                val token = loadToken(activity)
                 newHeaders["X-IIJmio-Authorization"] = token
                 return newHeaders
             }
@@ -201,12 +207,13 @@ object MioUtil {
         return adapter.fromJson(json.toString())
     }
 
-    fun cacheJson(activity: Activity, jsonObject: JSONObject, key: String) {
+
+    fun cacheJson(activity: Activity, jsonObject: JSONObject, jsonDataType: String) {
         val jsonString = jsonObject.toString()
 
         val preference = activity.applicationContext.getSharedPreferences(activity.applicationContext.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
         val editor = preference.edit()
-        editor.putString(key, jsonString)
+        editor.putString(jsonDataType, jsonString)
         editor.apply()
     }
 

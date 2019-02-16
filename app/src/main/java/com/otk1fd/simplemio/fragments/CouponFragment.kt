@@ -4,6 +4,7 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -91,8 +92,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
         couponSwipeRefreshLayout.setOnRefreshListener {
             expandState = couponListView.onSaveInstanceState()
             firstVisiblePosition = couponListView.firstVisiblePosition
-            offsetPosition = couponListView.getChildAt(0).top
-
+            offsetPosition = couponListView.getChildAt(0)?.top ?: 0
             setCouponInfoByHttp()
         }
         couponSwipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(activity!!, R.color.colorPrimary))
@@ -103,13 +103,9 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
     override fun onResume() {
         super.onResume()
+        Log.d("hoge", "resume")
 
-        // 自動で更新を開始
-        // ログイン済みか確認
-        if (MioUtil.loadToken(activity!!) != "") {
-            couponSwipeRefreshLayout.isRefreshing = true
-            setCouponInfoByHttp()
-        }
+        setCouponInfoByCache()
     }
 
     override fun onPause() {
@@ -154,7 +150,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
     override fun onClick(v: View?) {
         if (v == applyButton) {
             startProgressDialog()
-            MioUtil.applyCouponStatus(activity!!, couponStatus, execFunc = { it ->
+            MioUtil.applyCouponStatus(activity!!, couponStatus, execFunc = {
                 val applyCouponStatusResultJson: ApplyCouponStatusResultJson? = MioUtil.parseJsonToApplyCouponResponse(it)
                 if (applyCouponStatusResultJson?.returnCode == "OK") {
                     setCouponInfoByHttp()
@@ -167,17 +163,12 @@ class CouponFragment : Fragment(), View.OnClickListener {
         }
     }
 
-
     private fun setCouponInfoByHttp() {
-        MioUtil.updateCoupon(activity!!, execFunc = { it ->
-            val couponInfoJson: CouponInfoJson? = MioUtil.parseJsonToCoupon(it)
-
+        MioUtil.updateCoupon(activity!!, execFunc = {
             MioUtil.cacheJson(activity!!, it, activity!!.applicationContext.getString(R.string.preference_key_cache_coupon))
-
-            couponInfoJson?.let { setCouponInfo(it) }
+            setCouponInfoByCache()
             couponSwipeRefreshLayout.isRefreshing = false
         }, errorFunc = {
-            // クーポン情報の取得に失敗した場合はキャッシュしているJSONデータをリストに適用する
             HttpErrorHandler.handleHttpError(it) { setCouponInfoByCache() }
             couponSwipeRefreshLayout.isRefreshing = false
         })
@@ -188,6 +179,9 @@ class CouponFragment : Fragment(), View.OnClickListener {
         if (jsonString != "{}") {
             val couponInfoJson = MioUtil.parseJsonToCoupon(JSONObject(jsonString))
             couponInfoJson?.let { setCouponInfo(it) }
+        } else {
+            couponSwipeRefreshLayout.isRefreshing = true
+            setCouponInfoByHttp()
         }
     }
 
