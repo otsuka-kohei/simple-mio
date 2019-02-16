@@ -120,7 +120,8 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
         expandState = couponListView.onSaveInstanceState()
         firstVisiblePosition = couponListView.firstVisiblePosition
-        offsetPosition = couponListView.getChildAt(0).top
+        offsetPosition = 12345
+        offsetPosition = couponListView.getChildAt(0)?.top ?: 0
     }
 
     private fun showEditTextDialogToSetSimName(serviceCode: String) {
