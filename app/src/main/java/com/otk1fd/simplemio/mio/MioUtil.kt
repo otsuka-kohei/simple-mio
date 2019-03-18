@@ -43,19 +43,19 @@ object MioUtil {
         editor.apply()
     }
 
-    fun updateCoupon(activity: Activity, execFunc: (JSONObject) -> Unit = {}, errorFunc: (VolleyError) -> Unit = {}) {
+    fun updateCoupon(activity: Activity, execFunc: (JSONObject) -> Unit = {}, errorFunc: (VolleyError) -> Unit = {}, finallyFunc: () -> Unit = {}) {
         val url = "https://api.iijmio.jp/mobile/d/v2/coupon/"
 
-        httpGet(activity, url, { execFunc(it) }, { errorFunc(it) })
+        httpGet(activity, url, { execFunc(it) }, { errorFunc(it) }, { finallyFunc() })
     }
 
-    fun updatePacket(activity: Activity, execFunc: (JSONObject) -> Unit = {}, errorFunc: (VolleyError) -> Unit = {}) {
+    fun updatePacket(activity: Activity, execFunc: (JSONObject) -> Unit = {}, errorFunc: (VolleyError) -> Unit = {}, finallyFunc: () -> Unit = {}) {
         val url = "https://api.iijmio.jp/mobile/d/v2/log/packet/"
 
-        httpGet(activity, url, { execFunc(it) }, { errorFunc(it) })
+        httpGet(activity, url, { execFunc(it) }, { errorFunc(it) }, { finallyFunc() })
     }
 
-    fun applyCouponStatus(activity: Activity, coupomStatusMap: Map<String, Boolean>, execFunc: (JSONObject) -> Unit = {}, errorFunc: (VolleyError) -> Unit = {}) {
+    fun applyCouponStatus(activity: Activity, coupomStatusMap: Map<String, Boolean>, execFunc: (JSONObject) -> Unit = {}, errorFunc: (VolleyError) -> Unit = {}, finallyFunc: () -> Unit = {}) {
         val url = "https://api.iijmio.jp/mobile/d/v2/coupon/"
 
         val hdoList = ArrayList<CouponStatus>()
@@ -71,7 +71,7 @@ object MioUtil {
 
         val postJsonObject: JSONObject = generateCouponPostJsonObject(hdoList, hduList)
 
-        httpPut(activity, url, postJsonObject, { execFunc(it) }, { errorFunc(it) })
+        httpPut(activity, url, postJsonObject, { execFunc(it) }, { errorFunc(it) }, { finallyFunc() })
     }
 
     private data class CouponStatus(
@@ -116,15 +116,21 @@ object MioUtil {
         return JSONObject(jsonStr)
     }
 
-    private fun httpGet(activity: Activity, url: String, successFunc: (JSONObject) -> Unit, errorFunc: (VolleyError) -> Unit) {
+    private fun httpGet(activity: Activity, url: String, successFunc: (JSONObject) -> Unit, errorFunc: (VolleyError) -> Unit, finallyFunc: () -> Unit) {
         val token = loadToken(activity)
         if (token == "") {
             return
         }
 
         val jsonRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
-                Response.Listener<JSONObject> { successFunc(it) },
-                Response.ErrorListener { errorFunc(it) }) {
+                Response.Listener<JSONObject> {
+                    successFunc(it)
+                    finallyFunc()
+                },
+                Response.ErrorListener {
+                    errorFunc(it)
+                    finallyFunc()
+                }) {
             // ヘッダの追加
             @Throws(AuthFailureError::class)
             override fun getHeaders(): MutableMap<String, String> {
@@ -145,15 +151,21 @@ object MioUtil {
         queue.start()
     }
 
-    private fun httpPut(activity: Activity, url: String, jsonObject: JSONObject, successFunc: (JSONObject) -> Unit, errorFunc: (VolleyError) -> Unit) {
+    private fun httpPut(activity: Activity, url: String, jsonObject: JSONObject, successFunc: (JSONObject) -> Unit, errorFunc: (VolleyError) -> Unit, finallyFunc: () -> Unit) {
         val token = loadToken(activity)
         if (token == "") {
             return
         }
 
         val jsonRequest = object : JsonObjectRequest(Request.Method.PUT, url, jsonObject,
-                Response.Listener<JSONObject> { successFunc(it) },
-                Response.ErrorListener { errorFunc(it) }) {
+                Response.Listener<JSONObject> {
+                    successFunc(it)
+                    finallyFunc()
+                },
+                Response.ErrorListener {
+                    errorFunc(it)
+                    finallyFunc()
+                }) {
 
             // ヘッダの追加
             @Throws(AuthFailureError::class)

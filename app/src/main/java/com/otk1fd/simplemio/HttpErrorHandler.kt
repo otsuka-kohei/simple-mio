@@ -14,8 +14,8 @@ object HttpErrorHandler {
         this.loginFunc = loginFunc
         this.showErrorMessageFunc = showErrorMessageFunc
     }
-    
-    fun handleHttpError(volleyError: VolleyError?, getError: Boolean = true, recoveryFunc: () -> Unit = {}) {
+
+    fun handleHttpError(volleyError: VolleyError?, getError: Boolean = true, suggestLogin: Boolean = true, recoveryFunc: () -> Unit = {}) {
         if (volleyError?.networkResponse == null) {
             showErrorMessageFunc("通信エラーが発生し、最新のデータを取得できませんでした。\n少しお待ちの上、再度お試しください。")
             recoveryFunc()
@@ -34,7 +34,9 @@ object HttpErrorHandler {
                 }
             }
             403 -> {
-                loginFunc()
+                if (suggestLogin) {
+                    loginFunc()
+                }
             }
             500 -> {
                 showErrorMessageFunc("IIJmioのサーバでエラーが発生し、最新のデータを取得できませんでした。\nしばらくお待ちの上、再度お試しください。")

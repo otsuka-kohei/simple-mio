@@ -50,6 +50,8 @@ class CouponFragment : Fragment(), View.OnClickListener {
     private var firstVisiblePosition: Int? = 0
     private var offsetPosition: Int? = 0
 
+    private var firstStarting = true
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -105,7 +107,12 @@ class CouponFragment : Fragment(), View.OnClickListener {
         super.onResume()
         Log.d("hoge", "resume")
 
-        setCouponInfoByCache()
+        if (firstStarting) {
+            firstCachingAndSetByHTTP()
+            firstStarting = false
+        } else {
+            setCouponInfoByCache()
+        }
     }
 
     override fun onPause() {
@@ -116,7 +123,6 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
         expandState = couponListView.onSaveInstanceState()
         firstVisiblePosition = couponListView.firstVisiblePosition
-        offsetPosition = 12345
         offsetPosition = couponListView.getChildAt(0)?.top ?: 0
     }
 
@@ -167,9 +173,9 @@ class CouponFragment : Fragment(), View.OnClickListener {
         MioUtil.updateCoupon(activity!!, execFunc = {
             MioUtil.cacheJson(activity!!, it, activity!!.applicationContext.getString(R.string.preference_key_cache_coupon))
             setCouponInfoByCache()
-            couponSwipeRefreshLayout.isRefreshing = false
         }, errorFunc = {
             HttpErrorHandler.handleHttpError(it) { setCouponInfoByCache() }
+        }, finallyFunc = {
             couponSwipeRefreshLayout.isRefreshing = false
         })
     }
@@ -345,5 +351,26 @@ class CouponFragment : Fragment(), View.OnClickListener {
             map[key] = srcMap.getValue(key)
         }
         return map
+    }
+
+    private fun firstCachingAndSetByHTTP() {
+        couponSwipeRefreshLayout.isRefreshing = true
+
+        MioUtil.updateCoupon(activity!!, execFunc = { couponJSONObject ->
+            MioUtil.cacheJson(activity!!, couponJSONObject, activity!!.applicationContext.getString(R.string.preference_key_cache_coupon))
+
+            MioUtil.updatePacket(activity!!, execFunc = { packetLogJSONObject ->
+                MioUtil.cacheJson(activity!!, packetLogJSONObject, activity!!.getString(R.string.preference_key_cache_packet_log))
+            }, errorFunc = {
+                HttpErrorHandler.handleHttpError(it, suggestLogin = false)
+            }, finallyFunc = {
+                setCouponInfoByCache()
+                couponSwipeRefreshLayout.isRefreshing = false
+            })
+        }, errorFunc = {
+            HttpErrorHandler.handleHttpError(it)
+            couponSwipeRefreshLayout.isRefreshing = false
+            setCouponInfoByCache()
+        })
     }
 }
