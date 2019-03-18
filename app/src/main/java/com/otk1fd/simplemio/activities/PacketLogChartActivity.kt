@@ -153,9 +153,9 @@ class PacketLogActivity : AppCompatActivity() {
         MioUtil.updatePacket(this, execFunc = {
             MioUtil.cacheJson(this, it, applicationContext.getString(R.string.preference_key_cache_packet_log))
             setDataToLineChartByCache(hddServiceCode, serviceCode)
-            stopProgressDialog()
         }, errorFunc = {
             HttpErrorHandler.handleHttpError(it) { setDataToLineChartByCache(hddServiceCode, serviceCode) }
+        }, finallyFunc = {
             stopProgressDialog()
         })
     }
