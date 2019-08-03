@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.android.volley.toolbox.JsonObjectRequest
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.components.XAxis
@@ -150,7 +151,7 @@ class PacketLogActivity : AppCompatActivity() {
     }
 
     private fun setDataToLineChartByHttp(hddServiceCode: String, serviceCode: String) {
-        MioUtil.updatePacket(this, execFunc = {
+        val request: JsonObjectRequest = MioUtil.generateUpdatePacketRequest(this, execFunc = {
             MioUtil.cacheJson(this, it, applicationContext.getString(R.string.preference_key_cache_packet_log))
             setDataToLineChartByCache(hddServiceCode, serviceCode)
         }, errorFunc = {
@@ -158,6 +159,7 @@ class PacketLogActivity : AppCompatActivity() {
         }, finallyFunc = {
             stopProgressDialog()
         })
+        MioUtil.startRequests(request)
     }
 
     /**

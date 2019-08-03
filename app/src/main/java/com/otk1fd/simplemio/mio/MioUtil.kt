@@ -43,30 +43,25 @@ object MioUtil {
         editor.apply()
     }
 
-    fun updateCoupon(activity: Activity, execFunc: (JSONObject) -> Unit = {}, errorFunc: (VolleyError) -> Unit = {}, finallyFunc: () -> Unit = {}) {
+    fun generateUpdateCouponRequest(activity: Activity, execFunc: (JSONObject) -> Unit = {}, errorFunc: (VolleyError) -> Unit = {}, finallyFunc: () -> Unit = {}): JsonObjectRequest {
         val url = "https://api.iijmio.jp/mobile/d/v2/coupon/"
 
-        val jsonObjectRequest: JsonObjectRequest? = generateHttpGetRequest(activity, url, { execFunc(it) }, { errorFunc(it) }, { finallyFunc() })
-
-        if (jsonObjectRequest != null) {
-            queue.add(jsonObjectRequest)
-            queue.start()
-        }
+        return generateHttpGetRequest(activity, url, { execFunc(it) }, { errorFunc(it) }, { finallyFunc() })
     }
 
-    fun updatePacket(activity: Activity, execFunc: (JSONObject) -> Unit = {}, errorFunc: (VolleyError) -> Unit = {}, finallyFunc: () -> Unit = {}) {
+    fun generateUpdatePacketRequest(activity: Activity, execFunc: (JSONObject) -> Unit = {}, errorFunc: (VolleyError) -> Unit = {}, finallyFunc: () -> Unit = {}): JsonObjectRequest {
         val url = "https://api.iijmio.jp/mobile/d/v2/log/packet/"
 
-        val jsonObjectRequest: JsonObjectRequest? = generateHttpGetRequest(activity, url, { execFunc(it) }, { errorFunc(it) }, { finallyFunc() })
-
-        if (jsonObjectRequest != null) {
-            queue.add(jsonObjectRequest)
-            queue.start()
-        }
+        return generateHttpGetRequest(activity, url, { execFunc(it) }, { errorFunc(it) }, { finallyFunc() })
     }
 
+    fun startRequests(vararg requests: JsonObjectRequest, finallyFunc: () -> Unit = {}) {
+        requests.forEach { queue.add(it) }
+        queue.start()
+        finallyFunc()
+    }
 
-    fun applyCouponStatus(activity: Activity, coupomStatusMap: Map<String, Boolean>, execFunc: (JSONObject) -> Unit = {}, errorFunc: (VolleyError) -> Unit = {}, finallyFunc: () -> Unit = {}) {
+    fun generateApplyCouponStatusRequest(activity: Activity, coupomStatusMap: Map<String, Boolean>, execFunc: (JSONObject) -> Unit = {}, errorFunc: (VolleyError) -> Unit = {}, finallyFunc: () -> Unit = {}): JsonObjectRequest {
         val url = "https://api.iijmio.jp/mobile/d/v2/coupon/"
 
         val hdoList = ArrayList<CouponStatus>()
@@ -82,12 +77,7 @@ object MioUtil {
 
         val postJsonObject: JSONObject = generateCouponPostJsonObject(hdoList, hduList)
 
-        val jsonObjectRequest: JsonObjectRequest? = generateHttpPutRequest(activity, url, postJsonObject, { execFunc(it) }, { errorFunc(it) }, { finallyFunc() })
-
-        if (jsonObjectRequest != null) {
-            queue.add(jsonObjectRequest)
-            queue.start()
-        }
+        return generateHttpPutRequest(activity, url, postJsonObject, { execFunc(it) }, { errorFunc(it) }, { finallyFunc() })
     }
 
     private data class CouponStatus(
@@ -132,11 +122,8 @@ object MioUtil {
         return JSONObject(jsonStr)
     }
 
-    private fun generateHttpGetRequest(activity: Activity, url: String, successFunc: (JSONObject) -> Unit, errorFunc: (VolleyError) -> Unit, finallyFunc: () -> Unit): JsonObjectRequest? {
+    private fun generateHttpGetRequest(activity: Activity, url: String, successFunc: (JSONObject) -> Unit, errorFunc: (VolleyError) -> Unit, finallyFunc: () -> Unit): JsonObjectRequest {
         val token = loadToken(activity)
-        if (token == "") {
-            return null
-        }
 
         val jsonRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
                 Response.Listener<JSONObject> {
@@ -166,11 +153,8 @@ object MioUtil {
         return jsonRequest
     }
 
-    private fun generateHttpPutRequest(activity: Activity, url: String, jsonObject: JSONObject, successFunc: (JSONObject) -> Unit, errorFunc: (VolleyError) -> Unit, finallyFunc: () -> Unit): JsonObjectRequest? {
+    private fun generateHttpPutRequest(activity: Activity, url: String, jsonObject: JSONObject, successFunc: (JSONObject) -> Unit, errorFunc: (VolleyError) -> Unit, finallyFunc: () -> Unit): JsonObjectRequest {
         val token = loadToken(activity)
-        if (token == "") {
-            return null
-        }
 
         val jsonRequest = object : JsonObjectRequest(Request.Method.PUT, url, jsonObject,
                 Response.Listener<JSONObject> {
@@ -247,7 +231,7 @@ object MioUtil {
 
     fun loadJsonStringFromCache(activity: Activity, key: String): String {
         val preference = activity.applicationContext.getSharedPreferences(activity.applicationContext.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
-        return preference.getString(key, "{}")
+        return preference.getString(key, "{}") ?: "{}"
     }
 
     fun isJsonValid(jsonObject: JSONObject): Boolean {

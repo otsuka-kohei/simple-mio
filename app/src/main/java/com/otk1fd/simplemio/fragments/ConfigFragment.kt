@@ -3,12 +3,12 @@ package com.otk1fd.simplemio.fragments
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.preference.SwitchPreference
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreference
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.activities.MainActivity
 
@@ -28,7 +28,7 @@ class ConfigFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChange
 
         showPhoneNumberKey = getString(R.string.preference_key_show_phone_number)
 
-        findPreference(showPhoneNumberKey).onPreferenceChangeListener = this
+        (findPreference(showPhoneNumberKey) as SwitchPreference?)?.onPreferenceChangeListener = this
     }
 
     override fun onResume() {
@@ -37,7 +37,7 @@ class ConfigFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChange
         if (preferenceManager.sharedPreferences.getBoolean(showPhoneNumberKey, false)) {
             if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
                 preferenceManager.sharedPreferences.edit { putBoolean(showPhoneNumberKey, false) }
-                (findPreference(showPhoneNumberKey) as SwitchPreference).isChecked = false
+                (findPreference(showPhoneNumberKey) as SwitchPreference?)?.isChecked = false
             }
         }
 
