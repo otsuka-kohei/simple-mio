@@ -10,7 +10,9 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
 import com.otk1fd.simplemio.R
+import com.otk1fd.simplemio.Util
 import com.otk1fd.simplemio.activities.MainActivity
+import com.otk1fd.simplemio.mio.MioUtil
 
 
 /**
@@ -29,6 +31,22 @@ class ConfigFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChange
         showPhoneNumberKey = getString(R.string.preference_key_show_phone_number)
 
         (findPreference(showPhoneNumberKey) as SwitchPreference?)?.onPreferenceChangeListener = this
+
+        val logoutButtonKey = getString(R.string.preference_key_logout)
+        val logoutButton = findPreference(logoutButtonKey) as Preference?
+        logoutButton?.setOnPreferenceClickListener {
+            Util.showAlertDialog(activity!!, "ログアウト", "IIJmioからログアウトしてもよろしいですか？",
+                    "はい", negativeButtonText = "いいえ",
+                    positiveFunc = {
+                        MioUtil.deleteToken(activity!!)
+                        Util.showAlertDialog(activity!!, "ログアウト完了", "IIJmioからログアウトしました．\nアプリを終了します",
+                                "はい",
+                                positiveFunc = {
+                                    activity!!.finish()
+                                })
+                    })
+            return@setOnPreferenceClickListener true
+        }
     }
 
     override fun onResume() {

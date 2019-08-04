@@ -11,15 +11,13 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.otk1fd.simplemio.R
-import com.otk1fd.simplemio.Util
 import com.otk1fd.simplemio.activities.OpenSourceActivity
-import com.otk1fd.simplemio.mio.MioUtil
 
 
 /**
  * Created by otk1fd on 2018/02/24.
  */
-class AboutFragment : Fragment(), View.OnClickListener {
+class AboutFragment : Fragment() {
 
     private lateinit var logoutButton: Button
     private lateinit var aboutTextView: TextView
@@ -35,35 +33,14 @@ class AboutFragment : Fragment(), View.OnClickListener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        logoutButton = activity!!.findViewById(R.id.logoutButton)
-        logoutButton.setOnClickListener(this)
-
         aboutTextView = activity!!.findViewById(R.id.aboutTextView)
         aboutTextView.text = activity!!.getString(R.string.about)
 
         openSourceTextView = activity!!.findViewById(R.id.openSourceTitleTextView)
-        openSourceTextView.setOnClickListener(this)
-
-    }
-
-    override fun onClick(v: View?) {
-        if (v == logoutButton) {
-            Log.d("login", "logout")
-            Util.showAlertDialog(activity!!, "ログアウト", "IIJmioからログアウトしてもよろしいですか？",
-                    "はい", negativeButtonText = "いいえ",
-                    positiveFunc = {
-                        MioUtil.deleteToken(activity!!)
-                        Util.showAlertDialog(activity!!, "ログアウト完了", "IIJmioからログアウトしました．\nアプリを終了します",
-                                "はい",
-                                positiveFunc = {
-                                    activity!!.finish()
-                                })
-                    })
-        }
-
-        if (v == openSourceTextView) {
+        openSourceTextView.setOnClickListener {
             val intent = Intent(activity!!, OpenSourceActivity::class.java)
             activity!!.startActivity(intent)
         }
+
     }
 }
