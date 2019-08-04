@@ -161,7 +161,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
     override fun onClick(v: View?) {
         if (v == applyButton) {
             startProgressDialog()
-            MioUtil.generateApplyCouponStatusRequest(activity!!, couponStatus, execFunc = {
+            val request: JsonObjectRequest = MioUtil.generateApplyCouponStatusRequest(activity!!, couponStatus, execFunc = {
                 val applyCouponStatusResultJson: ApplyCouponStatusResultJson? = MioUtil.parseJsonToApplyCouponResponse(it)
                 if (applyCouponStatusResultJson?.returnCode == "OK") {
                     setCouponInfoByHttp()
@@ -171,6 +171,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
                 HttpErrorHandler.handleHttpError(it, getError = false)
                 stopProgressDialog()
             })
+            MioUtil.startRequests(request)
         }
     }
 
