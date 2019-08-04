@@ -30,6 +30,7 @@ import com.otk1fd.simplemio.ui.listview_item.CouponListItemParent
 import org.json.JSONObject
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 /**
@@ -42,7 +43,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
     private lateinit var progressDialog: ProgressDialog
     private lateinit var couponSwipeRefreshLayout: SwipeRefreshLayout
 
-    private val couponStatus = HashMap<String, Boolean>().withDefault { false }
+    private val couponStatus: MutableMap<String, Boolean> = HashMap<String, Boolean>().withDefault { false }
     private var oldCouponStatus = cloneHashMapWithDefault(couponStatus)
 
     private var expandAllGroup = false
@@ -51,9 +52,9 @@ class CouponFragment : Fragment(), View.OnClickListener {
     private var firstVisiblePosition: Int? = 0
     private var offsetPosition: Int? = 0
 
-    private var firstStarting = true
+    private var firstStarting: Boolean = true
 
-    private var bulkUpdateCounter = 0
+    private var bulkUpdateCounter: Int = 0
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -348,7 +349,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
         progressDialog.dismiss()
     }
 
-    private fun <K, V> cloneHashMapWithDefault(srcMap: MutableMap<K, V>): HashMap<K, V> {
+    private fun <K, V> cloneHashMapWithDefault(srcMap: MutableMap<K, V>): MutableMap<K, V> {
         val map = HashMap<K, V>()
         val keys = srcMap.keys
         for (key in keys) {

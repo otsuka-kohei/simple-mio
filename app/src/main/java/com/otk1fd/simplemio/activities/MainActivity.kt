@@ -93,11 +93,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
 
-        } else {
-            // トークンが存在しない場合はログインする
-            if (MioUtil.loadToken(this) == "") {
-                startOAuthWithDialog()
-            }
         }
     }
 
