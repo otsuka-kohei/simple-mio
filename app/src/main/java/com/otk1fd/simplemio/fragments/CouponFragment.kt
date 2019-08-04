@@ -139,6 +139,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
         dialog.setView(simNameEditText)
 
         simNameEditText.setSingleLine()
+        simNameEditText.hint = "SIMの名前"
         val defaultSimName = Util.loadSimName(activity!!, serviceCode)
         simNameEditText.setText(defaultSimName, TextView.BufferType.NORMAL)
         simNameEditText.setSelection(simNameEditText.text.length)
