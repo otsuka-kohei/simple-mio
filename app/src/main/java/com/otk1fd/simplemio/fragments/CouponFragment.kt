@@ -53,6 +53,8 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
     private var firstStarting = true
 
+    private var bulkUpdateCounter = 0
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -355,24 +357,34 @@ class CouponFragment : Fragment(), View.OnClickListener {
         return map
     }
 
+    private fun countBulkUpdateFinished() {
+        bulkUpdateCounter++
+        if (bulkUpdateCounter == 2) {
+            couponSwipeRefreshLayout.isRefreshing = false
+        }
+    }
+
     private fun firstCachingAndSetByHTTP() {
         couponSwipeRefreshLayout.isRefreshing = true
+        bulkUpdateCounter = 0
 
         val couponRequest: JsonObjectRequest = MioUtil.generateUpdateCouponRequest(activity!!, execFunc = {
             MioUtil.cacheJson(activity!!, it, activity!!.applicationContext.getString(R.string.preference_key_cache_coupon))
             setCouponInfoByCache()
         }, errorFunc = {
             HttpErrorHandler.handleHttpError(it) { setCouponInfoByCache() }
+        }, finallyFunc = {
+            countBulkUpdateFinished()
         })
 
         val packetRequest: JsonObjectRequest = MioUtil.generateUpdatePacketRequest(activity!!, execFunc = { packetLogJSONObject ->
             MioUtil.cacheJson(activity!!, packetLogJSONObject, activity!!.getString(R.string.preference_key_cache_packet_log))
         }, errorFunc = {
             HttpErrorHandler.handleHttpError(it, suggestLogin = false)
+        }, finallyFunc = {
+            countBulkUpdateFinished()
         })
 
-        MioUtil.startRequests(packetRequest, couponRequest) {
-            couponSwipeRefreshLayout.isRefreshing = false
-        }
+        MioUtil.startRequests(packetRequest, couponRequest)
     }
 }
