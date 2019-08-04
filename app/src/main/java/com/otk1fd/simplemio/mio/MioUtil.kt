@@ -33,7 +33,7 @@ object MioUtil {
 
     fun loadToken(activity: Activity): String {
         val preference = activity.applicationContext.getSharedPreferences(activity.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
-        return preference.getString(activity.getString(R.string.preference_key_token), "")
+        return preference.getString(activity.getString(R.string.preference_key_token), "") ?: ""
     }
 
     fun deleteToken(activity: Activity) {
@@ -55,10 +55,9 @@ object MioUtil {
         return generateHttpGetRequest(activity, url, { execFunc(it) }, { errorFunc(it) }, { finallyFunc() })
     }
 
-    fun startRequests(vararg requests: JsonObjectRequest, finallyFunc: () -> Unit = {}) {
+    fun startRequests(vararg requests: JsonObjectRequest) {
         requests.forEach { queue.add(it) }
         queue.start()
-        finallyFunc()
     }
 
     fun generateApplyCouponStatusRequest(activity: Activity, coupomStatusMap: Map<String, Boolean>, execFunc: (JSONObject) -> Unit = {}, errorFunc: (VolleyError) -> Unit = {}, finallyFunc: () -> Unit = {}): JsonObjectRequest {
