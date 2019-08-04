@@ -15,5 +15,9 @@
             android:key="@string/preference_key_show_phone_number"
             android:title="メニューに電話番号を表示する"
             android:summary="メニュー（左上の≡ボタンを押すと表示される画面）に、この端末の電話番号を表示します。" />
+        <Preference
+            android:title="ログアウト"
+            android:key="@string/preference_key_logout"
+            android:summary="IIJmioからログアウトします。" />
     </PreferenceCategory>
 </PreferenceScreen>
