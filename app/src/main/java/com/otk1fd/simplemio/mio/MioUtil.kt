@@ -139,7 +139,7 @@ object MioUtil {
                 val headers = super.getHeaders()
                 val newHeaders = HashMap<String, String>()
                 newHeaders.putAll(headers)
-                newHeaders["X-IIJmio-Developer"] = Util.getDeveloperId(activity)
+                newHeaders["X-IIJmio-Developer"] = activity.getString(R.string.developer_id)
                 newHeaders["X-IIJmio-Authorization"] = token
                 return newHeaders
             }
@@ -171,7 +171,7 @@ object MioUtil {
                 val headers = super.getHeaders()
                 val newHeaders = HashMap<String, String>()
                 newHeaders.putAll(headers)
-                newHeaders["X-IIJmio-Developer"] = Util.getDeveloperId(activity)
+                newHeaders["X-IIJmio-Developer"] = activity.getString(R.string.developer_id)
                 newHeaders["X-IIJmio-Authorization"] = token
                 return newHeaders
             }

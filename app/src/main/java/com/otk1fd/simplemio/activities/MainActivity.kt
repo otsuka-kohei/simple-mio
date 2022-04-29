@@ -20,7 +20,6 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.navigation.NavigationView
 import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
-import com.otk1fd.simplemio.Util
 import com.otk1fd.simplemio.Util.showAlertDialog
 import com.otk1fd.simplemio.fragments.AboutFragment
 import com.otk1fd.simplemio.fragments.ConfigFragment
@@ -39,14 +38,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
 
         MioUtil.setUp(this)
-        HttpErrorHandler.setUp(loginFunc = { startOAuthWithDialog() }, showErrorMessageFunc = { errorMessage -> Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show() })
+        HttpErrorHandler.setUp(
+            loginFunc = { startOAuthWithDialog() },
+            showErrorMessageFunc = { errorMessage ->
+                Toast.makeText(
+                    this,
+                    errorMessage,
+                    Toast.LENGTH_LONG
+                ).show()
+            })
 
         setContentView(R.layout.activity_main)
 
         setSupportActionBar(toolbar)
 
         val actionBarDrawerToggle = ActionBarDrawerToggle(
-                this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close)
+            this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close
+        )
         drawerLayout.addDrawerListener(actionBarDrawerToggle)
         actionBarDrawerToggle.syncState()
 
@@ -160,10 +168,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
      * @param usePreference Preferenceに保存してある設定内容に従うかどうか
      * @param showPhoneNumberParameter 任意で電話番号を表示するか決める
      */
-    fun updatePhoneNumberOnNavigationHeader(usePreference: Boolean = true, showPhoneNumberParameter: Boolean = false) {
+    fun updatePhoneNumberOnNavigationHeader(
+        usePreference: Boolean = true,
+        showPhoneNumberParameter: Boolean = false
+    ) {
         // 電話番号を表示するかのフラグ
         val showPhoneNumber = if (usePreference) {
-            getSharedPreferences(getString(R.string.preference_file_name), Context.MODE_PRIVATE).getBoolean(getString(R.string.preference_key_show_phone_number), false)
+            getSharedPreferences(
+                getString(R.string.preference_file_name),
+                Context.MODE_PRIVATE
+            ).getBoolean(getString(R.string.preference_key_show_phone_number), false)
         } else {
             showPhoneNumberParameter
         }
@@ -172,15 +186,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         var phoneNumber = ""
 
         // 電話番号の取得がパーミッションで許可されているか
-        val canShowPhoneNumberByPermiiison = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
+        val canShowPhoneNumberByPermiiison = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.READ_PHONE_STATE
+        ) == PackageManager.PERMISSION_GRANTED
 
         if (showPhoneNumber && canShowPhoneNumberByPermiiison) {
             // 電話番号を取得
-            val telephonyManager: TelephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+            val telephonyManager: TelephonyManager =
+                getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
             phoneNumber = telephonyManager.line1Number.orEmpty()
         } else {
             // パーミッションで許可されていないので，Preferenceを電話番号を表示しない設定に書き換える．
-            getSharedPreferences(getString(R.string.preference_file_name), Context.MODE_PRIVATE).edit { putBoolean(getString(R.string.preference_key_show_phone_number), false) }
+            getSharedPreferences(
+                getString(R.string.preference_file_name),
+                Context.MODE_PRIVATE
+            ).edit { putBoolean(getString(R.string.preference_key_show_phone_number), false) }
         }
 
         val navigationHeader = navigationView.getHeaderView(0)
@@ -200,8 +221,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
      */
     private fun startOAuthWithDialog() {
         showAlertDialog(this, "ログイン", "IIJmioでのログインが必要です\nブラウザを開いてログインページに移動してもよろしいですか？",
-                "はい", negativeButtonText = "いいえ",
-                positiveFunc = { startOAuth() }, negativeFunc = { this.finish() })
+            "はい", negativeButtonText = "いいえ",
+            positiveFunc = { startOAuth() }, negativeFunc = { this.finish() })
     }
 
     /**
@@ -211,7 +232,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val uri = "https://api.iijmio.jp/mobile/d/v1/authorization/?" +
                 "response_type=token" +
-                "&client_id=" + Util.getDeveloperId(this) +
+                "&client_id=" + getString(R.string.developer_id) +
                 "&redirect_uri=" + getString(R.string.simple_app_name) + "%3A%2F%2Fcallback" +
                 "&state=" + "success"
 
