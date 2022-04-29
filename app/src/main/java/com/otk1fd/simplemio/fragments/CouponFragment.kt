@@ -66,13 +66,13 @@ class CouponFragment : Fragment(), View.OnClickListener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        applyButton = activity!!.findViewById(R.id.applyButton)
+        applyButton = requireActivity().findViewById(R.id.applyButton)
         applyButton.setOnClickListener(this)
         applyButton.hide()
 
-        progressDialog = ProgressDialog(activity!!)
+        progressDialog = ProgressDialog(requireActivity())
 
-        couponListView = activity!!.findViewById(R.id.couponListView)
+        couponListView = requireActivity().findViewById(R.id.couponListView)
         // ExpandableListView が展開されたときに自動スクロールするようにする
         couponListView.setOnGroupClickListener { parent, v, groupPosition, id ->
             couponListView.smoothScrollToPosition(groupPosition)
@@ -93,7 +93,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
             false
         }
 
-        couponSwipeRefreshLayout = activity!!.findViewById(R.id.couponSwipeRefreshLayout)
+        couponSwipeRefreshLayout = requireActivity().findViewById(R.id.couponSwipeRefreshLayout)
 
         couponSwipeRefreshLayout.setOnRefreshListener {
             expandState = couponListView.onSaveInstanceState()
@@ -101,10 +101,10 @@ class CouponFragment : Fragment(), View.OnClickListener {
             offsetPosition = couponListView.getChildAt(0)?.top ?: 0
             setCouponInfoByHttp()
         }
-        couponSwipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(activity!!, R.color.colorPrimary))
+        couponSwipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(requireActivity(), R.color.colorPrimary))
 
-        val preference = activity!!.getSharedPreferences(activity!!.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
-        expandAllGroup = preference.getBoolean(activity!!.getString(R.string.preference_key_expand_all_group), false)
+        val preference = requireActivity().getSharedPreferences(requireActivity().getString(R.string.preference_file_name), Context.MODE_PRIVATE)
+        expandAllGroup = preference.getBoolean(requireActivity().getString(R.string.preference_key_expand_all_group), false)
     }
 
     override fun onResume() {
@@ -131,23 +131,23 @@ class CouponFragment : Fragment(), View.OnClickListener {
     }
 
     private fun showEditTextDialogToSetSimName(serviceCode: String) {
-        val simNameEditText = EditText(activity!!)
+        val simNameEditText = EditText(requireActivity())
 
-        val dialog = AlertDialog.Builder(activity!!)
+        val dialog = AlertDialog.Builder(requireActivity())
 
         dialog.setTitle("SIMの名前を入力してください")
         dialog.setView(simNameEditText)
 
         simNameEditText.setSingleLine()
         simNameEditText.hint = "SIMの名前"
-        val defaultSimName = Util.loadSimName(activity!!, serviceCode)
+        val defaultSimName = Util.loadSimName(requireActivity(), serviceCode)
         simNameEditText.setText(defaultSimName, TextView.BufferType.NORMAL)
         simNameEditText.setSelection(simNameEditText.text.length)
 
         dialog.setPositiveButton("完了") { dialog, whichButton ->
             var simnName = simNameEditText.text.toString()
             simnName = simnName.replace("\n", " ")
-            Util.saveSimName(activity!!, serviceCode, simnName)
+            Util.saveSimName(requireActivity(), serviceCode, simnName)
             setCouponInfoByCache()
         }
 
@@ -161,7 +161,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
     override fun onClick(v: View?) {
         if (v == applyButton) {
             startProgressDialog()
-            val request: JsonObjectRequest = MioUtil.generateApplyCouponStatusRequest(activity!!, couponStatus, execFunc = {
+            val request: JsonObjectRequest = MioUtil.generateApplyCouponStatusRequest(requireActivity(), couponStatus, execFunc = {
                 val applyCouponStatusResultJson: ApplyCouponStatusResultJson? = MioUtil.parseJsonToApplyCouponResponse(it)
                 if (applyCouponStatusResultJson?.returnCode == "OK") {
                     setCouponInfoByHttp()
@@ -176,8 +176,8 @@ class CouponFragment : Fragment(), View.OnClickListener {
     }
 
     private fun setCouponInfoByHttp() {
-        val request: JsonObjectRequest = MioUtil.generateUpdateCouponRequest(activity!!, execFunc = {
-            MioUtil.cacheJson(activity!!, it, activity!!.applicationContext.getString(R.string.preference_key_cache_coupon))
+        val request: JsonObjectRequest = MioUtil.generateUpdateCouponRequest(requireActivity(), execFunc = {
+            MioUtil.cacheJson(requireActivity(), it, requireActivity().applicationContext.getString(R.string.preference_key_cache_coupon))
             setCouponInfoByCache()
         }, errorFunc = {
             HttpErrorHandler.handleHttpError(it) { setCouponInfoByCache() }
@@ -188,7 +188,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
     }
 
     private fun setCouponInfoByCache() {
-        val jsonString = MioUtil.loadJsonStringFromCache(activity!!, activity!!.applicationContext.getString(R.string.preference_key_cache_coupon))
+        val jsonString = MioUtil.loadJsonStringFromCache(requireActivity(), requireActivity().applicationContext.getString(R.string.preference_key_cache_coupon))
         if (jsonString != "{}") {
             val couponInfoJson = MioUtil.parseJsonToCoupon(JSONObject(jsonString))
             couponInfoJson?.let { setCouponInfo(it) }
@@ -232,7 +232,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
             childrenList.add(children)
         }
 
-        val couponExpandableListAdapter = CouponExpandableListAdapter(activity!!, parents, childrenList, setCouponStatus = { serviceCode, status ->
+        val couponExpandableListAdapter = CouponExpandableListAdapter(requireActivity(), parents, childrenList, setCouponStatus = { serviceCode, status ->
             couponStatus[serviceCode] = status
             updateApplyButtonShow()
         },
@@ -270,8 +270,8 @@ class CouponFragment : Fragment(), View.OnClickListener {
     }
 
     private fun getVolume(couponInfo: CouponInfo): String {
-        val preference = activity!!.getSharedPreferences(activity!!.getString(R.string.preference_file_name), Context.MODE_PRIVATE)
-        val useOnlyMB = preference.getBoolean(activity!!.getString(R.string.preference_key_use_MB_only), false)
+        val preference = requireActivity().getSharedPreferences(requireActivity().getString(R.string.preference_file_name), Context.MODE_PRIVATE)
+        val useOnlyMB = preference.getBoolean(requireActivity().getString(R.string.preference_key_use_MB_only), false)
 
         val plan: String = couponInfo.plan
 
@@ -371,8 +371,8 @@ class CouponFragment : Fragment(), View.OnClickListener {
         couponSwipeRefreshLayout.isRefreshing = true
         bulkUpdateCounter = 0
 
-        val couponRequest: JsonObjectRequest = MioUtil.generateUpdateCouponRequest(activity!!, execFunc = {
-            MioUtil.cacheJson(activity!!, it, activity!!.applicationContext.getString(R.string.preference_key_cache_coupon))
+        val couponRequest: JsonObjectRequest = MioUtil.generateUpdateCouponRequest(requireActivity(), execFunc = {
+            MioUtil.cacheJson(requireActivity(), it, requireActivity().applicationContext.getString(R.string.preference_key_cache_coupon))
             setCouponInfoByCache()
         }, errorFunc = {
             HttpErrorHandler.handleHttpError(it) { setCouponInfoByCache() }
@@ -380,8 +380,8 @@ class CouponFragment : Fragment(), View.OnClickListener {
             countBulkUpdateFinished()
         })
 
-        val packetRequest: JsonObjectRequest = MioUtil.generateUpdatePacketRequest(activity!!, execFunc = { packetLogJSONObject ->
-            MioUtil.cacheJson(activity!!, packetLogJSONObject, activity!!.getString(R.string.preference_key_cache_packet_log))
+        val packetRequest: JsonObjectRequest = MioUtil.generateUpdatePacketRequest(requireActivity(), execFunc = { packetLogJSONObject ->
+            MioUtil.cacheJson(requireActivity(), packetLogJSONObject, requireActivity().getString(R.string.preference_key_cache_packet_log))
         }, errorFunc = {
             HttpErrorHandler.handleHttpError(it, suggestLogin = false)
         }, finallyFunc = {

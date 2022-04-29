@@ -33,13 +33,13 @@ class AboutFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        aboutTextView = activity!!.findViewById(R.id.aboutTextView)
-        aboutTextView.text = activity!!.getString(R.string.about)
+        aboutTextView = requireActivity().findViewById(R.id.aboutTextView)
+        aboutTextView.text = requireActivity().getString(R.string.about)
 
-        openSourceTextView = activity!!.findViewById(R.id.openSourceTitleTextView)
+        openSourceTextView = requireActivity().findViewById(R.id.openSourceTitleTextView)
         openSourceTextView.setOnClickListener {
-            val intent = Intent(activity!!, OpenSourceActivity::class.java)
-            activity!!.startActivity(intent)
+            val intent = Intent(requireActivity(), OpenSourceActivity::class.java)
+            requireActivity().startActivity(intent)
         }
 
     }
