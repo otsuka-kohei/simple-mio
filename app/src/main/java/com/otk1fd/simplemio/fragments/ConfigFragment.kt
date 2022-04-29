@@ -24,7 +24,7 @@ class ConfigFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChange
     private lateinit var showPhoneNumberKey: String
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        preferenceManager.sharedPreferencesName = activity!!.getString(R.string.preference_file_name)
+        preferenceManager.sharedPreferencesName = requireActivity().getString(R.string.preference_file_name)
         // /app/res/xml/preference.xml に定義されている設定画面を適用
         addPreferencesFromResource(R.xml.preference)
 
@@ -35,14 +35,14 @@ class ConfigFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChange
         val logoutButtonKey = getString(R.string.preference_key_logout)
         val logoutButton = findPreference(logoutButtonKey) as Preference?
         logoutButton?.setOnPreferenceClickListener {
-            Util.showAlertDialog(activity!!, "ログアウト", "IIJmioからログアウトしてもよろしいですか？",
+            Util.showAlertDialog(requireActivity(), "ログアウト", "IIJmioからログアウトしてもよろしいですか？",
                     "はい", negativeButtonText = "いいえ",
                     positiveFunc = {
-                        MioUtil.deleteToken(activity!!)
-                        Util.showAlertDialog(activity!!, "ログアウト完了", "IIJmioからログアウトしました．\nアプリを終了します",
+                        MioUtil.deleteToken(requireActivity())
+                        Util.showAlertDialog(requireActivity(), "ログアウト完了", "IIJmioからログアウトしました．\nアプリを終了します",
                                 "はい",
                                 positiveFunc = {
-                                    activity!!.finish()
+                                    requireActivity().finish()
                                 })
                     })
             return@setOnPreferenceClickListener true
@@ -52,23 +52,22 @@ class ConfigFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChange
     override fun onResume() {
         super.onResume()
 
-        if (preferenceManager.sharedPreferences.getBoolean(showPhoneNumberKey, false)) {
-            if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                preferenceManager.sharedPreferences.edit { putBoolean(showPhoneNumberKey, false) }
+        if (preferenceManager.sharedPreferences?.getBoolean(showPhoneNumberKey, false) == true) {
+            if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                preferenceManager.sharedPreferences?.edit { putBoolean(showPhoneNumberKey, false) }
                 (findPreference(showPhoneNumberKey) as SwitchPreference?)?.isChecked = false
             }
         }
 
-        (activity!! as MainActivity).updatePhoneNumberOnNavigationHeader()
+        (requireActivity() as MainActivity).updatePhoneNumberOnNavigationHeader()
     }
 
-
-    override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {
-        if (preference?.key == showPhoneNumberKey) {
-            if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(activity!!, arrayOf(Manifest.permission.READ_PHONE_STATE), PERMISSIONS_REQUEST_READ_PHONE_STATE)
+    override fun onPreferenceChange(preference: Preference, newValue: Any?): Boolean {
+        if (preference.key == showPhoneNumberKey) {
+            if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.READ_PHONE_STATE), PERMISSIONS_REQUEST_READ_PHONE_STATE)
             } else {
-                (activity!! as MainActivity).updatePhoneNumberOnNavigationHeader(usePreference = false, showPhoneNumberParameter = newValue as Boolean)
+                (requireActivity() as MainActivity).updatePhoneNumberOnNavigationHeader(usePreference = false, showPhoneNumberParameter = newValue as Boolean)
             }
         }
 

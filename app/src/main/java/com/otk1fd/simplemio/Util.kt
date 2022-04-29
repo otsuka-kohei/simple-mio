@@ -56,6 +56,6 @@ object Util {
             activity.getString(R.string.sim_name_preference_file_name),
             Context.MODE_PRIVATE
         )
-        return preference.getString(serviceCode, "")
+        return preference.getString(serviceCode, "") ?: ""
     }
 }

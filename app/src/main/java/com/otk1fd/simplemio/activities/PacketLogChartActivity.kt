@@ -14,6 +14,7 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
@@ -42,8 +43,8 @@ class PacketLogActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         // 呼び出し元から渡された，表示する利用履歴のSIMのサービスコードを取得する
-        hddServiceCode = intent.getStringExtra("hddServiceCode")
-        serviceCode = intent.getStringExtra("serviceCode")
+        hddServiceCode = intent.getStringExtra("hddServiceCode") ?: ""
+        serviceCode = intent.getStringExtra("serviceCode") ?: ""
 
         setContentView(R.layout.activity_packet_log_chart)
 
@@ -81,7 +82,7 @@ class PacketLogActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item?.itemId) {
             R.id.action_reload -> {
                 startProgressDialog()
@@ -138,7 +139,10 @@ class PacketLogActivity : AppCompatActivity() {
      */
     private fun setDataToLineChartByCache(hddServiceCode: String, serviceCode: String) {
         // キャッシュから利用履歴データを読み込む．
-        val jsonString = MioUtil.loadJsonStringFromCache(this, this.applicationContext.getString(R.string.preference_key_cache_packet_log))
+        val jsonString = MioUtil.loadJsonStringFromCache(
+            this,
+            this.applicationContext.getString(R.string.preference_key_cache_packet_log)
+        )
 
         // 読み込んだ利用履歴データが空でなかったら（一度でもキャッシュしたことがあれば）それをグラフにセットする．
         if (jsonString != "{}") {
@@ -152,10 +156,19 @@ class PacketLogActivity : AppCompatActivity() {
 
     private fun setDataToLineChartByHttp(hddServiceCode: String, serviceCode: String) {
         val request: JsonObjectRequest = MioUtil.generateUpdatePacketRequest(this, execFunc = {
-            MioUtil.cacheJson(this, it, applicationContext.getString(R.string.preference_key_cache_packet_log))
+            MioUtil.cacheJson(
+                this,
+                it,
+                applicationContext.getString(R.string.preference_key_cache_packet_log)
+            )
             setDataToLineChartByCache(hddServiceCode, serviceCode)
         }, errorFunc = {
-            HttpErrorHandler.handleHttpError(it) { setDataToLineChartByCache(hddServiceCode, serviceCode) }
+            HttpErrorHandler.handleHttpError(it) {
+                setDataToLineChartByCache(
+                    hddServiceCode,
+                    serviceCode
+                )
+            }
         }, finallyFunc = {
             stopProgressDialog()
         })
@@ -169,12 +182,31 @@ class PacketLogActivity : AppCompatActivity() {
      * @param hddServiceCode セットする利用履歴データのhddサービスコード
      * @param serviceCode セットする利用履歴データのhdxサービスコード
      */
-    private fun setDataToLineChart(packetLogInfoJson: PacketLogInfoJson, hddServiceCode: String, serviceCode: String) {
+    private fun setDataToLineChart(
+        packetLogInfoJson: PacketLogInfoJson,
+        hddServiceCode: String,
+        serviceCode: String
+    ) {
 
         // クーポンON時のグラフプロットデータ
-        val couponUseDataSet = getLineDataFromJson(packetLogInfoJson, hddServiceCode, serviceCode, true, R.color.packetLogChartWithCoupon, "クーポンON", true)
+        val couponUseDataSet = getLineDataFromJson(
+            packetLogInfoJson,
+            hddServiceCode,
+            serviceCode,
+            true,
+            R.color.packetLogChartWithCoupon,
+            "クーポンON",
+            true
+        )
         // クーポンOFF時のグラフプロットデータ
-        val notCouponUseDataSet = getLineDataFromJson(packetLogInfoJson, hddServiceCode, serviceCode, false, R.color.packetLogChartWithoutCoupon, "クーポンOFF")
+        val notCouponUseDataSet = getLineDataFromJson(
+            packetLogInfoJson,
+            hddServiceCode,
+            serviceCode,
+            false,
+            R.color.packetLogChartWithoutCoupon,
+            "クーポンOFF"
+        )
 
         val dataSets = ArrayList<ILineDataSet>()
         // クーポンOFF時のグラフを先に描画し，そのあとクーポンON時のグラフを表示する
@@ -201,7 +233,15 @@ class PacketLogActivity : AppCompatActivity() {
      *
      * @return グラフプロットデータセット
      */
-    private fun getLineDataFromJson(packetLogInfoJson: PacketLogInfoJson?, hddServiceCode: String, serviceCode: String, couponUse: Boolean, colorResourceId: Int, label: String, setDateList: Boolean = false): LineDataSet {
+    private fun getLineDataFromJson(
+        packetLogInfoJson: PacketLogInfoJson?,
+        hddServiceCode: String,
+        serviceCode: String,
+        couponUse: Boolean,
+        colorResourceId: Int,
+        label: String,
+        setDateList: Boolean = false
+    ): LineDataSet {
 
         // JSONデータから指定したhddサービスコードの項目を取り出す．
         val packetLogInfoList = packetLogInfoJson?.packetLogInfo.orEmpty()
@@ -210,11 +250,13 @@ class PacketLogActivity : AppCompatActivity() {
         // 指定したhdxサービスコードの利用履歴データを取り出す．
         val packetLog: ArrayList<PacketLog> = if (serviceCode.contains("hdo")) {
             val hdoInfo = packetLogInfo?.hdoInfo.orEmpty()
-            val hdoPacketLog = hdoInfo.find { it.hdoServiceCode == serviceCode }?.packetLog.orEmpty()
+            val hdoPacketLog =
+                hdoInfo.find { it.hdoServiceCode == serviceCode }?.packetLog.orEmpty()
             ArrayList(hdoPacketLog)
         } else {
             val hduInfo = packetLogInfo?.hduInfo.orEmpty()
-            val hduPacketLog = hduInfo.find { it.hduServiceCode == serviceCode }?.packetLog.orEmpty()
+            val hduPacketLog =
+                hduInfo.find { it.hduServiceCode == serviceCode }?.packetLog.orEmpty()
             ArrayList(hduPacketLog)
         }
 
@@ -296,7 +338,7 @@ class PacketLogActivity : AppCompatActivity() {
  *
  * @param xValueStrings X軸の値（日付）の文字列のリスト
  */
-private class XAxisValueFormatterForDate(val xValueStrings: List<String>) : IAxisValueFormatter {
+private class XAxisValueFormatterForDate(val xValueStrings: List<String>) : ValueFormatter() {
     override fun getFormattedValue(value: Float, axis: AxisBase): String {
         // "value" represents the position of the label on the axis (x or y)
 
@@ -317,7 +359,7 @@ private class XAxisValueFormatterForDate(val xValueStrings: List<String>) : IAxi
 /**
  * Y軸に表示する値のフォーマッタ
  */
-private class YAxisValueFormatterForUnitMB : IAxisValueFormatter {
+private class YAxisValueFormatterForUnitMB : ValueFormatter() {
     override fun getFormattedValue(value: Float, axis: AxisBase): String {
         // "value" represents the position of the label on the axis (x or y)
 

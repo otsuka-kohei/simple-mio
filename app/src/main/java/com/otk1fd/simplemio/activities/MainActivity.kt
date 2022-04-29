@@ -91,8 +91,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 uriStr = uriStr.replace('#', '?')
                 val validUri = Uri.parse(uriStr)
 
-                val token = validUri.getQueryParameter("access_token")
-                val state = validUri.getQueryParameter("state")
+                val token: String = validUri.getQueryParameter("access_token") ?: ""
+                val state: String = validUri.getQueryParameter("state") ?: ""
 
                 if (state != "success") {
                     Toast.makeText(this, "正しく認証することができませんでした。", Toast.LENGTH_LONG).show()
