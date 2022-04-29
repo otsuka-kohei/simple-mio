@@ -17,10 +17,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import com.google.android.material.navigation.NavigationView
 import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
-import com.otk1fd.simplemio.Util.showAlertDialog
+import com.otk1fd.simplemio.dialog.AlertDialogFragment
+import com.otk1fd.simplemio.dialog.AlertDialogFragmentData
 import com.otk1fd.simplemio.fragments.AboutFragment
 import com.otk1fd.simplemio.fragments.ConfigFragment
 import com.otk1fd.simplemio.fragments.CouponFragment
@@ -220,9 +222,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
      * 確認ダイアログを表示して，IIJmioにログインする．
      */
     private fun startOAuthWithDialog() {
-        showAlertDialog(this, "ログイン", "IIJmioでのログインが必要です\nブラウザを開いてログインページに移動してもよろしいですか？",
-            "はい", negativeButtonText = "いいえ",
-            positiveFunc = { startOAuth() }, negativeFunc = { this.finish() })
+        val alertDialogFragmentData = AlertDialogFragmentData(
+            "ログイン",
+            "IIJmioでのログインが必要です\nブラウザを開いてログインページに移動してもよろしいですか？",
+            positiveButtonText = "はい",
+            positiveButtonFunc = { fragmentActivity: FragmentActivity -> (fragmentActivity as MainActivity).startOAuth() },
+            negativeButtonText = "いいえ",
+            negativeButtonFunc = { fragmentActivity: FragmentActivity -> (fragmentActivity as MainActivity).finish() })
+
+        AlertDialogFragment.show(this, alertDialogFragmentData)
     }
 
     /**
