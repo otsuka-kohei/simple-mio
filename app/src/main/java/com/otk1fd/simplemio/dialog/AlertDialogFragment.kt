@@ -32,8 +32,13 @@ class AlertDialogFragment private constructor() : DialogFragment() {
                 ?: AlertDialogFragmentData()
 
         return AlertDialog.Builder(requireActivity()).apply {
-            setTitle(alertDialogFragmentData.title)
-            setMessage(alertDialogFragmentData.message)
+            if (alertDialogFragmentData.title.isNotEmpty()) {
+                setTitle(alertDialogFragmentData.title)
+            }
+
+            if (alertDialogFragmentData.message.isNotEmpty()) {
+                setMessage(alertDialogFragmentData.message)
+            }
 
             if (alertDialogFragmentData.positiveButtonText.isNotEmpty()) {
                 setPositiveButton(

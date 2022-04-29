@@ -224,7 +224,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun startOAuthWithDialog() {
         val alertDialogFragmentData = AlertDialogFragmentData(
             "ログイン",
-            "IIJmioでのログインが必要です\nブラウザを開いてログインページに移動してもよろしいですか？",
+            "IIJmioでのログインが必要です。\nブラウザを開いてログインページに移動してもよろしいですか？",
             positiveButtonText = "はい",
             positiveButtonFunc = { fragmentActivity: FragmentActivity -> (fragmentActivity as MainActivity).startOAuth() },
             negativeButtonText = "いいえ",
