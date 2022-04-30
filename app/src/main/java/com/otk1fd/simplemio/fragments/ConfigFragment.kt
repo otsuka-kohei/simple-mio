@@ -10,8 +10,9 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
 import com.otk1fd.simplemio.R
-import com.otk1fd.simplemio.Util
 import com.otk1fd.simplemio.activities.MainActivity
+import com.otk1fd.simplemio.dialog.AlertDialogFragment
+import com.otk1fd.simplemio.dialog.AlertDialogFragmentData
 import com.otk1fd.simplemio.mio.MioUtil
 
 
@@ -24,7 +25,8 @@ class ConfigFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChange
     private lateinit var showPhoneNumberKey: String
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        preferenceManager.sharedPreferencesName = requireActivity().getString(R.string.preference_file_name)
+        preferenceManager.sharedPreferencesName =
+            requireActivity().getString(R.string.preference_file_name)
         // /app/res/xml/preference.xml に定義されている設定画面を適用
         addPreferencesFromResource(R.xml.preference)
 
@@ -35,16 +37,33 @@ class ConfigFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChange
         val logoutButtonKey = getString(R.string.preference_key_logout)
         val logoutButton = findPreference(logoutButtonKey) as Preference?
         logoutButton?.setOnPreferenceClickListener {
-            Util.showAlertDialog(requireActivity(), "ログアウト", "IIJmioからログアウトしてもよろしいですか？",
-                    "はい", negativeButtonText = "いいえ",
-                    positiveFunc = {
-                        MioUtil.deleteToken(requireActivity())
-                        Util.showAlertDialog(requireActivity(), "ログアウト完了", "IIJmioからログアウトしました．\nアプリを終了します",
-                                "はい",
-                                positiveFunc = {
-                                    requireActivity().finish()
-                                })
-                    })
+            val alertDialogFragmentDataForLogoutConfirmation = AlertDialogFragmentData(
+                title = "ログアウト",
+                message = "IIJmioからログアウトしますか？",
+                positiveButtonText = "はい",
+                positiveButtonFunc = { fragmentActivityForLogoutConfirmation ->
+                    MioUtil.deleteToken(fragmentActivityForLogoutConfirmation)
+
+                    val alertDialogFragmentDataForLogoutMessage = AlertDialogFragmentData(
+                        title = "ログアウト完了",
+                        message = "IIJmioからログアウトしました。\nアプリを終了します。",
+                        positiveButtonText = "はい",
+                        positiveButtonFunc = { fragmentActivityForLogoutMessage ->
+                            fragmentActivityForLogoutMessage.finish()
+                        }
+                    )
+                    AlertDialogFragment.show(
+                        fragmentActivityForLogoutConfirmation,
+                        alertDialogFragmentDataForLogoutMessage
+                    )
+                },
+                negativeButtonText = "いいえ"
+            )
+            AlertDialogFragment.show(
+                requireActivity(),
+                alertDialogFragmentDataForLogoutConfirmation
+            )
+
             return@setOnPreferenceClickListener true
         }
     }
@@ -53,7 +72,11 @@ class ConfigFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChange
         super.onResume()
 
         if (preferenceManager.sharedPreferences?.getBoolean(showPhoneNumberKey, false) == true) {
-            if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(
+                    requireActivity(),
+                    Manifest.permission.READ_PHONE_STATE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
                 preferenceManager.sharedPreferences?.edit { putBoolean(showPhoneNumberKey, false) }
                 (findPreference(showPhoneNumberKey) as SwitchPreference?)?.isChecked = false
             }
@@ -64,10 +87,21 @@ class ConfigFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChange
 
     override fun onPreferenceChange(preference: Preference, newValue: Any?): Boolean {
         if (preference.key == showPhoneNumberKey) {
-            if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.READ_PHONE_STATE), PERMISSIONS_REQUEST_READ_PHONE_STATE)
+            if (ContextCompat.checkSelfPermission(
+                    requireActivity(),
+                    Manifest.permission.READ_PHONE_STATE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    arrayOf(Manifest.permission.READ_PHONE_STATE),
+                    PERMISSIONS_REQUEST_READ_PHONE_STATE
+                )
             } else {
-                (requireActivity() as MainActivity).updatePhoneNumberOnNavigationHeader(usePreference = false, showPhoneNumberParameter = newValue as Boolean)
+                (requireActivity() as MainActivity).updatePhoneNumberOnNavigationHeader(
+                    usePreference = false,
+                    showPhoneNumberParameter = newValue as Boolean
+                )
             }
         }
 
