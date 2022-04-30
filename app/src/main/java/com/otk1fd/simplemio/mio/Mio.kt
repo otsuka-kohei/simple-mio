@@ -41,8 +41,8 @@ class Mio(private val fragmentActivity: FragmentActivity) {
             return adapter.toJson(couponInfoResponse)
         }
 
-        fun parseJsonToPacketLog(jsonString: String): PacketLogInfoResponse? {
-            val adapter = Moshi.Builder().build().adapter(PacketLogInfoResponse::class.java)
+        fun parseJsonToPacketLog(jsonString: String): UsageInfoResponse? {
+            val adapter = Moshi.Builder().build().adapter(UsageInfoResponse::class.java)
             return try {
                 adapter.fromJson(jsonString)
             } catch (e: Exception) {
@@ -50,9 +50,9 @@ class Mio(private val fragmentActivity: FragmentActivity) {
             }
         }
 
-        fun parsePacketLogToJson(packetLogInfoResponse: PacketLogInfoResponse): String {
-            val adapter = Moshi.Builder().build().adapter(PacketLogInfoResponse::class.java)
-            return adapter.toJson(packetLogInfoResponse)
+        fun parsePacketLogToJson(usageInfoResponse: UsageInfoResponse): String {
+            val adapter = Moshi.Builder().build().adapter(UsageInfoResponse::class.java)
+            return adapter.toJson(usageInfoResponse)
         }
 
         fun getJapanesePlanName(plan: String): String {
@@ -130,13 +130,13 @@ class Mio(private val fragmentActivity: FragmentActivity) {
         return CouponInfoResponseWithHttpResponseCode(couponInfoResponse, httpStatusCode)
     }
 
-    suspend fun getUsageInfo(): PacketLogInfoResponseWithHttpResponseCode {
+    suspend fun getUsageInfo(): UsageInfoResponseWithHttpResponseCode {
         val (response, httpStatusCode) = getRequestIijmio("https://api.iijmio.jp/mobile/d/v2/log/packet/")
 
-        val packetLogInfoResponse: PacketLogInfoResponse? = response?.let {
+        val usageInfoResponse: UsageInfoResponse? = response?.let {
             parseJsonToPacketLog(it)
         }
-        return PacketLogInfoResponseWithHttpResponseCode(packetLogInfoResponse, httpStatusCode)
+        return UsageInfoResponseWithHttpResponseCode(usageInfoResponse, httpStatusCode)
     }
 
     private suspend fun getRequestIijmio(url: String): Pair<String?, Int> =
