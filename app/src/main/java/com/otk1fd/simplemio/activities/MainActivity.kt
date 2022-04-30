@@ -2,9 +2,7 @@ package com.otk1fd.simplemio.activities
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.telephony.TelephonyManager
 import android.view.MenuItem
@@ -18,6 +16,7 @@ import androidx.core.content.edit
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.navigation.NavigationView
 import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
@@ -26,9 +25,10 @@ import com.otk1fd.simplemio.dialog.AlertDialogFragmentData
 import com.otk1fd.simplemio.fragments.AboutFragment
 import com.otk1fd.simplemio.fragments.ConfigFragment
 import com.otk1fd.simplemio.fragments.CouponFragment
-import com.otk1fd.simplemio.mio.MioUtil
+import com.otk1fd.simplemio.mio.Mio
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.coroutines.launch
 
 
 /**
@@ -36,12 +36,15 @@ import kotlinx.android.synthetic.main.app_bar_main.*
  */
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
+    lateinit var mio: Mio
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        MioUtil.setUp(this)
+        mio = Mio(this)
+
         HttpErrorHandler.setUp(
-            loginFunc = { startOAuthWithDialog() },
+            loginFunc = { loginWithDialog() },
             showErrorMessageFunc = { errorMessage ->
                 Toast.makeText(
                     this,
@@ -72,38 +75,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onStart()
 
         updatePhoneNumberOnNavigationHeader()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        val intent = intent
-        val action = intent.action
-
-        if (action == Intent.ACTION_VIEW) {
-            val uri: Uri? = intent.data
-
-            // 外部ブラウザでのIIJmioログインから戻ってきたとき
-            if (uri != null && uri.toString().contains("simplemio")) {
-
-                // 受け取るURIが
-                // simplemio://callback#access_token=token&state=success&token_type=Bearer&expires_in=7776000
-                // となっていて，正しくエンコードできないので # を ? に置き換える
-                var uriStr = uri.toString()
-                uriStr = uriStr.replace('#', '?')
-                val validUri = Uri.parse(uriStr)
-
-                val token: String = validUri.getQueryParameter("access_token") ?: ""
-                val state: String = validUri.getQueryParameter("state") ?: ""
-
-                if (state != "success") {
-                    Toast.makeText(this, "正しく認証することができませんでした。", Toast.LENGTH_LONG).show()
-                } else {
-                    MioUtil.saveToken(this, token)
-                }
-            }
-
-        }
     }
 
     override fun onBackPressed() {
@@ -146,7 +117,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
-
 
         // Fragmentをセット
         fragment?.let {
@@ -221,36 +191,32 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     /**
      * 確認ダイアログを表示して，IIJmioにログインする．
      */
-    private fun startOAuthWithDialog() {
-        val alertDialogFragmentData = AlertDialogFragmentData(
-            "ログイン",
-            "IIJmioでのログインが必要です。\nブラウザを開いてログインページに移動してもよろしいですか？",
+    private fun loginWithDialog() {
+        val alertDialogFragmentDataForLogin = AlertDialogFragmentData(
+            title = "ログイン",
+            message = "IIJmioでのログインが必要です。\nログイン画面に移動してもよろしいですか？",
             positiveButtonText = "はい",
-            positiveButtonFunc = { fragmentActivity: FragmentActivity -> (fragmentActivity as MainActivity).startOAuth() },
+            positiveButtonFunc = { fragmentActivity: FragmentActivity ->
+                fragmentActivity.lifecycleScope.launch {
+                    val result: Boolean = mio.login()
+                    if (!result) {
+                        val alertDialogFragmentDataForLoginErrorMessage = AlertDialogFragmentData(
+                            message = "ログインに失敗しました",
+                            positiveButtonText = "OK",
+                            positiveButtonFunc = {
+                                (it as MainActivity).loginWithDialog()
+                            }
+                        )
+                        AlertDialogFragment.show(
+                            this@MainActivity,
+                            alertDialogFragmentDataForLoginErrorMessage
+                        )
+                    }
+                }
+            },
             negativeButtonText = "いいえ",
             negativeButtonFunc = { fragmentActivity: FragmentActivity -> (fragmentActivity as MainActivity).finish() })
 
-        AlertDialogFragment.show(this, alertDialogFragmentData)
-    }
-
-    /**
-     * 外部ブラウザを起動してIIJmioにログインする．
-     */
-    private fun startOAuth() {
-
-        val uri = "https://api.iijmio.jp/mobile/d/v1/authorization/?" +
-                "response_type=token" +
-                "&client_id=" + getString(R.string.developer_id) +
-                "&redirect_uri=" + getString(R.string.simple_app_name) + "%3A%2F%2Fcallback" +
-                "&state=" + "success"
-
-        // リクエスト用URIを渡して，外部ブラウザのActivityを起動する．
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
-        startActivity(intent)
-    }
-
-    public override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        setIntent(intent)
+        AlertDialogFragment.show(this, alertDialogFragmentDataForLogin)
     }
 }

@@ -1,6 +1,6 @@
 package com.otk1fd.simplemio
 
-import com.android.volley.VolleyError
+import android.util.Log
 
 
 /**
@@ -15,16 +15,13 @@ object HttpErrorHandler {
         this.showErrorMessageFunc = showErrorMessageFunc
     }
 
-    fun handleHttpError(volleyError: VolleyError?, getError: Boolean = true, suggestLogin: Boolean = true, recoveryFunc: () -> Unit = {}) {
-        if (volleyError?.networkResponse == null) {
-            showErrorMessageFunc("通信エラーが発生し、最新のデータを取得できませんでした。\n少しお待ちの上、再度お試しください。")
-            recoveryFunc()
-            return
-        }
-
-        val errorCode = volleyError.networkResponse.statusCode
-
-        when (errorCode) {
+    fun handleHttpError(
+        httpStatusCode: Int,
+        getError: Boolean = true,
+        suggestLogin: Boolean = true,
+        recoveryFunc: () -> Unit = {}
+    ) {
+        when (httpStatusCode) {
             429 -> {
                 if (getError) {
                     showErrorMessageFunc("アクセス数制限のため、最新のデータを取得できませんでした。\n少しお待ちの上、再度お試しください。")
@@ -46,8 +43,11 @@ object HttpErrorHandler {
                 showErrorMessageFunc("IIJmioのサーバがメンテナンス中のため、最新のデータを取得できませんでした。\nしばらくお待ちの上、再度お試しください。")
                 recoveryFunc()
             }
+            200 -> {
+                /* 正常レスポンス */
+            }
             else -> {
-                showErrorMessageFunc("エラーが発生し、最新のデータを取得できませんでした。\nしばらくお待ちの上、再度お試しください。")
+                showErrorMessageFunc("通信エラーが発生し、最新のデータを取得できませんでした。\n少しお待ちの上、再度お試しください。")
                 recoveryFunc()
             }
         }

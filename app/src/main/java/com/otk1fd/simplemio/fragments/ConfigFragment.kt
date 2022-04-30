@@ -13,7 +13,7 @@ import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.activities.MainActivity
 import com.otk1fd.simplemio.dialog.AlertDialogFragment
 import com.otk1fd.simplemio.dialog.AlertDialogFragmentData
-import com.otk1fd.simplemio.mio.MioUtil
+import com.otk1fd.simplemio.mio.Mio
 
 
 /**
@@ -21,10 +21,17 @@ import com.otk1fd.simplemio.mio.MioUtil
  */
 class ConfigFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener {
 
-    private val PERMISSIONS_REQUEST_READ_PHONE_STATE = 12345
+    companion object {
+        private const val PERMISSIONS_REQUEST_READ_PHONE_STATE: Int = 12345
+    }
+
     private lateinit var showPhoneNumberKey: String
 
+    private lateinit var mio: Mio
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        mio = (requireActivity() as MainActivity).mio
+
         preferenceManager.sharedPreferencesName =
             requireActivity().getString(R.string.preference_file_name)
         // /app/res/xml/preference.xml に定義されている設定画面を適用
@@ -42,7 +49,7 @@ class ConfigFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChange
                 message = "IIJmioからログアウトしますか？",
                 positiveButtonText = "はい",
                 positiveButtonFunc = { fragmentActivityForLogoutConfirmation ->
-                    MioUtil.deleteToken(fragmentActivityForLogoutConfirmation)
+                    mio.deleteToken()
 
                     val alertDialogFragmentDataForLogoutMessage = AlertDialogFragmentData(
                         title = "ログアウト完了",

@@ -6,25 +6,24 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.android.volley.toolbox.JsonObjectRequest
+import androidx.lifecycle.lifecycleScope
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.Util
-import com.otk1fd.simplemio.mio.MioUtil
+import com.otk1fd.simplemio.mio.Mio
 import com.otk1fd.simplemio.mio.PacketLog
-import com.otk1fd.simplemio.mio.PacketLogInfoJson
+import com.otk1fd.simplemio.mio.PacketLogInfoResponse
 import kotlinx.android.synthetic.main.activity_packet_log_chart.*
 import kotlinx.android.synthetic.main.content_packet_log_chart.*
-import org.json.JSONObject
+import kotlinx.coroutines.launch
 
 
 /**
@@ -32,6 +31,8 @@ import org.json.JSONObject
  * [PacketLogFragment][com.otk1fd.simplemio.fragments.PacketLogFragment]から呼び出される．
  */
 class PacketLogActivity : AppCompatActivity() {
+
+    private lateinit var mio: Mio
 
     private lateinit var progressDialog: ProgressDialog
     private val dateList = ArrayList<String>()
@@ -41,6 +42,8 @@ class PacketLogActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        mio = Mio(this)
 
         // 呼び出し元から渡された，表示する利用履歴のSIMのサービスコードを取得する
         hddServiceCode = intent.getStringExtra("hddServiceCode") ?: ""
@@ -77,7 +80,7 @@ class PacketLogActivity : AppCompatActivity() {
         stopProgressDialog()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(com.otk1fd.simplemio.R.menu.packet_log_chart_activity, menu)
         return super.onCreateOptionsMenu(menu)
     }
@@ -139,14 +142,12 @@ class PacketLogActivity : AppCompatActivity() {
      */
     private fun setDataToLineChartByCache(hddServiceCode: String, serviceCode: String) {
         // キャッシュから利用履歴データを読み込む．
-        val jsonString = MioUtil.loadJsonStringFromCache(
-            this,
-            this.applicationContext.getString(R.string.preference_key_cache_packet_log)
-        )
+        val jsonString =
+            mio.loadCachedJsonString(this.applicationContext.getString(R.string.preference_key_cache_packet_log))
 
         // 読み込んだ利用履歴データが空でなかったら（一度でもキャッシュしたことがあれば）それをグラフにセットする．
         if (jsonString != "{}") {
-            val packetLogInfoJson = MioUtil.parseJsonToPacketLog(JSONObject(jsonString))
+            val packetLogInfoJson = Mio.parseJsonToPacketLog(jsonString)
             packetLogInfoJson?.let { setDataToLineChart(it, hddServiceCode, serviceCode) }
         } else {
             startProgressDialog()
@@ -155,42 +156,43 @@ class PacketLogActivity : AppCompatActivity() {
     }
 
     private fun setDataToLineChartByHttp(hddServiceCode: String, serviceCode: String) {
-        val request: JsonObjectRequest = MioUtil.generateUpdatePacketRequest(this, execFunc = {
-            MioUtil.cacheJson(
-                this,
-                it,
-                applicationContext.getString(R.string.preference_key_cache_packet_log)
-            )
-            setDataToLineChartByCache(hddServiceCode, serviceCode)
-        }, errorFunc = {
-            HttpErrorHandler.handleHttpError(it) {
-                setDataToLineChartByCache(
-                    hddServiceCode,
-                    serviceCode
+        lifecycleScope.launch {
+            val packetLogInfoResponseWithHttpResponseCode = mio.getUsageInfo()
+            packetLogInfoResponseWithHttpResponseCode.packetLogInfoResponse?.let {
+                mio.cacheJsonString(
+                    Mio.parsePacketLogToJson(it),
+                    getString(R.string.preference_key_cache_packet_log)
                 )
+                setDataToLineChartByCache(hddServiceCode, serviceCode)
+            }?.let {
+                HttpErrorHandler.handleHttpError(packetLogInfoResponseWithHttpResponseCode.httpStatusCode) {
+                    setDataToLineChartByCache(
+                        hddServiceCode,
+                        serviceCode
+                    )
+                }
             }
-        }, finallyFunc = {
+
             stopProgressDialog()
-        })
-        MioUtil.startRequests(request)
+        }
     }
 
     /**
      * グラフに利用履歴データをセットし，プロットする．
      *
-     * @param packetLogInfoJson IIJmioのAPIから取得できる利用履歴JSONデータ全体
+     * @param packetLogInfoResponse IIJmioのAPIから取得できる利用履歴JSONデータ全体
      * @param hddServiceCode セットする利用履歴データのhddサービスコード
      * @param serviceCode セットする利用履歴データのhdxサービスコード
      */
     private fun setDataToLineChart(
-        packetLogInfoJson: PacketLogInfoJson,
+        packetLogInfoResponse: PacketLogInfoResponse,
         hddServiceCode: String,
         serviceCode: String
     ) {
 
         // クーポンON時のグラフプロットデータ
         val couponUseDataSet = getLineDataFromJson(
-            packetLogInfoJson,
+            packetLogInfoResponse,
             hddServiceCode,
             serviceCode,
             true,
@@ -200,7 +202,7 @@ class PacketLogActivity : AppCompatActivity() {
         )
         // クーポンOFF時のグラフプロットデータ
         val notCouponUseDataSet = getLineDataFromJson(
-            packetLogInfoJson,
+            packetLogInfoResponse,
             hddServiceCode,
             serviceCode,
             false,
@@ -223,7 +225,7 @@ class PacketLogActivity : AppCompatActivity() {
     /**
      * APIから取得した利用履歴データから，グラフにプロットするデータを作成する．
      *
-     * @param packetLogInfoJson IIJmioのAPIから取得できる利用履歴JSONデータ全体
+     * @param packetLogInfoResponse IIJmioのAPIから取得できる利用履歴JSONデータ全体
      * @param hddServiceCode セットする利用履歴データのhddサービスコード
      * @param serviceCode セットする利用履歴データのhdxサービスコード
      * @param couponUse クーポンON時のデータかどうか
@@ -234,7 +236,7 @@ class PacketLogActivity : AppCompatActivity() {
      * @return グラフプロットデータセット
      */
     private fun getLineDataFromJson(
-        packetLogInfoJson: PacketLogInfoJson?,
+        packetLogInfoResponse: PacketLogInfoResponse?,
         hddServiceCode: String,
         serviceCode: String,
         couponUse: Boolean,
@@ -244,7 +246,7 @@ class PacketLogActivity : AppCompatActivity() {
     ): LineDataSet {
 
         // JSONデータから指定したhddサービスコードの項目を取り出す．
-        val packetLogInfoList = packetLogInfoJson?.packetLogInfo.orEmpty()
+        val packetLogInfoList = packetLogInfoResponse?.packetLogInfo.orEmpty()
         val packetLogInfo = packetLogInfoList.find { it.hddServiceCode == hddServiceCode }
 
         // 指定したhdxサービスコードの利用履歴データを取り出す．
