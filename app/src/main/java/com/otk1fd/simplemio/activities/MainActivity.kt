@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.telephony.TelephonyManager
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
@@ -194,13 +195,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
      * 確認ダイアログを表示して，IIJmioにログインする．
      */
     private fun loginWithDialog() {
+        Log.d("hoge", "start login")
         val alertDialogFragmentDataForLogin = AlertDialogFragmentData(
             title = "ログイン",
             message = "IIJmioでのログインが必要です。\nログイン画面に移動してもよろしいですか？",
             positiveButtonText = "はい",
             positiveButtonFunc = { fragmentActivity: FragmentActivity ->
                 fragmentActivity.lifecycleScope.launch {
-                    val result: Boolean = mio.login()
+                    val result: Boolean = (fragmentActivity as MainActivity).mio.login()
                     if (!result) {
                         val alertDialogFragmentDataForLoginErrorMessage = AlertDialogFragmentData(
                             message = "ログインに失敗しました",

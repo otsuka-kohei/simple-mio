@@ -56,12 +56,15 @@ class Mio(private val fragmentActivity: FragmentActivity) {
         }
 
         fun getJapanesePlanName(plan: String): String {
-            if (plan == "Family Share") return "ファミリーシェアプラン"
-            if (plan == "Minimum Start") return "ミニマムスタートプラン"
-            if (plan == "Light Start") return "ライトスタートプラン"
-            if (plan == "Eco Minimum") return "エコプランミニマム"
-            if (plan == "Eco Standard") return "エコプランスタンダード"
-            return ""
+            return when (plan) {
+                "Family Share" -> "ファミリーシェアプラン"
+                "Minimum Start" -> "ミニマムスタートプラン"
+                "Light Start" -> "ライトスタートプラン"
+                "Eco Minimum" -> "エコプランミニマム"
+                "Eco Standard" -> "エコプランスタンダード"
+                "Pay as you go" -> "プリペイドパック"
+                else -> ""
+            }
         }
     }
 
@@ -71,18 +74,18 @@ class Mio(private val fragmentActivity: FragmentActivity) {
         fragmentActivity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult: ActivityResult ->
             activityResult.data?.let { intent: Intent ->
                 intent.getStringExtra(MioLoginActivity.TOKEN_KEY)?.let { token: String ->
-                    Log.d("hoge","token: $token")
+                    Log.d("hoge", "token: $token")
                     saveToken(token)
                     loginContinuation.resume(true)
                 }
-            }?:let{
-                Log.d("hoge","no token")
+            } ?: let {
+                Log.d("hoge", "no token")
                 loginContinuation.resume(false)
             }
         }
 
     suspend fun login() = suspendCoroutine<Boolean> { continuation ->
-        Log.d("hoge","start login")
+        Log.d("hoge", "start login")
         loginContinuation = continuation
         val intent = Intent(fragmentActivity, MioLoginActivity::class.java)
         intent.putExtra(MioLoginActivity.LOGIN_FLAG_KEY, true)
@@ -161,14 +164,18 @@ class Mio(private val fragmentActivity: FragmentActivity) {
     suspend fun applyCouponSetting(couponStatusMap: Map<String, Boolean>): Int {
         val hdoList = ArrayList<CouponSetting>()
         val hduList = ArrayList<CouponSetting>()
+        val hdxList = ArrayList<CouponSetting>()
         for ((serviceCode, status) in couponStatusMap) {
-            if (serviceCode.contains("hdo")) {
-                hdoList.add(CouponSetting(serviceCode, status))
-            } else if (serviceCode.contains("hdu")) {
-                hduList.add(CouponSetting(serviceCode, status))
+            with(serviceCode) {
+                when {
+                    contains("hdo") -> hdoList.add(CouponSetting(serviceCode, status))
+                    contains("hdu") -> hduList.add(CouponSetting(serviceCode, status))
+                    contains("hdx") -> hdxList.add(CouponSetting(serviceCode, status))
+                    else -> {}
+                }
             }
         }
-        val jsonString: String = getJsonStringForApplyCouponSetting(hdoList, hduList)
+        val jsonString: String = getJsonStringForApplyCouponSetting(hdoList, hduList, hdxList)
 
         return putRequestIijmio("https://api.iijmio.jp/mobile/d/v2/coupon/", jsonString)
     }
@@ -199,10 +206,12 @@ class Mio(private val fragmentActivity: FragmentActivity) {
 
     private fun getJsonStringForApplyCouponSetting(
         hdoList: List<CouponSetting>,
-        hduList: List<CouponSetting>
+        hduList: List<CouponSetting>,
+        hdxList: List<CouponSetting>
     ): String {
         var hdoStr = """"hdoInfo":["""
         var hduStr = """"hduInfo":["""
+        var hdxStr = """"hdxInfo":["""
 
         for ((index, couponStatus) in hdoList.withIndex()) {
 
@@ -222,7 +231,7 @@ class Mio(private val fragmentActivity: FragmentActivity) {
 
             val hdu = couponStatus.hdxServiceCode
             val on = couponStatus.coupon
-            val str = """{"hdoServiceCode":"$hdu","couponUse":$on}"""
+            val str = """{"hduServiceCode":"$hdu","couponUse":$on}"""
 
             hduStr += str
 
@@ -232,7 +241,36 @@ class Mio(private val fragmentActivity: FragmentActivity) {
         }
         hduStr += " ]"
 
-        return """{"couponInfo":[{$hdoStr,$hduStr}]}"""
+        return """
+            {
+                "couponInfo":[
+                    {
+                        ${getHdzInfoJsonString("hdo", hdoList)},
+                        ${getHdzInfoJsonString("hdu", hduList)},
+                        ${getHdzInfoJsonString("hdx", hdxList)}
+                    }
+                ]
+            }
+            """
+    }
+
+    private fun getHdzInfoJsonString(hdz: String, hdzList: List<CouponSetting>): String {
+        var hdzStr = """"${hdz}Info":["""
+
+        for ((index, couponStatus) in hdzList.withIndex()) {
+            val hdo = couponStatus.hdxServiceCode
+            val on = couponStatus.coupon
+            val str = """{"${hdz}ServiceCode":"$hdo","couponUse":$on}"""
+
+            hdzStr += str
+
+            if (index < hdzList.size - 1) {
+                hdzStr += ", "
+            }
+        }
+        hdzStr += " ]"
+
+        return hdzStr
     }
 
     fun cacheJsonString(jsonString: String, jsonDataType: String) {

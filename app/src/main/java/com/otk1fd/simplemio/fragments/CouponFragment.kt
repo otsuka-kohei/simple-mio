@@ -1,6 +1,5 @@
 package com.otk1fd.simplemio.fragments
 
-import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
@@ -24,6 +23,7 @@ import com.otk1fd.simplemio.dialog.ProgressDialogFragmentData
 import com.otk1fd.simplemio.mio.CouponInfo
 import com.otk1fd.simplemio.mio.CouponInfoResponse
 import com.otk1fd.simplemio.mio.Mio
+import com.otk1fd.simplemio.mio.PacketLogInfoResponse
 import com.otk1fd.simplemio.ui.CouponExpandableListAdapter
 import com.otk1fd.simplemio.ui.listview_item.CouponListItemChild
 import com.otk1fd.simplemio.ui.listview_item.CouponListItemParent
@@ -38,23 +38,20 @@ class CouponFragment : Fragment(), View.OnClickListener {
     private lateinit var mio: Mio
 
     private lateinit var applyButton: FloatingActionButton
-    private lateinit var couponListView: ExpandableListView
-    private lateinit var progressDialog: ProgressDialog
+    private lateinit var couponExpandableListView: ExpandableListView
     private lateinit var couponSwipeRefreshLayout: SwipeRefreshLayout
 
-    private val couponStatus: MutableMap<String, Boolean> =
+    private val currentCouponStatusMap: MutableMap<String, Boolean> =
         HashMap<String, Boolean>().withDefault { false }
-    private var oldCouponStatus = cloneHashMapWithDefault(couponStatus)
+    private var previousCouponStatusMap = cloneHashMapWithDefault(currentCouponStatusMap)
 
     private var expandAllGroup = false
 
-    private var expandState: Parcelable? = null
+    private var expandStateParcelable: Parcelable? = null
     private var firstVisiblePosition: Int? = 0
-    private var offsetPosition: Int? = 0
+    private var firstVisiblePositionOffsetForChileElement: Int? = 0
 
-    private var firstStarting: Boolean = true
-
-    private var bulkUpdateCounter: Int = 0
+    private var isFirstTime: Boolean = true
 
     private var progressDialogFragment: ProgressDialogFragment? = null
 
@@ -76,20 +73,20 @@ class CouponFragment : Fragment(), View.OnClickListener {
         applyButton.setOnClickListener(this)
         applyButton.hide()
 
-        couponListView = requireActivity().findViewById(R.id.couponListView)
+        couponExpandableListView = requireActivity().findViewById(R.id.couponListView)
         // ExpandableListView が展開されたときに自動スクロールするようにする
-        couponListView.setOnGroupClickListener { parent, v, groupPosition, id ->
-            couponListView.smoothScrollToPosition(groupPosition)
+        couponExpandableListView.setOnGroupClickListener { _, _, groupPosition, _ ->
+            couponExpandableListView.smoothScrollToPosition(groupPosition)
             return@setOnGroupClickListener false
         }
 
-        couponListView.setOnItemLongClickListener { adapterView, view, i, l ->
-            val groupPosition = ExpandableListView.getPackedPositionGroup(l)
-            val childPosition = ExpandableListView.getPackedPositionChild(l)
+        couponExpandableListView.setOnItemLongClickListener { _, _, _, id ->
+            val groupPosition = ExpandableListView.getPackedPositionGroup(id)
+            val childPosition = ExpandableListView.getPackedPositionChild(id)
 
-            val packedPositionType = ExpandableListView.getPackedPositionType(l)
+            val packedPositionType = ExpandableListView.getPackedPositionType(id)
             if (packedPositionType == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-                val adapter = couponListView.expandableListAdapter
+                val adapter = couponExpandableListView.expandableListAdapter
                 val child = adapter.getChild(groupPosition, childPosition) as CouponListItemChild
                 val serviceCode = child.serviceCode
                 showEditTextDialogToSetSimName(serviceCode)
@@ -100,9 +97,10 @@ class CouponFragment : Fragment(), View.OnClickListener {
         couponSwipeRefreshLayout = requireActivity().findViewById(R.id.couponSwipeRefreshLayout)
 
         couponSwipeRefreshLayout.setOnRefreshListener {
-            expandState = couponListView.onSaveInstanceState()
-            firstVisiblePosition = couponListView.firstVisiblePosition
-            offsetPosition = couponListView.getChildAt(0)?.top ?: 0
+            expandStateParcelable = couponExpandableListView.onSaveInstanceState()
+            firstVisiblePosition = couponExpandableListView.firstVisiblePosition
+            firstVisiblePositionOffsetForChileElement =
+                couponExpandableListView.getChildAt(0)?.top ?: 0
             lifecycleScope.launch {
                 setCouponInfoByHttp()
             }
@@ -127,9 +125,9 @@ class CouponFragment : Fragment(), View.OnClickListener {
     override fun onResume() {
         super.onResume()
 
-        if (firstStarting) {
+        if (isFirstTime) {
             firstCachingAndSetByHTTP()
-            firstStarting = false
+            isFirstTime = false
         } else {
             lifecycleScope.launch {
                 setCouponInfoByCache()
@@ -143,9 +141,9 @@ class CouponFragment : Fragment(), View.OnClickListener {
         couponSwipeRefreshLayout.isRefreshing = false
         stopProgressDialog()
 
-        expandState = couponListView.onSaveInstanceState()
-        firstVisiblePosition = couponListView.firstVisiblePosition
-        offsetPosition = couponListView.getChildAt(0)?.top ?: 0
+        expandStateParcelable = couponExpandableListView.onSaveInstanceState()
+        firstVisiblePosition = couponExpandableListView.firstVisiblePosition
+        firstVisiblePositionOffsetForChileElement = couponExpandableListView.getChildAt(0)?.top ?: 0
     }
 
     private fun showEditTextDialogToSetSimName(serviceCode: String) {
@@ -174,9 +172,9 @@ class CouponFragment : Fragment(), View.OnClickListener {
             requireActivity().lifecycleScope.launch {
                 startProgressDialog()
                 val couponInfoResponseWithHttpResponseCode = mio.getCouponInfo()
-                val httpResponseCode: Int = mio.applyCouponSetting(couponStatus)
+                val httpResponseCode: Int = mio.applyCouponSetting(currentCouponStatusMap)
 
-                if (httpResponseCode == 200) {
+                if (httpResponseCode == HttpErrorHandler.HTTP_OK) {
                     setCouponInfoByHttp()
                 } else {
                     HttpErrorHandler.handleHttpError(
@@ -191,6 +189,8 @@ class CouponFragment : Fragment(), View.OnClickListener {
     }
 
     private suspend fun setCouponInfoByHttp() {
+        couponSwipeRefreshLayout.isRefreshing = true
+
         val couponInfoResponseWithHttpResponseCode = mio.getCouponInfo()
 
         couponInfoResponseWithHttpResponseCode.couponInfoResponse?.let {
@@ -210,6 +210,10 @@ class CouponFragment : Fragment(), View.OnClickListener {
         couponSwipeRefreshLayout.isRefreshing = false
     }
 
+    suspend fun refreshCouponInfo() {
+        setCouponInfoByCache()
+    }
+
     private suspend fun setCouponInfoByCache() {
         val jsonString =
             mio.loadCachedJsonString(requireActivity().applicationContext.getString(R.string.preference_key_cache_coupon))
@@ -217,15 +221,14 @@ class CouponFragment : Fragment(), View.OnClickListener {
             val couponInfoJson = Mio.parseJsonToCoupon(jsonString)
             couponInfoJson?.let { setCouponInfo(it) }
         } else {
-            couponSwipeRefreshLayout.isRefreshing = true
             setCouponInfoByHttp()
         }
     }
 
     private fun setCouponInfo(couponInfoResponse: CouponInfoResponse) {
         // ExpandableListView のそれぞれの Group 要素の展開状況を控えておく
-        val oldAdapter = couponListView.expandableListAdapter
-        expandState = couponListView.onSaveInstanceState()
+        val oldAdapter = couponExpandableListView.expandableListAdapter
+        expandStateParcelable = couponExpandableListView.onSaveInstanceState()
 
         // 親要素のリスト
         val parents = ArrayList<CouponListItemParent>()
@@ -236,7 +239,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
         for (couponInfo in couponInfoList) {
             val parent = CouponListItemParent(
                 couponInfo.hddServiceCode,
-                getJapanesePlanName(couponInfo.plan),
+                Mio.getJapanesePlanName(couponInfo.plan),
                 getVolume(couponInfo)
             )
             parents.add(parent)
@@ -270,16 +273,17 @@ class CouponFragment : Fragment(), View.OnClickListener {
             childrenList.add(children)
         }
 
-        val couponExpandableListAdapter = CouponExpandableListAdapter(requireActivity(),
+        val couponExpandableListAdapter = CouponExpandableListAdapter(
+            this,
             parents,
             childrenList,
-            setCouponStatus = { serviceCode, status ->
-                couponStatus[serviceCode] = status
+            setCouponStatusFunc = { serviceCode, status ->
+                currentCouponStatusMap[serviceCode] = status
                 updateApplyButtonShow()
             },
-            getCouponStatus = { serviceCode -> couponStatus.getValue(serviceCode) })
+            getCouponStatusFunc = { serviceCode -> currentCouponStatusMap.getValue(serviceCode) })
 
-        couponListView.setAdapter(couponExpandableListAdapter)
+        couponExpandableListView.setAdapter(couponExpandableListAdapter)
 
         couponInfoResponse.let { setCouponStatus(it) }
 
@@ -288,22 +292,22 @@ class CouponFragment : Fragment(), View.OnClickListener {
         val groupNum: Int = couponExpandableListAdapter.groupCount
         if (expandAllGroup) {
             for (i in 0 until groupNum) {
-                couponListView.expandGroup(i)
+                couponExpandableListView.expandGroup(i)
             }
         }
 
-        expandState?.let { couponListView.onRestoreInstanceState(it) }
+        expandStateParcelable?.let { couponExpandableListView.onRestoreInstanceState(it) }
 
         val firstVisiblePositionSet = firstVisiblePosition ?: 0
-        val childPositionSet = offsetPosition ?: 0
-        couponListView.setSelectionFromTop(firstVisiblePositionSet, childPositionSet)
+        val childPositionSet = firstVisiblePositionOffsetForChileElement ?: 0
+        couponExpandableListView.setSelectionFromTop(firstVisiblePositionSet, childPositionSet)
 
-        oldCouponStatus = cloneHashMapWithDefault(couponStatus)
+        previousCouponStatusMap = cloneHashMapWithDefault(currentCouponStatusMap)
         updateApplyButtonShow()
     }
 
     private fun updateApplyButtonShow() {
-        if (couponStatus != oldCouponStatus) {
+        if (currentCouponStatusMap != previousCouponStatusMap) {
             applyButton.show()
         } else {
             applyButton.hide()
@@ -361,27 +365,17 @@ class CouponFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    private fun getJapanesePlanName(plan: String): String {
-        if (plan == "Family Share") return "ファミリーシェアプラン"
-        if (plan == "Minimum Start") return "ミニマムスタートプラン"
-        if (plan == "Light Start") return "ライトスタートプラン"
-        if (plan == "Eco Minimum") return "エコプランミニマム"
-        if (plan == "Eco Standard") return "エコプランスタンダード"
-
-        return ""
-    }
-
     private fun setCouponStatus(couponInfoResponse: CouponInfoResponse): Unit {
         for (couponInfo in couponInfoResponse.couponInfo) {
 
             val hdoInfoList = couponInfo.hdoInfo.orEmpty()
             for (hdoInfo in hdoInfoList) {
-                couponStatus[hdoInfo.hdoServiceCode] = hdoInfo.couponUse
+                currentCouponStatusMap[hdoInfo.hdoServiceCode] = hdoInfo.couponUse
             }
 
             val hduInfoList = couponInfo.hduInfo.orEmpty()
             for (hduInfo in hduInfoList) {
-                couponStatus[hduInfo.hduServiceCode] = hduInfo.couponUse
+                currentCouponStatusMap[hduInfo.hduServiceCode] = hduInfo.couponUse
             }
 
         }
@@ -409,25 +403,29 @@ class CouponFragment : Fragment(), View.OnClickListener {
         return map
     }
 
-    private fun countBulkUpdateFinished() {
-        bulkUpdateCounter++
-        if (bulkUpdateCounter == 2) {
-            couponSwipeRefreshLayout.isRefreshing = false
-        }
-    }
-
     private fun firstCachingAndSetByHTTP() {
-        couponSwipeRefreshLayout.isRefreshing = true
-        bulkUpdateCounter = 0
-
         lifecycleScope.launch {
+            couponSwipeRefreshLayout.isRefreshing = true
+
             val couponInfoResponseWithHttpResponseCode = mio.getCouponInfo()
-            couponInfoResponseWithHttpResponseCode.couponInfoResponse?.let {
+            couponInfoResponseWithHttpResponseCode.couponInfoResponse?.let { couponInfoResponse: CouponInfoResponse ->
                 mio.cacheJsonString(
-                    Mio.parseCouponToJson(it),
+                    Mio.parseCouponToJson(couponInfoResponse),
                     requireActivity().getString(R.string.preference_key_cache_coupon)
                 )
                 setCouponInfoByCache()
+
+                val packetLogInfoResponseWithHttpResponseCode = mio.getUsageInfo()
+                packetLogInfoResponseWithHttpResponseCode.packetLogInfoResponse?.let { packetLogInfoResponse: PacketLogInfoResponse ->
+                    mio.cacheJsonString(
+                        Mio.parsePacketLogToJson(packetLogInfoResponse),
+                        requireActivity().getString(R.string.preference_key_cache_packet_log)
+                    )
+                } ?: let {
+                    HttpErrorHandler.handleHttpError(
+                        packetLogInfoResponseWithHttpResponseCode.httpStatusCode
+                    )
+                }
             } ?: let {
                 HttpErrorHandler.handleHttpError(couponInfoResponseWithHttpResponseCode.httpStatusCode) {
                     requireActivity().lifecycleScope.launch {
@@ -436,23 +434,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
                 }
             }
 
-            countBulkUpdateFinished()
-        }
-
-        lifecycleScope.launch {
-            val packetLogInfoResponseWithHttpResponseCode = mio.getUsageInfo()
-            packetLogInfoResponseWithHttpResponseCode.packetLogInfoResponse?.let {
-                mio.cacheJsonString(
-                    Mio.parsePacketLogToJson(it),
-                    requireActivity().getString(R.string.preference_key_cache_packet_log)
-                )
-            } ?: let {
-                HttpErrorHandler.handleHttpError(
-                    packetLogInfoResponseWithHttpResponseCode.httpStatusCode
-                )
-            }
-
-            countBulkUpdateFinished()
+            couponSwipeRefreshLayout.isRefreshing = false
         }
     }
 }

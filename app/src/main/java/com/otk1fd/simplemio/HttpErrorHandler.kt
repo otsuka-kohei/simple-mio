@@ -5,6 +5,9 @@ package com.otk1fd.simplemio
  * Created by otk1fd on 2018/03/14.
  */
 object HttpErrorHandler {
+
+    const val HTTP_OK = 200
+
     private lateinit var loginFunc: () -> Unit
     private lateinit var showErrorMessageFunc: (String) -> Unit
 

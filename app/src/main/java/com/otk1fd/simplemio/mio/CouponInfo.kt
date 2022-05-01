@@ -15,6 +15,7 @@ data class CouponInfo(
     val plan: String,
     val hdoInfo: List<CouponHdoInfo>?,
     val hduInfo: List<CouponHduInfo>?,
+    val hdxInfo: List<CouponHdxInfo>?,
     val coupon: List<Coupon>?,
     val history: List<History>?,
     val remains: Int?
@@ -28,11 +29,22 @@ data class CouponHdoInfo(
     val sms: Boolean,
     val voice: Boolean,
     val couponUse: Boolean,
-    val coupon: List<Coupon>
+    val coupon: List<Coupon>?
 )
 
 data class CouponHduInfo(
     val hduServiceCode: String,
+    val number: String,
+    val iccid: String,
+    val regulation: Boolean,
+    val sms: Boolean,
+    val voice: Boolean,
+    val couponUse: Boolean,
+    val coupon: List<Coupon>?
+)
+
+data class CouponHdxInfo(
+    val hdxServiceCode: String,
     val number: String,
     val iccid: String,
     val regulation: Boolean,

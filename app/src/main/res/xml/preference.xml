@@ -3,21 +3,21 @@
     <PreferenceCategory android:title="クーポン切り替え">
         <SwitchPreference
             android:key="@string/preference_key_use_MB_only"
-            android:title="常にMB単位でクーポン残量表示する"
-            android:summary="クーポン残量でGB単位ではなく、MB単位で表示します。" />
+            android:summary="クーポン残量でGB単位ではなく、MB単位で表示します。"
+            android:title="MB単位でクーポン残量表示" />
     </PreferenceCategory>
     <PreferenceCategory android:title="その他">
         <SwitchPreference
             android:key="@string/preference_key_expand_all_group"
-            android:title="常にリストを展開する"
-            android:summary="クーポン切り替え画面とデータ通信量履歴画面で、常にリストを展開した状態にします。" />
+            android:summary="クーポン切り替え画面で、常にリストを展開した状態にします。"
+            android:title="リストを展開" />
         <SwitchPreference
             android:key="@string/preference_key_show_phone_number"
-            android:title="メニューに電話番号を表示する"
-            android:summary="メニュー（左上の≡ボタンを押すと表示される画面）に、この端末の電話番号を表示します。" />
+            android:summary="メニューに端末の電話番号を表示します。"
+            android:title="電話番号を表示" />
         <Preference
-            android:title="ログアウト"
             android:key="@string/preference_key_logout"
-            android:summary="IIJmioからログアウトします。" />
+            android:summary="IIJmioからログアウトします。"
+            android:title="ログアウト" />
     </PreferenceCategory>
 </PreferenceScreen>
