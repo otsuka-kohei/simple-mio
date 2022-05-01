@@ -1,12 +1,13 @@
 package com.otk1fd.simplemio.activities
 
-import android.app.ProgressDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.components.XAxis
@@ -18,13 +19,12 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.Util
+import com.otk1fd.simplemio.databinding.ActivityPacketLogChartBinding
 import com.otk1fd.simplemio.dialog.ProgressDialogFragment
 import com.otk1fd.simplemio.dialog.ProgressDialogFragmentData
 import com.otk1fd.simplemio.mio.Mio
 import com.otk1fd.simplemio.mio.PacketLog
 import com.otk1fd.simplemio.mio.PacketLogInfoResponse
-import kotlinx.android.synthetic.main.activity_packet_log_chart.*
-import kotlinx.android.synthetic.main.content_packet_log_chart.*
 import kotlinx.coroutines.launch
 
 
@@ -33,6 +33,10 @@ import kotlinx.coroutines.launch
  * [PacketLogFragment][com.otk1fd.simplemio.fragments.PacketLogFragment]から呼び出される．
  */
 class PacketLogActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityPacketLogChartBinding
+
+    private lateinit var lineChartView: LineChart
 
     private lateinit var mio: Mio
 
@@ -46,15 +50,19 @@ class PacketLogActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        binding = ActivityPacketLogChartBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+
+        lineChartView = binding.contentPacketLogChart.lineChartView
+
         mio = Mio(this)
 
         // 呼び出し元から渡された，表示する利用履歴のSIMのサービスコードを取得する
         hddServiceCode = intent.getStringExtra("hddServiceCode") ?: ""
         serviceCode = intent.getStringExtra("serviceCode") ?: ""
 
-        setContentView(R.layout.activity_packet_log_chart)
-
-        setSupportActionBar(packetLogToolbar)
+        setSupportActionBar(binding.packetLogToolbar)
 
         // CouponFragmentでユーザが設定したSIMの表示名を取得する
         val simName = Util.loadSimName(this, serviceCode)
@@ -116,17 +124,22 @@ class PacketLogActivity : AppCompatActivity() {
 
         // Y軸の値の表示を変えるカスタムフォーマッタを指定する．
         lineChartView.axisLeft.valueFormatter = YAxisValueFormatterForUnitMB()
+        lineChartView.axisRight.valueFormatter = YAxisValueFormatterForUnitMB()
+
 
         // Y軸の最小値を設定する．
         lineChartView.axisLeft.axisMinimum = 0f
+        lineChartView.axisRight.axisMinimum = 0f
 
+        // Y軸の値を表示する最小インターバルを設定する．
+        // 1個ずつに指定したので，実質的にY軸の値をもれなく表示する．
         lineChartView.axisLeft.isGranularityEnabled = true
         lineChartView.axisLeft.granularity = 1f
-
-        lineChartView.axisRight.valueFormatter = YAxisValueFormatterForUnitMB()
-        lineChartView.axisRight.axisMinimum = 0f
         lineChartView.axisRight.isGranularityEnabled = true
         lineChartView.axisRight.granularity = 1f
+
+        // X軸に沿ってアニメーションしながらプロットする。
+        //lineChartView.animateX(1500);
 
         // Descriptionを非表示にする．
         val description = Description()
@@ -220,7 +233,6 @@ class PacketLogActivity : AppCompatActivity() {
 
         // グラフをデータをセットし，プロットする．
         lineChartView.data = lineData
-        lineChartView.invalidate()
     }
 
     /**
@@ -369,6 +381,7 @@ private class YAxisValueFormatterForUnitMB : ValueFormatter() {
         // "value" represents the position of the label on the axis (x or y)
 
         // 使用したデータ量（MB）に単位の文字列を付加して返す．
+        Log.d("hoge", "${value.toInt()}MB")
         return "${value.toInt()}MB"
     }
 }

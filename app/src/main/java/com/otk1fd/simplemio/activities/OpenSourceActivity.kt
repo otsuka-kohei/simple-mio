@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.webkit.WebView
 import androidx.appcompat.app.AppCompatActivity
 import com.otk1fd.simplemio.R
-import kotlinx.android.synthetic.main.activity_open_source.*
+import com.otk1fd.simplemio.databinding.ActivityOpenSourceBinding
 
 
 /**
@@ -14,14 +14,18 @@ import kotlinx.android.synthetic.main.activity_open_source.*
  */
 class OpenSourceActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityOpenSourceBinding
+
     private lateinit var openSourceWebView: WebView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_open_source)
+        binding = ActivityOpenSourceBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
-        setSupportActionBar(openSourceToolbar)
+        setSupportActionBar(binding.openSourceToolbar)
 
         // Toolbarにタイトルを設定
         supportActionBar?.title = "オープンソースライセンス"

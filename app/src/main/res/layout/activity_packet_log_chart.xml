@@ -21,6 +21,8 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/content_packet_log_chart" />
+    <include
+        android:id="@+id/contentPacketLogChart"
+        layout="@layout/content_packet_log_chart" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

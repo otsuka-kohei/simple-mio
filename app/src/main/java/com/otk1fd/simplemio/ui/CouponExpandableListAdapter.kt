@@ -10,9 +10,10 @@ import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.Util
 import com.otk1fd.simplemio.activities.PacketLogActivity
+import com.otk1fd.simplemio.databinding.ItemChildCouponBinding
+import com.otk1fd.simplemio.databinding.ItemParentCouponBinding
 import com.otk1fd.simplemio.dialog.EditTextDialogFragment
 import com.otk1fd.simplemio.dialog.EditTextDialogFragmentData
 import com.otk1fd.simplemio.fragments.CouponFragment
@@ -30,13 +31,11 @@ class CouponExpandableListAdapter(
 ) : BaseExpandableListAdapter() {
 
     private fun getBasicChildView(): View {
-        return LayoutInflater.from(fragment.requireActivity())
-            .inflate(R.layout.item_child_coupon, null)
+        return ItemChildCouponBinding.inflate(LayoutInflater.from(fragment.requireActivity())).root
     }
 
     private fun getBasicParentView(): View {
-        return LayoutInflater.from(fragment.requireActivity())
-            .inflate(R.layout.item_parent_coupon, null)
+        return ItemParentCouponBinding.inflate(LayoutInflater.from(fragment.requireActivity())).root
     }
 
     override fun isChildSelectable(groupPosition: Int, childPosition: Int): Boolean {
@@ -55,9 +54,10 @@ class CouponExpandableListAdapter(
     ): View {
         val parentView: View = getBasicParentView()
 
-        val volumeTextView: TextView = parentView.findViewById(R.id.volumeTextView)
-        val hddServiceCodeTextView: TextView = parentView.findViewById(R.id.hddServiceCodeTextView)
-        val planTextView: TextView = parentView.findViewById(R.id.planTextView)
+        val volumeTextView: TextView = ItemParentCouponBinding.bind(parentView).volumeTextView
+        val hddServiceCodeTextView: TextView =
+            ItemParentCouponBinding.bind(parentView).hddServiceCodeTextView
+        val planTextView: TextView = ItemParentCouponBinding.bind(parentView).planTextView
 
         val couponListItemParent: CouponListItemParent = parents[groupPosition]
 
@@ -89,13 +89,16 @@ class CouponExpandableListAdapter(
     ): View {
         val childView: View = getBasicChildView()
 
-        val phoneNumberTextView: TextView = childView.findViewById(R.id.phoneNumberTextView)
-        val serviceCodeTextView: TextView = childView.findViewById(R.id.serviceCodeTextView)
-        val typeTextView: TextView = childView.findViewById(R.id.typeTextView)
-        val couponSwitch: SwitchCompat = childView.findViewById(R.id.couponSwitch)
-        val simNameTestView: TextView = childView.findViewById(R.id.simNameTextView)
-        val packetLogButton: Button = childView.findViewById(R.id.packetLogButton)
-        val editSimNameButton: Button = childView.findViewById(R.id.editSimNameButton)
+
+        val phoneNumberTextView: TextView =
+            ItemChildCouponBinding.bind(childView).phoneNumberTextView
+        val serviceCodeTextView: TextView =
+            ItemChildCouponBinding.bind(childView).serviceCodeTextView
+        val typeTextView: TextView = ItemChildCouponBinding.bind(childView).typeTextView
+        val couponSwitch: SwitchCompat = ItemChildCouponBinding.bind(childView).couponSwitch
+        val simNameTestView: TextView = ItemChildCouponBinding.bind(childView).simNameTextView
+        val packetLogButton: Button = ItemChildCouponBinding.bind(childView).packetLogButton
+        val editSimNameButton: Button = ItemChildCouponBinding.bind(childView).editSimNameButton
 
         val couponListItemChild: CouponListItemChild = children[groupPosition][childPosition]
 

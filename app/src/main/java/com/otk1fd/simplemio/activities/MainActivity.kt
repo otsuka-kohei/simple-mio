@@ -11,23 +11,24 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.navigation.NavigationView
 import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
+import com.otk1fd.simplemio.databinding.ActivityMainBinding
 import com.otk1fd.simplemio.dialog.AlertDialogFragment
 import com.otk1fd.simplemio.dialog.AlertDialogFragmentData
 import com.otk1fd.simplemio.fragments.AboutFragment
 import com.otk1fd.simplemio.fragments.ConfigFragment
 import com.otk1fd.simplemio.fragments.CouponFragment
 import com.otk1fd.simplemio.mio.Mio
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.coroutines.launch
 
 
@@ -38,8 +39,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     lateinit var mio: Mio
 
+    private lateinit var binding: ActivityMainBinding
+
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navigationView: NavigationView
+    private lateinit var toolbar: Toolbar
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+
+        drawerLayout = binding.drawerLayout
+        navigationView = binding.navigationView
+        toolbar = binding.appBarMain.toolbar
 
         mio = Mio(this)
 
@@ -56,12 +71,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 )
             })
 
-        setContentView(R.layout.activity_main)
-
         setSupportActionBar(toolbar)
 
         val actionBarDrawerToggle = ActionBarDrawerToggle(
-            this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close
+            this,
+            drawerLayout,
+            toolbar,
+            R.string.drawer_open,
+            R.string.drawer_close
         )
         drawerLayout.addDrawerListener(actionBarDrawerToggle)
         actionBarDrawerToggle.syncState()
