@@ -4,6 +4,7 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -230,7 +231,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
         // 子要素のリスト（親ごとに分類するため，リストのリストになる）
         val childrenList = ArrayList<List<CouponListItemChild>>()
 
-        val couponInfoList = couponInfoResponse.couponInfoList
+        val couponInfoList = couponInfoResponse.couponInfo
         for (couponInfo in couponInfoList) {
             val parent = CouponListItemParent(
                 couponInfo.hddServiceCode,
@@ -241,7 +242,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
             val children = ArrayList<CouponListItemChild>()
 
-            val hdoInfoList = couponInfo.couponHdoInfoList.orEmpty()
+            val hdoInfoList = couponInfo.hdoInfo.orEmpty()
             for (hdoInfo in hdoInfoList) {
                 val type: String = if (hdoInfo.voice) "音声" else if (hdoInfo.sms) "SMS" else "データ"
                 val child = CouponListItemChild(
@@ -253,7 +254,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
                 children.add(child)
             }
 
-            val hduInfoList = couponInfo.couponHduInfoList.orEmpty()
+            val hduInfoList = couponInfo.hduInfo.orEmpty()
             for (hduInfo in hduInfoList) {
                 val type: String = if (hduInfo.voice) "音声" else if (hduInfo.sms) "SMS" else "データ"
                 val child = CouponListItemChild(
@@ -330,7 +331,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
             return mb.toString() + "MB"
 
         } else {
-            val couponList = couponInfo.couponList.orEmpty()
+            val couponList = couponInfo.coupon.orEmpty()
 
             val now: Calendar = Calendar.getInstance()
             val nowYear: Int = now.get(Calendar.YEAR)
@@ -370,14 +371,14 @@ class CouponFragment : Fragment(), View.OnClickListener {
     }
 
     private fun setCouponStatus(couponInfoResponse: CouponInfoResponse): Unit {
-        for (couponInfo in couponInfoResponse.couponInfoList) {
+        for (couponInfo in couponInfoResponse.couponInfo) {
 
-            val hdoInfoList = couponInfo.couponHdoInfoList.orEmpty()
+            val hdoInfoList = couponInfo.hdoInfo.orEmpty()
             for (hdoInfo in hdoInfoList) {
                 couponStatus[hdoInfo.hdoServiceCode] = hdoInfo.couponUse
             }
 
-            val hduInfoList = couponInfo.couponHduInfoList.orEmpty()
+            val hduInfoList = couponInfo.hduInfo.orEmpty()
             for (hduInfo in hduInfoList) {
                 couponStatus[hduInfo.hduServiceCode] = hduInfo.couponUse
             }
@@ -437,7 +438,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
         lifecycleScope.launch {
             val packetLogInfoResponseWithHttpResponseCode = mio.getUsageInfo()
-            packetLogInfoResponseWithHttpResponseCode.usageInfoResponse?.let {
+            packetLogInfoResponseWithHttpResponseCode.packetLogInfoResponse?.let {
                 mio.cacheJsonString(
                     Mio.parsePacketLogToJson(it),
                     requireActivity().getString(R.string.preference_key_cache_packet_log)

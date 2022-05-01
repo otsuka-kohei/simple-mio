@@ -19,8 +19,8 @@ import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.Util
 import com.otk1fd.simplemio.mio.Mio
-import com.otk1fd.simplemio.mio.Usage
-import com.otk1fd.simplemio.mio.UsageInfoResponse
+import com.otk1fd.simplemio.mio.PacketLog
+import com.otk1fd.simplemio.mio.PacketLogInfoResponse
 import kotlinx.android.synthetic.main.activity_packet_log_chart.*
 import kotlinx.android.synthetic.main.content_packet_log_chart.*
 import kotlinx.coroutines.launch
@@ -158,7 +158,7 @@ class PacketLogActivity : AppCompatActivity() {
     private fun setDataToLineChartByHttp(hddServiceCode: String, serviceCode: String) {
         lifecycleScope.launch {
             val packetLogInfoResponseWithHttpResponseCode = mio.getUsageInfo()
-            packetLogInfoResponseWithHttpResponseCode.usageInfoResponse?.let {
+            packetLogInfoResponseWithHttpResponseCode.packetLogInfoResponse?.let {
                 mio.cacheJsonString(
                     Mio.parsePacketLogToJson(it),
                     getString(R.string.preference_key_cache_packet_log)
@@ -180,19 +180,19 @@ class PacketLogActivity : AppCompatActivity() {
     /**
      * グラフに利用履歴データをセットし，プロットする．
      *
-     * @param usageInfoResponse IIJmioのAPIから取得できる利用履歴JSONデータ全体
+     * @param packetLogInfoResponse IIJmioのAPIから取得できる利用履歴JSONデータ全体
      * @param hddServiceCode セットする利用履歴データのhddサービスコード
      * @param serviceCode セットする利用履歴データのhdxサービスコード
      */
     private fun setDataToLineChart(
-        usageInfoResponse: UsageInfoResponse,
+        packetLogInfoResponse: PacketLogInfoResponse,
         hddServiceCode: String,
         serviceCode: String
     ) {
 
         // クーポンON時のグラフプロットデータ
         val couponUseDataSet = getLineDataFromJson(
-            usageInfoResponse,
+            packetLogInfoResponse,
             hddServiceCode,
             serviceCode,
             true,
@@ -202,7 +202,7 @@ class PacketLogActivity : AppCompatActivity() {
         )
         // クーポンOFF時のグラフプロットデータ
         val notCouponUseDataSet = getLineDataFromJson(
-            usageInfoResponse,
+            packetLogInfoResponse,
             hddServiceCode,
             serviceCode,
             false,
@@ -225,7 +225,7 @@ class PacketLogActivity : AppCompatActivity() {
     /**
      * APIから取得した利用履歴データから，グラフにプロットするデータを作成する．
      *
-     * @param usageInfoResponse IIJmioのAPIから取得できる利用履歴JSONデータ全体
+     * @param packetLogInfoResponse IIJmioのAPIから取得できる利用履歴JSONデータ全体
      * @param hddServiceCode セットする利用履歴データのhddサービスコード
      * @param serviceCode セットする利用履歴データのhdxサービスコード
      * @param couponUse クーポンON時のデータかどうか
@@ -236,7 +236,7 @@ class PacketLogActivity : AppCompatActivity() {
      * @return グラフプロットデータセット
      */
     private fun getLineDataFromJson(
-        usageInfoResponse: UsageInfoResponse?,
+        packetLogInfoResponse: PacketLogInfoResponse?,
         hddServiceCode: String,
         serviceCode: String,
         couponUse: Boolean,
@@ -246,19 +246,19 @@ class PacketLogActivity : AppCompatActivity() {
     ): LineDataSet {
 
         // JSONデータから指定したhddサービスコードの項目を取り出す．
-        val packetLogInfoList = usageInfoResponse?.usageInfo.orEmpty()
+        val packetLogInfoList = packetLogInfoResponse?.packetLogInfo.orEmpty()
         val packetLogInfo = packetLogInfoList.find { it.hddServiceCode == hddServiceCode }
 
         // 指定したhdxサービスコードの利用履歴データを取り出す．
-        val usage: ArrayList<Usage> = if (serviceCode.contains("hdo")) {
-            val hdoInfo = packetLogInfo?.usageHdoInfoList.orEmpty()
+        val packetLog: ArrayList<PacketLog> = if (serviceCode.contains("hdo")) {
+            val hdoInfo = packetLogInfo?.hdoInfo.orEmpty()
             val hdoPacketLog =
-                hdoInfo.find { it.hdoServiceCode == serviceCode }?.usageList.orEmpty()
+                hdoInfo.find { it.hdoServiceCode == serviceCode }?.packetLog.orEmpty()
             ArrayList(hdoPacketLog)
         } else {
-            val hduInfo = packetLogInfo?.usageHduInfoList.orEmpty()
+            val hduInfo = packetLogInfo?.hduInfo.orEmpty()
             val hduPacketLog =
-                hduInfo.find { it.hduServiceCode == serviceCode }?.usageList.orEmpty()
+                hduInfo.find { it.hduServiceCode == serviceCode }?.packetLog.orEmpty()
             ArrayList(hduPacketLog)
         }
 
@@ -269,7 +269,7 @@ class PacketLogActivity : AppCompatActivity() {
         }
 
 
-        for ((index, log) in usage.withIndex()) {
+        for ((index, log) in packetLog.withIndex()) {
 
             // 利用履歴データを，インデックスとペアにしてエントリーとし，リストに加える．
             if (couponUse) {

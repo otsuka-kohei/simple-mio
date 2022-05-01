@@ -7,16 +7,16 @@ data class CouponInfoResponseWithHttpResponseCode(
 
 data class CouponInfoResponse(
     val returnCode: String,
-    val couponInfoList: List<CouponInfo>
+    val couponInfo: List<CouponInfo>
 )
 
 data class CouponInfo(
     val hddServiceCode: String,
     val plan: String,
-    val couponHdoInfoList: List<CouponHdoInfo>?,
-    val couponHduInfoList: List<CouponHduInfo>?,
-    val couponList: List<Coupon>?,
-    val historyList: List<History>?,
+    val hdoInfo: List<CouponHdoInfo>?,
+    val hduInfo: List<CouponHduInfo>?,
+    val coupon: List<Coupon>?,
+    val history: List<History>?,
     val remains: Int?
 )
 
@@ -28,7 +28,7 @@ data class CouponHdoInfo(
     val sms: Boolean,
     val voice: Boolean,
     val couponUse: Boolean,
-    val couponList: List<Coupon>
+    val coupon: List<Coupon>
 )
 
 data class CouponHduInfo(
@@ -39,7 +39,7 @@ data class CouponHduInfo(
     val sms: Boolean,
     val voice: Boolean,
     val couponUse: Boolean,
-    val couponList: List<Coupon>?
+    val coupon: List<Coupon>?
 )
 
 data class Coupon(
