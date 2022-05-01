@@ -97,7 +97,6 @@ class PacketLogChartActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item?.itemId) {
             R.id.action_reload -> {
-                startProgressDialog()
                 setDataToLineChartByHttp(hddServiceCode, serviceCode)
             }
         }
@@ -163,13 +162,14 @@ class PacketLogChartActivity : AppCompatActivity() {
             val packetLogInfoJson = Mio.parseJsonToPacketLog(jsonString)
             packetLogInfoJson?.let { setDataToLineChart(it, hddServiceCode, serviceCode) }
         } else {
-            startProgressDialog()
             setDataToLineChartByHttp(hddServiceCode, serviceCode)
         }
     }
 
     private fun setDataToLineChartByHttp(hddServiceCode: String, serviceCode: String) {
         lifecycleScope.launch {
+            startProgressDialog()
+
             val packetLogInfoResponseWithHttpResponseCode = mio.getUsageInfo()
             packetLogInfoResponseWithHttpResponseCode.packetLogInfoResponse?.let {
                 mio.cacheJsonString(
@@ -202,9 +202,8 @@ class PacketLogChartActivity : AppCompatActivity() {
         hddServiceCode: String,
         serviceCode: String
     ) {
-
         // クーポンON時のグラフプロットデータ
-        val couponUseDataSet = getLineDataFromJson(
+        val withCouponLineDataSet = getLineDataSet(
             packetLogInfoResponse,
             hddServiceCode,
             serviceCode,
@@ -215,24 +214,23 @@ class PacketLogChartActivity : AppCompatActivity() {
         )
 
         // クーポンOFF時のグラフプロットデータ
-        val notCouponUseDataSet = getLineDataFromJson(
+        val withoutCouponLineDataSet = getLineDataSet(
             packetLogInfoResponse,
             hddServiceCode,
             serviceCode,
             false,
             R.color.packetLogChartWithoutCoupon,
-            "クーポンOFF"
+            "クーポンOFF",
+            false
         )
 
-        val dataSets = ArrayList<ILineDataSet>()
         // クーポンOFF時のグラフを先に描画し，そのあとクーポンON時のグラフを表示する
-        dataSets.add(notCouponUseDataSet)
-        dataSets.add(couponUseDataSet)
-
-        val lineData = LineData(dataSets)
+        val dataSets = ArrayList<ILineDataSet>()
+        dataSets.add(withoutCouponLineDataSet)
+        dataSets.add(withCouponLineDataSet)
 
         // グラフをデータをセットし，プロットする．
-        lineChartView.data = lineData
+        lineChartView.data = LineData(dataSets)
     }
 
     /**
@@ -248,14 +246,14 @@ class PacketLogChartActivity : AppCompatActivity() {
      *
      * @return グラフプロットデータセット
      */
-    private fun getLineDataFromJson(
+    private fun getLineDataSet(
         packetLogInfoResponse: PacketLogInfoResponse?,
         hddServiceCode: String,
         serviceCode: String,
         couponUse: Boolean,
         colorResourceId: Int,
         label: String,
-        setDateList: Boolean = false
+        setDateList: Boolean
     ): LineDataSet {
 
         // JSONデータから指定したhddサービスコードの項目を取り出す．
