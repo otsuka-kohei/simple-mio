@@ -14,17 +14,17 @@ class AlertDialogFragment private constructor() : DialogFragment() {
         fun show(
             fragmentActivity: FragmentActivity,
             alertDialogFragmentData: AlertDialogFragmentData
-        ) {
+        ): AlertDialogFragment {
             val alertDialogFragment = AlertDialogFragment()
             val bundle = Bundle()
             bundle.putSerializable(ARGUMENT_KEY, alertDialogFragmentData)
             alertDialogFragment.arguments = bundle
             alertDialogFragment.show(fragmentActivity.supportFragmentManager, FRAGMENT_KEY)
+            return alertDialogFragment
         }
     }
 
     private lateinit var alertDialogFragmentData: AlertDialogFragmentData
-    //private lateinit var fragmentActivity: FragmentActivity
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         alertDialogFragmentData =

@@ -4,7 +4,6 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +19,8 @@ import com.otk1fd.simplemio.Util
 import com.otk1fd.simplemio.activities.MainActivity
 import com.otk1fd.simplemio.dialog.EditTextDialogFragment
 import com.otk1fd.simplemio.dialog.EditTextDialogFragmentData
+import com.otk1fd.simplemio.dialog.ProgressDialogFragment
+import com.otk1fd.simplemio.dialog.ProgressDialogFragmentData
 import com.otk1fd.simplemio.mio.CouponInfo
 import com.otk1fd.simplemio.mio.CouponInfoResponse
 import com.otk1fd.simplemio.mio.Mio
@@ -55,6 +56,8 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
     private var bulkUpdateCounter: Int = 0
 
+    private var progressDialogFragment: ProgressDialogFragment? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -72,8 +75,6 @@ class CouponFragment : Fragment(), View.OnClickListener {
         applyButton = requireActivity().findViewById(R.id.applyButton)
         applyButton.setOnClickListener(this)
         applyButton.hide()
-
-        progressDialog = ProgressDialog(requireActivity())
 
         couponListView = requireActivity().findViewById(R.id.couponListView)
         // ExpandableListView が展開されたときに自動スクロールするようにする
@@ -180,7 +181,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
                 } else {
                     HttpErrorHandler.handleHttpError(
                         couponInfoResponseWithHttpResponseCode.httpStatusCode,
-                        getError = false
+                        errorByHttpGetRequest = false
                     )
                 }
 
@@ -198,7 +199,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
                 requireActivity().applicationContext.getString(R.string.preference_key_cache_coupon)
             )
             setCouponInfoByCache()
-        }?:let {
+        } ?: let {
             HttpErrorHandler.handleHttpError(couponInfoResponseWithHttpResponseCode.httpStatusCode) {
                 lifecycleScope.launch {
                     setCouponInfoByCache()
@@ -387,14 +388,16 @@ class CouponFragment : Fragment(), View.OnClickListener {
     }
 
     private fun startProgressDialog() {
-        progressDialog.setTitle("クーポン設定適用中")
-        progressDialog.setMessage("少々お待ちください")
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER)
-        progressDialog.show()
+        val progressDialogFragmentData = ProgressDialogFragmentData(
+            title = "クーポン設定適用中",
+            message = "少々お待ちください"
+        )
+        progressDialogFragment =
+            ProgressDialogFragment.show(requireActivity(), progressDialogFragmentData)
     }
 
     private fun stopProgressDialog() {
-        progressDialog.dismiss()
+        progressDialogFragment?.dismiss()
     }
 
     private fun <K, V> cloneHashMapWithDefault(srcMap: MutableMap<K, V>): MutableMap<K, V> {
@@ -425,7 +428,7 @@ class CouponFragment : Fragment(), View.OnClickListener {
                     requireActivity().getString(R.string.preference_key_cache_coupon)
                 )
                 setCouponInfoByCache()
-            }?:let {
+            } ?: let {
                 HttpErrorHandler.handleHttpError(couponInfoResponseWithHttpResponseCode.httpStatusCode) {
                     requireActivity().lifecycleScope.launch {
                         setCouponInfoByCache()
@@ -443,10 +446,9 @@ class CouponFragment : Fragment(), View.OnClickListener {
                     Mio.parsePacketLogToJson(it),
                     requireActivity().getString(R.string.preference_key_cache_packet_log)
                 )
-            }?:let {
+            } ?: let {
                 HttpErrorHandler.handleHttpError(
-                    packetLogInfoResponseWithHttpResponseCode.httpStatusCode,
-                    suggestLogin = false
+                    packetLogInfoResponseWithHttpResponseCode.httpStatusCode
                 )
             }
 

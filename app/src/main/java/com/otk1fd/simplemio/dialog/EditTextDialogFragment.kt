@@ -16,17 +16,17 @@ class EditTextDialogFragment private constructor() : DialogFragment() {
         fun show(
             fragmentActivity: FragmentActivity,
             editTextDialogFragmentData: EditTextDialogFragmentData
-        ) {
-            val alertDialogFragment = EditTextDialogFragment()
+        ): EditTextDialogFragment {
+            val editTextDialogFragment = EditTextDialogFragment()
             val bundle = Bundle()
             bundle.putSerializable(ARGUMENT_KEY, editTextDialogFragmentData)
-            alertDialogFragment.arguments = bundle
-            alertDialogFragment.show(fragmentActivity.supportFragmentManager, FRAGMENT_KEY)
+            editTextDialogFragment.arguments = bundle
+            editTextDialogFragment.show(fragmentActivity.supportFragmentManager, FRAGMENT_KEY)
+            return editTextDialogFragment
         }
     }
 
     private lateinit var editTextDialogFragmentData: EditTextDialogFragmentData
-    //private lateinit var fragmentActivity: FragmentActivity
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         editTextDialogFragmentData =

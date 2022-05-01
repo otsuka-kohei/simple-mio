@@ -18,6 +18,8 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.Util
+import com.otk1fd.simplemio.dialog.ProgressDialogFragment
+import com.otk1fd.simplemio.dialog.ProgressDialogFragmentData
 import com.otk1fd.simplemio.mio.Mio
 import com.otk1fd.simplemio.mio.PacketLog
 import com.otk1fd.simplemio.mio.PacketLogInfoResponse
@@ -34,11 +36,12 @@ class PacketLogActivity : AppCompatActivity() {
 
     private lateinit var mio: Mio
 
-    private lateinit var progressDialog: ProgressDialog
     private val dateList = ArrayList<String>()
 
     private lateinit var hddServiceCode: String
     private lateinit var serviceCode: String
+
+    private var progressDialogFragment: ProgressDialogFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,8 +65,6 @@ class PacketLogActivity : AppCompatActivity() {
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_close)
         // Toolbarの×ボタンを表示する
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        progressDialog = ProgressDialog(this)
 
         initLineChart()
     }
@@ -314,17 +315,19 @@ class PacketLogActivity : AppCompatActivity() {
      * ぐるぐる回るダイアログを表示する．
      */
     private fun startProgressDialog() {
-        progressDialog.setTitle("読み込み中")
-        progressDialog.setMessage("少々お待ちください")
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER)
-        progressDialog.show()
+        val progressDialogFragmentData = ProgressDialogFragmentData(
+            title = "読み込み中",
+            message = "少々お待ちください"
+        )
+        progressDialogFragment =
+            ProgressDialogFragment.show(this, progressDialogFragmentData)
     }
 
     /**
      * ぐるぐる回るダイアログを閉じる．
      */
     private fun stopProgressDialog() {
-        progressDialog.dismiss()
+        progressDialogFragment?.dismiss()
     }
 
     override fun onSupportNavigateUp(): Boolean {
