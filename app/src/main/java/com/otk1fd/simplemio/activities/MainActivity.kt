@@ -8,7 +8,6 @@ import android.telephony.TelephonyManager
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -46,11 +45,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         HttpErrorHandler.setUp(
             loginFunc = { loginWithDialog() },
             showErrorMessageFunc = { errorMessage ->
-                Toast.makeText(
-                    this,
-                    errorMessage,
-                    Toast.LENGTH_LONG
-                ).show()
+                val alertDialogFragmentData = AlertDialogFragmentData(
+                    message = errorMessage,
+                    positiveButtonText = "OK"
+                )
+                AlertDialogFragment.show(
+                    this@MainActivity,
+                    alertDialogFragmentData
+                )
             })
 
         setContentView(R.layout.activity_main)
