@@ -138,7 +138,7 @@ class PacketLogChartActivity : AppCompatActivity() {
         lineChartView.axisRight.granularity = 1f
 
         // X軸に沿ってアニメーションしながらプロットする。
-        //lineChartView.animateX(1500);
+        lineChartView.animateX(1000)
 
         // Descriptionを非表示にする．
         val description = Description()
@@ -307,9 +307,9 @@ class PacketLogChartActivity : AppCompatActivity() {
         // 折れ線グラフの点に値を表示しない
         dataSet.setDrawValues(false)
 
-        // 折れ線グラフの線と天のサイズ
+        // 折れ線グラフの線と点のサイズ
         dataSet.lineWidth = 4.0f
-        dataSet.circleSize = 4.0f
+        dataSet.circleRadius = 4.0f
 
         // グラフをタップした時に表示されるハイライトの見た目の設定
         dataSet.highLightColor = color
@@ -343,41 +343,42 @@ class PacketLogChartActivity : AppCompatActivity() {
         return false
     }
 
-}
 
-/**
- * X軸に表示する値のフォーマッタ
- *
- * @param xValueStrings X軸の値（日付）の文字列のリスト
- */
-private class XAxisValueFormatterForDate(val xValueStrings: List<String>) :
-    IAxisValueFormatter /*ValueFormatter()*/ {
-    override fun getFormattedValue(value: Float, axis: AxisBase): String {
-        // "value" represents the position of the label on the axis (x or y)
+    /**
+     * X軸に表示する値のフォーマッタ
+     *
+     * @param xValueStrings X軸の値（日付）の文字列のリスト
+     */
+    private class XAxisValueFormatterForDate(val xValueStrings: List<String>) :
+        IAxisValueFormatter /*ValueFormatter()*/ {
+        override fun getFormattedValue(value: Float, axis: AxisBase): String {
+            // "value" represents the position of the label on the axis (x or y)
 
-        // 日付データの文字列 2018/01/01 の場合，20180101 となる．
-        val dateStr = xValueStrings[value.toInt()]
+            // 日付データの文字列 2018/01/01 の場合，20180101 となる．
+            val dateStr = xValueStrings[value.toInt()]
 
-        // 年月日ごとに部分文字列を抽出
-        val yearStr = dateStr.substring(0, 4)
-        val monthStr = dateStr.substring(4, 6)
-        val dayStr = dateStr.substring(6, 8)
+            // 年月日ごとに部分文字列を抽出
+            val yearStr = dateStr.substring(0, 4)
+            val monthStr = dateStr.substring(4, 6)
+            val dayStr = dateStr.substring(6, 8)
 
-        // 2018/01/01 の形で返す．
-        return "$yearStr/$monthStr/$dayStr"
+            // 2018/01/01 の形で返す．
+            return "$yearStr/$monthStr/$dayStr"
+        }
+    }
+
+    /**
+     * Y軸に表示する値のフォーマッタ
+     */
+    private class YAxisValueFormatterForUnitMB : IAxisValueFormatter /*ValueFormatter()*/ {
+        override fun getFormattedValue(value: Float, axis: AxisBase): String {
+            // "value" represents the position of the label on the axis (x or y)
+
+            // 使用したデータ量（MB）に単位の文字列を付加して返す．
+            Log.d("hoge", "${value.toInt()}MB")
+            return "${value.toInt()}MB"
+        }
     }
 }
 
 
-/**
- * Y軸に表示する値のフォーマッタ
- */
-private class YAxisValueFormatterForUnitMB : IAxisValueFormatter /*ValueFormatter()*/ {
-    override fun getFormattedValue(value: Float, axis: AxisBase): String {
-        // "value" represents the position of the label on the axis (x or y)
-
-        // 使用したデータ量（MB）に単位の文字列を付加して返す．
-        Log.d("hoge", "${value.toInt()}MB")
-        return "${value.toInt()}MB"
-    }
-}
