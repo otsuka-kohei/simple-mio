@@ -13,8 +13,9 @@ data class PacketLogInfoResponse(
 data class PacketLogInfo(
     val hddServiceCode: String,
     val plan: String,
-    val hdoInfo: List<UsageHdoInfo>,
-    val hduInfo: List<UsageHduInfo>
+    val hdoInfo: List<UsageHdoInfo>?,
+    val hduInfo: List<UsageHduInfo>?,
+    val hdxInfo: List<UsageHdxInfo>?
 )
 
 data class UsageHdoInfo(
@@ -24,6 +25,11 @@ data class UsageHdoInfo(
 
 data class UsageHduInfo(
     val hduServiceCode: String,
+    val packetLog: List<PacketLog>
+)
+
+data class UsageHdxInfo(
+    val hdxServiceCode: String,
     val packetLog: List<PacketLog>
 )
 

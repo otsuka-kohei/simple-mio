@@ -14,7 +14,7 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
  * IIJmioの利用履歴を折れ線グラフにして表示するActivity．
  * [PacketLogFragment][com.otk1fd.simplemio.fragments.PacketLogFragment]から呼び出される．
  */
-class PacketLogActivity : AppCompatActivity() {
+class PacketLogChartActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPacketLogChartBinding
 
@@ -68,7 +68,7 @@ class PacketLogActivity : AppCompatActivity() {
         val simName = Util.loadSimName(this, serviceCode)
 
         // Toolbarにタイトルを設定
-        supportActionBar?.title = """${if (simName != "") simName else serviceCode}のデータ通信量履歴"""
+        supportActionBar?.title = "${if (simName != "") simName else serviceCode}のデータ通信量履歴"
         // Toolbarに×ボタンを左上に設定
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_close)
         // Toolbarの×ボタンを表示する
@@ -125,7 +125,6 @@ class PacketLogActivity : AppCompatActivity() {
         // Y軸の値の表示を変えるカスタムフォーマッタを指定する．
         lineChartView.axisLeft.valueFormatter = YAxisValueFormatterForUnitMB()
         lineChartView.axisRight.valueFormatter = YAxisValueFormatterForUnitMB()
-
 
         // Y軸の最小値を設定する．
         lineChartView.axisLeft.axisMinimum = 0f
@@ -214,6 +213,7 @@ class PacketLogActivity : AppCompatActivity() {
             "クーポンON",
             true
         )
+
         // クーポンOFF時のグラフプロットデータ
         val notCouponUseDataSet = getLineDataFromJson(
             packetLogInfoResponse,
@@ -263,27 +263,22 @@ class PacketLogActivity : AppCompatActivity() {
         val packetLogInfo = packetLogInfoList.find { it.hddServiceCode == hddServiceCode }
 
         // 指定したhdxサービスコードの利用履歴データを取り出す．
-        val packetLog: ArrayList<PacketLog> = if (serviceCode.contains("hdo")) {
-            val hdoInfo = packetLogInfo?.hdoInfo.orEmpty()
-            val hdoPacketLog =
-                hdoInfo.find { it.hdoServiceCode == serviceCode }?.packetLog.orEmpty()
-            ArrayList(hdoPacketLog)
-        } else {
-            val hduInfo = packetLogInfo?.hduInfo.orEmpty()
-            val hduPacketLog =
-                hduInfo.find { it.hduServiceCode == serviceCode }?.packetLog.orEmpty()
-            ArrayList(hduPacketLog)
+        val packetLog: List<PacketLog> = with(serviceCode) {
+            when {
+                contains("hdo") -> packetLogInfo?.hdoInfo?.find { it.hdoServiceCode == serviceCode }?.packetLog.orEmpty()
+                contains("hdu") -> packetLogInfo?.hduInfo?.find { it.hduServiceCode == serviceCode }?.packetLog.orEmpty()
+                contains("hdx") -> packetLogInfo?.hdxInfo?.find { it.hdxServiceCode == serviceCode }?.packetLog.orEmpty()
+                else -> arrayListOf()
+            }
         }
 
-        val entries = ArrayList<Entry>()
+        val entries = arrayListOf<Entry>()
 
         if (setDateList) {
             dateList.clear()
         }
 
-
         for ((index, log) in packetLog.withIndex()) {
-
             // 利用履歴データを，インデックスとペアにしてエントリーとし，リストに加える．
             if (couponUse) {
                 entries.add(Entry(index.toFloat(), log.withCoupon.toFloat()))
@@ -355,7 +350,8 @@ class PacketLogActivity : AppCompatActivity() {
  *
  * @param xValueStrings X軸の値（日付）の文字列のリスト
  */
-private class XAxisValueFormatterForDate(val xValueStrings: List<String>) : ValueFormatter() {
+private class XAxisValueFormatterForDate(val xValueStrings: List<String>) :
+    IAxisValueFormatter /*ValueFormatter()*/ {
     override fun getFormattedValue(value: Float, axis: AxisBase): String {
         // "value" represents the position of the label on the axis (x or y)
 
@@ -376,7 +372,7 @@ private class XAxisValueFormatterForDate(val xValueStrings: List<String>) : Valu
 /**
  * Y軸に表示する値のフォーマッタ
  */
-private class YAxisValueFormatterForUnitMB : ValueFormatter() {
+private class YAxisValueFormatterForUnitMB : IAxisValueFormatter /*ValueFormatter()*/ {
     override fun getFormattedValue(value: Float, axis: AxisBase): String {
         // "value" represents the position of the label on the axis (x or y)
 

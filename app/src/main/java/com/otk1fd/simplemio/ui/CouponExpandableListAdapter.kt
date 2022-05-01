@@ -11,7 +11,7 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.otk1fd.simplemio.Util
-import com.otk1fd.simplemio.activities.PacketLogActivity
+import com.otk1fd.simplemio.activities.PacketLogChartActivity
 import com.otk1fd.simplemio.databinding.ItemChildCouponBinding
 import com.otk1fd.simplemio.databinding.ItemParentCouponBinding
 import com.otk1fd.simplemio.dialog.EditTextDialogFragment
@@ -111,7 +111,7 @@ class CouponExpandableListAdapter(
             val hddServiceCode = couponListItemParent.hddServiceCode
             val serviceCode = couponListItemChild.serviceCode
 
-            val intent = Intent(fragment.requireActivity(), PacketLogActivity::class.java)
+            val intent = Intent(fragment.requireActivity(), PacketLogChartActivity::class.java)
             intent.putExtra("hddServiceCode", hddServiceCode)
             intent.putExtra("serviceCode", serviceCode)
             fragment.requireActivity().startActivity(intent)

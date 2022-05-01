@@ -47,7 +47,7 @@
             android:label="@string/title_activity_open_source"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activities.PacketLogActivity"
+            android:name=".activities.PacketLogChartActivity"
             android:label="@string/title_activity_history"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
