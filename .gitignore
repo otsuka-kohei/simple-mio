@@ -14,8 +14,4 @@
 .cxx
 local.properties
 
-/app/release
 /.idea/deploymentTargetDropDown.xml
-
-# IIJmioデベロッパIDは秘密情報であるため除外
-/app/src/main/res/values/developer_id.xml

@@ -1,3 +1,8 @@
 /build
+/release
+/beta
+
+# IIJmioデベロッパIDは秘密情報であるため除外
+/src/main/res/values/developer_id.xml
 
 google-services.json
