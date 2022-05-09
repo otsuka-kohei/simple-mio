@@ -21,4 +21,9 @@
 -renamesourcefileattribute SourceFile
 
 # JSONのパース先オブジェクトはリフレクションを使うので難読化させない
--keep class com.otk1fd.simplemio.mio.json.* { *; }
+-keep class com.otk1fd.simplemio.mio.json.** { *; }
+
+# MPAndroidChartを難読化するとアニメーションが動かなくなる
+# https://github.com/PhilJay/MPAndroidChart/wiki/Proguard
+-keep class com.github.mikephil.charting.** { *; }
+
