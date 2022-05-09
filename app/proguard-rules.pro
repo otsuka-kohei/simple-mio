@@ -19,3 +19,6 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 -renamesourcefileattribute SourceFile
+
+# JSONのパース先オブジェクトはリフレクションを使うので難読化させない
+-keep class com.otk1fd.simplemio.mio.json.* { *; }
