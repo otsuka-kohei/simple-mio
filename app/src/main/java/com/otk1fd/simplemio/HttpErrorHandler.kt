@@ -1,5 +1,7 @@
 package com.otk1fd.simplemio
 
+import android.util.Log
+
 
 /**
  * Created by otk1fd on 2018/03/14.
@@ -21,6 +23,7 @@ object HttpErrorHandler {
         errorByHttpGetRequest: Boolean = true,
         recoveryFunc: () -> Unit = {}
     ) {
+        Log.d("HTTP Error Handling","HTTP status code: $httpStatusCode")
         when (httpStatusCode) {
             429 -> {
                 if (errorByHttpGetRequest) {

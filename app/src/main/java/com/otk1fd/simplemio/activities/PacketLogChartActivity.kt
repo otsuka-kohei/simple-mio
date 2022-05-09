@@ -23,8 +23,8 @@ import com.otk1fd.simplemio.databinding.ActivityPacketLogChartBinding
 import com.otk1fd.simplemio.dialog.ProgressDialogFragment
 import com.otk1fd.simplemio.dialog.ProgressDialogFragmentData
 import com.otk1fd.simplemio.mio.Mio
-import com.otk1fd.simplemio.mio.PacketLog
-import com.otk1fd.simplemio.mio.PacketLogInfoResponse
+import com.otk1fd.simplemio.mio.json.PacketLog
+import com.otk1fd.simplemio.mio.json.PacketLogInfoResponse
 import kotlinx.coroutines.launch
 
 
@@ -137,7 +137,8 @@ class PacketLogChartActivity : AppCompatActivity() {
         lineChartView.axisRight.granularity = 1f
 
         // X軸に沿ってアニメーションしながらプロットする。
-        lineChartView.animateX(1000)
+        // ProGuardで難読化するとアニメーションしなくなるので注意
+        lineChartView.animateX(1500)
 
         // Descriptionを非表示にする．
         val description = Description()
@@ -159,10 +160,11 @@ class PacketLogChartActivity : AppCompatActivity() {
 
         // 読み込んだ利用履歴データが空でなかったら（一度でもキャッシュしたことがあれば）それをグラフにセットする．
         if (jsonString != "{}") {
+            Log.d("Set Packet Log (Cache)", "JSON: $jsonString")
             val packetLogInfoJson = Mio.parseJsonToPacketLog(jsonString)
             packetLogInfoJson?.let { setDataToLineChart(it, hddServiceCode, serviceCode) }
         } else {
-            setDataToLineChartByHttp(hddServiceCode, serviceCode)
+            Log.d("Set Packet Log (Cache)", "Caches JSON is empty")
         }
     }
 

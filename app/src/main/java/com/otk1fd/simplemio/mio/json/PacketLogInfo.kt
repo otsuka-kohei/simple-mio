@@ -1,4 +1,4 @@
-package com.otk1fd.simplemio.mio
+package com.otk1fd.simplemio.mio.json
 
 data class PacketLogInfoResponseWithHttpResponseCode(
     val packetLogInfoResponse: PacketLogInfoResponse?,

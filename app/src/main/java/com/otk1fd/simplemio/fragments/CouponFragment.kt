@@ -3,6 +3,7 @@ package com.otk1fd.simplemio.fragments
 import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,10 +21,10 @@ import com.otk1fd.simplemio.dialog.EditTextDialogFragment
 import com.otk1fd.simplemio.dialog.EditTextDialogFragmentData
 import com.otk1fd.simplemio.dialog.ProgressDialogFragment
 import com.otk1fd.simplemio.dialog.ProgressDialogFragmentData
-import com.otk1fd.simplemio.mio.CouponInfo
-import com.otk1fd.simplemio.mio.CouponInfoResponse
 import com.otk1fd.simplemio.mio.Mio
-import com.otk1fd.simplemio.mio.PacketLogInfoResponse
+import com.otk1fd.simplemio.mio.json.CouponInfo
+import com.otk1fd.simplemio.mio.json.CouponInfoResponse
+import com.otk1fd.simplemio.mio.json.PacketLogInfoResponse
 import com.otk1fd.simplemio.ui.CouponExpandableListAdapter
 import com.otk1fd.simplemio.ui.listview_item.CouponListItemChild
 import com.otk1fd.simplemio.ui.listview_item.CouponListItemParent
@@ -34,7 +35,7 @@ import java.util.*
 /**
  * Created by otk1fd on 2018/02/24.
  */
-class CouponFragment : Fragment(), View.OnClickListener {
+class CouponFragment : Fragment() {
     private lateinit var mio: Mio
 
     private lateinit var applyButton: FloatingActionButton
@@ -55,7 +56,6 @@ class CouponFragment : Fragment(), View.OnClickListener {
 
     private var progressDialogFragment: ProgressDialogFragment? = null
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -70,8 +70,25 @@ class CouponFragment : Fragment(), View.OnClickListener {
         mio = (requireActivity() as MainActivity).mio
 
         applyButton = requireActivity().findViewById(R.id.applyButton)
-        applyButton.setOnClickListener(this)
         applyButton.hide()
+        applyButton.setOnClickListener {
+            requireActivity().lifecycleScope.launch {
+                startProgressDialog()
+                val couponInfoResponseWithHttpResponseCode = mio.getCouponInfo()
+                val httpResponseCode: Int = mio.applyCouponSetting(currentCouponStatusMap)
+
+                if (httpResponseCode == HttpErrorHandler.HTTP_OK) {
+                    setCouponInfoByHttp()
+                } else {
+                    HttpErrorHandler.handleHttpError(
+                        couponInfoResponseWithHttpResponseCode.httpStatusCode,
+                        errorByHttpGetRequest = false
+                    )
+                }
+
+                stopProgressDialog()
+            }
+        }
 
         couponExpandableListView = requireActivity().findViewById(R.id.couponListView)
         // ExpandableListView が展開されたときに自動スクロールするようにする
@@ -166,40 +183,21 @@ class CouponFragment : Fragment(), View.OnClickListener {
         EditTextDialogFragment.show(requireActivity(), editTextDialogFragmentData)
     }
 
-
-    override fun onClick(v: View?) {
-        if (v == applyButton) {
-            requireActivity().lifecycleScope.launch {
-                startProgressDialog()
-                val couponInfoResponseWithHttpResponseCode = mio.getCouponInfo()
-                val httpResponseCode: Int = mio.applyCouponSetting(currentCouponStatusMap)
-
-                if (httpResponseCode == HttpErrorHandler.HTTP_OK) {
-                    setCouponInfoByHttp()
-                } else {
-                    HttpErrorHandler.handleHttpError(
-                        couponInfoResponseWithHttpResponseCode.httpStatusCode,
-                        errorByHttpGetRequest = false
-                    )
-                }
-
-                stopProgressDialog()
-            }
-        }
-    }
-
     private suspend fun setCouponInfoByHttp() {
+        Log.d("Set Coupon Info (HTTP)", "Start")
         couponSwipeRefreshLayout.isRefreshing = true
 
         val couponInfoResponseWithHttpResponseCode = mio.getCouponInfo()
 
         couponInfoResponseWithHttpResponseCode.couponInfoResponse?.let {
+            Log.d("Set Coupon Info (HTTP)", "Finish successfully")
             mio.cacheJsonString(
                 Mio.parseCouponToJson(it),
                 requireActivity().applicationContext.getString(R.string.preference_key_cache_coupon)
             )
             setCouponInfoByCache()
         } ?: let {
+            Log.d("Set Coupon Info (HTTP)", "Finish failed")
             HttpErrorHandler.handleHttpError(couponInfoResponseWithHttpResponseCode.httpStatusCode) {
                 lifecycleScope.launch {
                     setCouponInfoByCache()
@@ -210,18 +208,20 @@ class CouponFragment : Fragment(), View.OnClickListener {
         couponSwipeRefreshLayout.isRefreshing = false
     }
 
-    suspend fun refreshCouponInfo() {
+    fun refreshCouponInfo() {
         setCouponInfoByCache()
     }
 
-    private suspend fun setCouponInfoByCache() {
+    private fun setCouponInfoByCache() {
         val jsonString =
             mio.loadCachedJsonString(requireActivity().applicationContext.getString(R.string.preference_key_cache_coupon))
+
         if (jsonString != "{}") {
+            Log.d("Set Coupon (Cache)", "JSON: $jsonString")
             val couponInfoJson = Mio.parseJsonToCoupon(jsonString)
             couponInfoJson?.let { setCouponInfo(it) }
         } else {
-            setCouponInfoByHttp()
+            Log.d("Set Coupon (Cache)", "Caches JSON is empty")
         }
     }
 

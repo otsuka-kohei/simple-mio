@@ -12,6 +12,10 @@ import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPut
 import com.github.kittinunf.result.Result
 import com.otk1fd.simplemio.R
+import com.otk1fd.simplemio.mio.json.CouponInfoResponse
+import com.otk1fd.simplemio.mio.json.CouponInfoResponseWithHttpResponseCode
+import com.otk1fd.simplemio.mio.json.PacketLogInfoResponse
+import com.otk1fd.simplemio.mio.json.PacketLogInfoResponseWithHttpResponseCode
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -151,10 +155,13 @@ class Mio(private val fragmentActivity: FragmentActivity) {
 
             when (result) {
                 is Result.Failure -> {
-                    Pair(null, result.error.response.statusCode)
+                    val statusCode = result.error.response.statusCode
+                    Log.d("HTTP GET Response", "Failed: $statusCode")
+                    Pair(null, statusCode)
                 }
                 is Result.Success -> {
                     val responseBody: String = result.get()
+                    Log.d("HTTP GET Response", "Success: $responseBody")
                     val httpStatusCode: Int = response.statusCode
                     Pair(responseBody, httpStatusCode)
                 }
@@ -278,6 +285,7 @@ class Mio(private val fragmentActivity: FragmentActivity) {
             fragmentActivity.applicationContext.getString(R.string.preference_file_name),
             Context.MODE_PRIVATE
         )
+        Log.d("Cache JSON", jsonString)
         val editor = preference.edit()
         editor.putString(jsonDataType, jsonString)
         editor.apply()
