@@ -102,7 +102,7 @@ class PacketLogChartActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item?.itemId) {
+        when (item.itemId) {
             R.id.action_reload -> {
                 setDataToLineChartByHttp(hddServiceCode, serviceCode)
             }
@@ -126,7 +126,10 @@ class PacketLogChartActivity : AppCompatActivity() {
         lineChartView.xAxis.granularity = 1f
 
         // 画面内に表示するX軸の値の数（非強制）を設定する．
-        lineChartView.xAxis.labelCount = 3
+        lineChartView.xAxis.labelCount = 5
+
+        // X軸のラベルの表示を90度回す
+        lineChartView.xAxis.labelRotationAngle = 90f
 
         // Y軸の右側の軸を非表示にする。
         lineChartView.axisRight.isEnabled = false
@@ -375,7 +378,7 @@ class PacketLogChartActivity : AppCompatActivity() {
             val monthStr = dateStr.substring(4, 6)
             val dayStr = dateStr.substring(6, 8)
 
-            // 2018/01/01 の形で返す．
+            // 2020/01/01 の形で返す．
             return "$yearStr/$monthStr/$dayStr"
         }
     }
@@ -388,7 +391,6 @@ class PacketLogChartActivity : AppCompatActivity() {
             // "value" represents the position of the label on the axis (x or y)
 
             // 使用したデータ量（MB）に単位の文字列を付加して返す．
-            Log.d("hoge", "${value.toInt()}MB")
             return "${value.toInt()}MB"
         }
     }
