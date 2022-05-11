@@ -3,15 +3,14 @@ package com.otk1fd.simplemio.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.activities.OpenSourceActivity
+import com.otk1fd.simplemio.databinding.FragmentAboutBinding
 
 
 /**
@@ -19,25 +18,23 @@ import com.otk1fd.simplemio.activities.OpenSourceActivity
  */
 class AboutFragment : Fragment() {
 
-    private lateinit var logoutButton: Button
-    private lateinit var aboutTextView: TextView
-    private lateinit var openSourceTextView: TextView
+    private lateinit var binding: FragmentAboutBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-        Log.d("About", "before return")
-        return inflater.inflate(R.layout.fragment_about, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentAboutBinding.inflate(layoutInflater)
+        return binding.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        aboutTextView = requireActivity().findViewById(R.id.aboutTextView)
-        aboutTextView.text = requireActivity().getString(R.string.about)
+        binding.aboutTextView.text = requireActivity().getString(R.string.about)
 
-        openSourceTextView = requireActivity().findViewById(R.id.openSourceTitleTextView)
-        openSourceTextView.setOnClickListener {
+        binding.openSourceTitleTextView.setOnClickListener {
             val intent = Intent(requireActivity(), OpenSourceActivity::class.java)
             requireActivity().startActivity(intent)
         }

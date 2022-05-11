@@ -3,11 +3,10 @@ package com.otk1fd.simplemio.dialog
 import android.app.Dialog
 import android.os.Bundle
 import android.view.View
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
-import com.otk1fd.simplemio.R
+import com.otk1fd.simplemio.databinding.FragmentProgressDialogBinding
 
 class ProgressDialogFragment private constructor() : DialogFragment() {
     companion object {
@@ -34,22 +33,21 @@ class ProgressDialogFragment private constructor() : DialogFragment() {
             arguments?.let { it.getSerializable(ARGUMENT_KEY) as ProgressDialogFragmentData }
                 ?: ProgressDialogFragmentData()
 
-        val inflater = requireActivity().layoutInflater
-        val view = inflater.inflate(R.layout.fragment_progress_dialog, null)
+        val binding: FragmentProgressDialogBinding =
+            FragmentProgressDialogBinding.inflate(requireActivity().layoutInflater)
 
         return AlertDialog.Builder(requireActivity()).apply {
             if (progressDialogFragmentData.title.isNotEmpty()) {
                 setTitle(progressDialogFragmentData.title)
             }
 
-            val progressDialogTextView: TextView = view.findViewById(R.id.progressMessageTextView)
             if (progressDialogFragmentData.message.isNotEmpty()) {
-                progressDialogTextView.text = progressDialogFragmentData.message
+                binding.progressMessageTextView.text = progressDialogFragmentData.message
             } else {
-                progressDialogTextView.visibility = View.GONE
+                binding.progressMessageTextView.visibility = View.GONE
             }
 
-            setView(view)
+            setView(binding.root)
         }.create()
     }
 }

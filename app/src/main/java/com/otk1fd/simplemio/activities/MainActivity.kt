@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.telephony.TelephonyManager
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
@@ -17,19 +16,15 @@ import androidx.core.content.edit
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.navigation.NavigationView
 import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.databinding.ActivityMainBinding
-import com.otk1fd.simplemio.dialog.AlertDialogFragment
-import com.otk1fd.simplemio.dialog.AlertDialogFragmentData
+import com.otk1fd.simplemio.databinding.NavHeaderMainBinding
 import com.otk1fd.simplemio.fragments.AboutFragment
 import com.otk1fd.simplemio.fragments.ConfigFragment
 import com.otk1fd.simplemio.fragments.CouponFragment
 import com.otk1fd.simplemio.mio.Mio
-import kotlinx.coroutines.launch
 
 
 /**
@@ -37,9 +32,10 @@ import kotlinx.coroutines.launch
  */
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    lateinit var mio: Mio
-
     private lateinit var binding: ActivityMainBinding
+
+    lateinit var mio: Mio
+    lateinit var httpErrorHandler: HttpErrorHandler
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
@@ -58,18 +54,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         mio = Mio(this)
 
-        HttpErrorHandler.setUp(
-            loginFunc = { loginWithDialog() },
-            showErrorMessageFunc = { errorMessage ->
-                val alertDialogFragmentData = AlertDialogFragmentData(
-                    message = errorMessage,
-                    positiveButtonText = "OK"
-                )
-                AlertDialogFragment.show(
-                    this@MainActivity,
-                    alertDialogFragmentData
-                )
-            })
+        httpErrorHandler = HttpErrorHandler(this, mio)
 
         setSupportActionBar(toolbar)
 
@@ -197,7 +182,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         val navigationHeader = navigationView.getHeaderView(0)
-        val phoneNumberTextView: TextView = navigationHeader.findViewById(R.id.phoneNumberTextView)
+        val phoneNumberTextView: TextView =
+            NavHeaderMainBinding.bind(navigationHeader).phoneNumberTextView
         phoneNumberTextView.text = phoneNumber
 
         // 電話番号が空文字列（表示しないことも含めて）なら電話番号表示用TextViewを非表示にする．
@@ -206,38 +192,5 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         } else {
             phoneNumberTextView.visibility = View.GONE
         }
-    }
-
-    /**
-     * 確認ダイアログを表示して，IIJmioにログインする．
-     */
-    private fun loginWithDialog() {
-        Log.d("hoge", "start login")
-        val alertDialogFragmentDataForLogin = AlertDialogFragmentData(
-            title = "ログイン",
-            message = "IIJmioでのログインが必要です。\nログイン画面に移動してもよろしいですか？",
-            positiveButtonText = "はい",
-            positiveButtonFunc = { fragmentActivity: FragmentActivity ->
-                fragmentActivity.lifecycleScope.launch {
-                    val result: Boolean = (fragmentActivity as MainActivity).mio.login()
-                    if (!result) {
-                        val alertDialogFragmentDataForLoginErrorMessage = AlertDialogFragmentData(
-                            message = "ログインに失敗しました",
-                            positiveButtonText = "OK",
-                            positiveButtonFunc = {
-                                (it as MainActivity).loginWithDialog()
-                            }
-                        )
-                        AlertDialogFragment.show(
-                            this@MainActivity,
-                            alertDialogFragmentDataForLoginErrorMessage
-                        )
-                    }
-                }
-            },
-            negativeButtonText = "いいえ",
-            negativeButtonFunc = { fragmentActivity: FragmentActivity -> (fragmentActivity as MainActivity).finish() })
-
-        AlertDialogFragment.show(this, alertDialogFragmentDataForLogin)
     }
 }

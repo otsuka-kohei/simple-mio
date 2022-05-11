@@ -10,6 +10,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
 import com.otk1fd.simplemio.R
+import com.otk1fd.simplemio.activities.FinishActivity
 import com.otk1fd.simplemio.activities.MainActivity
 import com.otk1fd.simplemio.dialog.AlertDialogFragment
 import com.otk1fd.simplemio.dialog.AlertDialogFragmentData
@@ -56,7 +57,7 @@ class ConfigFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChange
                         message = "IIJmioからログアウトしました。\nアプリを終了します。",
                         positiveButtonText = "はい",
                         positiveButtonFunc = { fragmentActivityForLogoutMessage ->
-                            fragmentActivityForLogoutMessage.finish()
+                            FinishActivity.finishApplication(fragmentActivityForLogoutMessage)
                         }
                     )
                     AlertDialogFragment.show(

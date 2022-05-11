@@ -21,6 +21,8 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/content_open_source" />
+    <include
+        android:id="@+id/contentOpenSource"
+        layout="@layout/content_open_source" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

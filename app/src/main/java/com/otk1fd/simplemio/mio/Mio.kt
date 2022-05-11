@@ -1,5 +1,6 @@
 package com.otk1fd.simplemio.mio
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -76,27 +77,16 @@ class Mio(private val fragmentActivity: FragmentActivity) {
 
     private val activityResultLauncher =
         fragmentActivity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult: ActivityResult ->
-            activityResult.data?.let { intent: Intent ->
-                intent.getStringExtra(MioLoginActivity.TOKEN_KEY)?.let { token: String ->
-                    Log.d("hoge", "token: $token")
-                    saveToken(token)
-                    loginContinuation.resume(true)
-                }
-            } ?: let {
-                Log.d("hoge", "no token")
-                loginContinuation.resume(false)
-            }
+            loginContinuation.resume(activityResult.resultCode == Activity.RESULT_OK)
         }
 
-    suspend fun login() = suspendCoroutine<Boolean> { continuation ->
-        Log.d("hoge", "start login")
-        loginContinuation = continuation
+    suspend fun login() = suspendCoroutine<Boolean> {
+        loginContinuation = it
         val intent = Intent(fragmentActivity, MioLoginActivity::class.java)
-        intent.putExtra(MioLoginActivity.LOGIN_FLAG_KEY, true)
         activityResultLauncher.launch(intent)
     }
 
-    private fun saveToken(token: String) {
+    fun saveToken(token: String) {
         val preference = fragmentActivity.applicationContext.getSharedPreferences(
             fragmentActivity.applicationContext.getString(R.string.preference_file_name),
             Context.MODE_PRIVATE

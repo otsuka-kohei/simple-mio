@@ -3,42 +3,37 @@ package com.otk1fd.simplemio.mio
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.Log
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
+import androidx.fragment.app.FragmentActivity
 import com.otk1fd.simplemio.R
+import com.otk1fd.simplemio.activities.FinishActivity
+import com.otk1fd.simplemio.databinding.ActivityMioLoginBinding
 
-class MioLoginActivity : AppCompatActivity() {
-    companion object {
-        const val TOKEN_KEY = "token"
-        const val LOGIN_FLAG_KEY = "login"
-    }
+class MioLoginActivity : FragmentActivity() {
 
-    private val viewModel: MioLoginActivityViewModel by viewModels()
+    private lateinit var binding: ActivityMioLoginBinding
+
+    private val mio = Mio(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (intent.getBooleanExtra(LOGIN_FLAG_KEY, false)) {
+        binding = ActivityMioLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        binding.loginButon.setOnClickListener {
             startOAuth()
+        }
+
+        binding.exitButton.setOnClickListener {
+            FinishActivity.finishApplication(this)
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        if (viewModel.beforeLogin.value != false) {
-            viewModel.beforeLogin.value = false
-            if (intent.getBooleanExtra(LOGIN_FLAG_KEY, false)) {
-                startOAuth()
-            }
-        } else {
-            setResult(RESULT_CANCELED)
-            finish()
-        }
+    override fun onBackPressed() {
+        setResult(RESULT_CANCELED)
+        finish()
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -56,16 +51,13 @@ class MioLoginActivity : AppCompatActivity() {
                 val token: String = replacedUri.getQueryParameter("access_token") ?: ""
                 val state: String = replacedUri.getQueryParameter("state") ?: ""
 
-                val returnIntent = Intent()
                 if (state != "success") {
                     setResult(RESULT_CANCELED)
-                    finish()
                 } else {
-                    returnIntent.putExtra(TOKEN_KEY, token)
-                    setResult(RESULT_OK, returnIntent)
-                    Log.d("hoge", "return token $token")
-                    finish()
+                    mio.saveToken(token)
+                    setResult(RESULT_OK)
                 }
+                finish()
             }
         }?.let {
             setResult(RESULT_CANCELED)
@@ -84,8 +76,4 @@ class MioLoginActivity : AppCompatActivity() {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
         startActivity(intent)
     }
-}
-
-class MioLoginActivityViewModel(handle: SavedStateHandle) : ViewModel() {
-    val beforeLogin: MutableLiveData<Boolean> = handle.getLiveData("BEFORE_LOGIN", true)
 }

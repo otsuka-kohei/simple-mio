@@ -10,8 +10,8 @@ android {
         applicationId "com.otk1fd.simplemio"
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 51
-        versionName '1.3.0'
+        versionCode 55
+        versionName '1.3.2'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

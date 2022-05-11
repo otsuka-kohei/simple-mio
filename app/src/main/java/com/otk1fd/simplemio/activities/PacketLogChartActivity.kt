@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.github.mikephil.charting.charts.LineChart
@@ -37,8 +39,10 @@ class PacketLogChartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPacketLogChartBinding
 
     private lateinit var lineChartView: LineChart
+    private lateinit var nodataMessageLayout: ConstraintLayout
 
     private lateinit var mio: Mio
+    private lateinit var httpErrorHandler: HttpErrorHandler
 
     private val dateList = ArrayList<String>()
 
@@ -56,7 +60,10 @@ class PacketLogChartActivity : AppCompatActivity() {
 
         lineChartView = binding.contentPacketLogChart.lineChartView
 
+        nodataMessageLayout = binding.contentPacketLogChart.nodataMessageLayout
+
         mio = Mio(this)
+        httpErrorHandler = HttpErrorHandler(this, mio)
 
         // 呼び出し元から渡された，表示する利用履歴のSIMのサービスコードを取得する
         hddServiceCode = intent.getStringExtra("hddServiceCode") ?: ""
@@ -161,10 +168,17 @@ class PacketLogChartActivity : AppCompatActivity() {
         // 読み込んだ利用履歴データが空でなかったら（一度でもキャッシュしたことがあれば）それをグラフにセットする．
         if (jsonString != "{}") {
             Log.d("Set Packet Log (Cache)", "JSON: $jsonString")
+
+            nodataMessageLayout.visibility = View.GONE
+            lineChartView.visibility = View.VISIBLE
+
             val packetLogInfoJson = Mio.parseJsonToPacketLog(jsonString)
             packetLogInfoJson?.let { setDataToLineChart(it, hddServiceCode, serviceCode) }
         } else {
             Log.d("Set Packet Log (Cache)", "Caches JSON is empty")
+
+            nodataMessageLayout.visibility = View.VISIBLE
+            lineChartView.visibility = View.GONE
         }
     }
 
@@ -180,12 +194,8 @@ class PacketLogChartActivity : AppCompatActivity() {
                 )
                 setDataToLineChartByCache(hddServiceCode, serviceCode)
             }?.let {
-                HttpErrorHandler.handleHttpError(packetLogInfoResponseWithHttpResponseCode.httpStatusCode) {
-                    setDataToLineChartByCache(
-                        hddServiceCode,
-                        serviceCode
-                    )
-                }
+                httpErrorHandler.handleHttpError(packetLogInfoResponseWithHttpResponseCode.httpStatusCode)
+                setDataToLineChartByCache(hddServiceCode, serviceCode)
             }
 
             stopProgressDialog()

@@ -22,8 +22,7 @@ class OpenSourceActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding = ActivityOpenSourceBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
+        setContentView(binding.root)
 
         setSupportActionBar(binding.openSourceToolbar)
 
@@ -35,7 +34,7 @@ class OpenSourceActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         // WebViewの初期設定
-        openSourceWebView = findViewById(R.id.openSourceWebView)
+        openSourceWebView = binding.contentOpenSource.openSourceWebView
         openSourceWebView.settings.useWideViewPort = true
         openSourceWebView.settings.loadWithOverviewMode = true
         openSourceWebView.settings.builtInZoomControls = true

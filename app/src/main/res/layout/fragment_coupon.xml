@@ -6,13 +6,89 @@
 
     <!-- TODO: Update blank fragment layout -->
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/nodataMessageLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/couponSwipeRefreshLayout">
+
+        <TextView
+            android:id="@+id/nodataMessageTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:singleLine="false"
+            android:text="表示するデータがありません。\n画面を上からスワイプして更新してください。"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toStartOf="@+id/verticalGuideline875"
+            app:layout_constraintStart_toStartOf="@+id/verticalGuideline125"
+            app:layout_constraintTop_toTopOf="@+id/horizontalGuidelin50" />
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/horizontalGuidelin50"
+            app:layout_constraintEnd_toStartOf="@+id/verticalGuideline75"
+            app:layout_constraintStart_toStartOf="@+id/verticalGuideline25"
+            app:layout_constraintTop_toTopOf="@+id/horizontalGuidelin25"
+            app:srcCompat="@drawable/ic_error" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/verticalGuideline25"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.25" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/verticalGuideline125"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.125" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/verticalGuideline875"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.875" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/verticalGuideline75"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.75" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/horizontalGuidelin50"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/horizontalGuidelin25"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.25" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/applyButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
         android:layout_marginStart="24dp"
+        android:layout_marginBottom="24dp"
         android:clickable="true"
+        android:focusable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_done" />
@@ -23,8 +99,10 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
 
         <ExpandableListView
             android:id="@+id/couponListView"
