@@ -16,6 +16,7 @@ import androidx.core.content.edit
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.navigation.NavigationView
 import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
@@ -25,6 +26,7 @@ import com.otk1fd.simplemio.fragments.AboutFragment
 import com.otk1fd.simplemio.fragments.ConfigFragment
 import com.otk1fd.simplemio.fragments.CouponFragment
 import com.otk1fd.simplemio.mio.Mio
+import kotlinx.coroutines.launch
 
 
 /**
@@ -74,6 +76,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val item = navigationView.menu.findItem(R.id.nav_coupon)
         onNavigationItemSelected(item)
         item.isChecked = true
+
+        // 最新の通信量情報を先に取得しておく
+        lifecycleScope.launch {
+            val packetLogInfoResponseWithHttpResponseCode = mio.getUsageInfo()
+            packetLogInfoResponseWithHttpResponseCode.packetLogInfoResponse?.let {
+                mio.cacheJsonString(
+                    Mio.parsePacketLogToJson(it),
+                    getString(R.string.preference_key_cache_packet_log)
+                )
+            }
+        }
     }
 
     override fun onStart() {
