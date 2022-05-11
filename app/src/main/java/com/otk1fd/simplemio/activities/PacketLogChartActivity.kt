@@ -128,24 +128,27 @@ class PacketLogChartActivity : AppCompatActivity() {
         // 画面内に表示するX軸の値の数（非強制）を設定する．
         lineChartView.xAxis.labelCount = 3
 
+        // Y軸の右側の軸を非表示にする。
+        lineChartView.axisRight.isEnabled = false
+
         // Y軸の値の表示を変えるカスタムフォーマッタを指定する．
         lineChartView.axisLeft.valueFormatter = YAxisValueFormatterForUnitMB()
-        lineChartView.axisRight.valueFormatter = YAxisValueFormatterForUnitMB()
+        //lineChartView.axisRight.valueFormatter = YAxisValueFormatterForUnitMB()
 
         // Y軸の最小値を設定する．
         lineChartView.axisLeft.axisMinimum = 0f
-        lineChartView.axisRight.axisMinimum = 0f
+        //lineChartView.axisRight.axisMinimum = 0f
 
         // Y軸の値を表示する最小インターバルを設定する．
         // 1個ずつに指定したので，実質的にY軸の値をもれなく表示する．
         lineChartView.axisLeft.isGranularityEnabled = true
         lineChartView.axisLeft.granularity = 1f
-        lineChartView.axisRight.isGranularityEnabled = true
-        lineChartView.axisRight.granularity = 1f
+        //lineChartView.axisRight.isGranularityEnabled = true
+        //lineChartView.axisRight.granularity = 1f
 
         // X軸に沿ってアニメーションしながらプロットする。
         // ProGuardで難読化するとアニメーションしなくなるので注意
-        lineChartView.animateX(1500)
+        //lineChartView.animateX(1500)
 
         // Descriptionを非表示にする．
         val description = Description()
