@@ -181,8 +181,8 @@ class CouponFragment : Fragment() {
             message = "",
             positiveButtonText = "完了",
             positiveButtonFunc = { fragmentActivity, text ->
-                val simnName = text.replace("\n", " ")
-                Util.saveSimName(requireActivity(), serviceCode, simnName)
+                val simName = text.replace("\n", " ")
+                Util.saveSimName(requireActivity(), serviceCode, simName)
                 fragmentActivity.lifecycleScope.launch {
                     setCouponInfoByCache()
                 }
@@ -297,7 +297,7 @@ class CouponFragment : Fragment() {
 
         couponExpandableListView.setAdapter(couponExpandableListAdapter)
 
-        couponInfoResponse.let { setCouponStatus(it) }
+        setCouponStatus(couponInfoResponse)
 
         // すべて展開するように設定されている場合はすべて展開する
         // そうでなければ，控えておいた ExpandableListView の展開状況を復元する
@@ -357,7 +357,7 @@ class CouponFragment : Fragment() {
             var volume = 0
 
             for (coupon in couponList) {
-                val expire: String = coupon.expire ?: "197001"
+                val expire: String = coupon.expire ?: ""
                 val expireYear: Int = expire.substring(0, 4).toInt()
                 val expireMonth: Int = expire.substring(4, 6).toInt()
 
@@ -377,7 +377,7 @@ class CouponFragment : Fragment() {
         }
     }
 
-    private fun setCouponStatus(couponInfoResponse: CouponInfoResponse): Unit {
+    private fun setCouponStatus(couponInfoResponse: CouponInfoResponse) {
         for (couponInfo in couponInfoResponse.couponInfo) {
 
             val hdoInfoList = couponInfo.hdoInfo.orEmpty()

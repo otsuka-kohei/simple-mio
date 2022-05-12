@@ -56,7 +56,7 @@ data class CouponHdxInfo(
 
 data class Coupon(
     val volume: Int,
-    val expire: String,
+    val expire: String?,
     val type: String
 )
 
