@@ -169,7 +169,7 @@ class PacketLogChartActivity : AppCompatActivity() {
     private fun setDataToLineChartByCache(hddServiceCode: String, serviceCode: String) {
         // キャッシュから利用履歴データを読み込む．
         val jsonString =
-            mio.loadCachedJsonString(this.applicationContext.getString(R.string.preference_key_cache_packet_log))
+            mio.loadCachedJsonString(getString(R.string.preference_key_cache_packet_log))
 
         // 読み込んだ利用履歴データが空でなかったら（一度でもキャッシュしたことがあれば）それをグラフにセットする．
         if (jsonString != "{}") {

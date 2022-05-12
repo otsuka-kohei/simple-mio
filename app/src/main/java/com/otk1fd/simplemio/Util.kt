@@ -1,17 +1,33 @@
 package com.otk1fd.simplemio
 
-import android.app.Activity
+import android.Manifest
 import android.content.Context
-import androidx.appcompat.app.AlertDialog
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.content.ContextCompat
 
 
 /**
  * Created by otk1fd on 2018/03/14.
  */
 object Util {
-    fun saveSimName(activity: Activity, serviceCode: String, simName: String) {
-        val preference = activity.applicationContext.getSharedPreferences(
-            activity.applicationContext.getString(R.string.sim_name_preference_file_name),
+    fun isPhoneNumberPermissionGranted(context: Context): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.READ_PHONE_NUMBERS
+            ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.READ_PHONE_STATE
+            ) == PackageManager.PERMISSION_GRANTED
+        }
+    }
+
+    fun saveSimName(context: Context, serviceCode: String, simName: String) {
+        val preference = context.getSharedPreferences(
+            context.getString(R.string.sim_name_preference_file_name),
             Context.MODE_PRIVATE
         )
         val editor = preference.edit()
@@ -19,9 +35,9 @@ object Util {
         editor.apply()
     }
 
-    fun loadSimName(activity: Activity, serviceCode: String): String {
-        val preference = activity.applicationContext.getSharedPreferences(
-            activity.getString(R.string.sim_name_preference_file_name),
+    fun loadSimName(context: Context, serviceCode: String): String {
+        val preference = context.getSharedPreferences(
+            context.getString(R.string.sim_name_preference_file_name),
             Context.MODE_PRIVATE
         )
         return preference.getString(serviceCode, "") ?: ""

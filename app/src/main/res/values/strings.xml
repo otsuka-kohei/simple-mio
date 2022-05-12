@@ -11,7 +11,6 @@
 
     <string name="preference_key_token">token</string>
     <string name="preference_key_use_MB_only">useMBOnly</string>
-    <string name="preference_key_show_phone_number">showPhoneNumber</string>
     <string name="preference_key_expand_all_group">expandAllGroup</string>
     <string name="preference_key_logout">logout</string>
 

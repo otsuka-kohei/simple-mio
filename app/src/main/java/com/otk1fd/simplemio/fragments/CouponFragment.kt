@@ -182,7 +182,7 @@ class CouponFragment : Fragment() {
             positiveButtonText = "完了",
             positiveButtonFunc = { fragmentActivity, text ->
                 val simnName = text.replace("\n", " ")
-                Util.saveSimName(fragmentActivity, serviceCode, simnName)
+                Util.saveSimName(requireActivity(), serviceCode, simnName)
                 fragmentActivity.lifecycleScope.launch {
                     setCouponInfoByCache()
                 }
@@ -205,7 +205,7 @@ class CouponFragment : Fragment() {
             Log.d("Set Coupon Info (HTTP)", "Finish successfully")
             mio.cacheJsonString(
                 Mio.parseCouponToJson(it),
-                requireActivity().applicationContext.getString(R.string.preference_key_cache_coupon)
+                getString(R.string.preference_key_cache_coupon)
             )
             setCouponInfoByCache()
         } ?: let {
@@ -222,7 +222,7 @@ class CouponFragment : Fragment() {
 
     private fun setCouponInfoByCache() {
         val jsonString =
-            mio.loadCachedJsonString(requireActivity().applicationContext.getString(R.string.preference_key_cache_coupon))
+            mio.loadCachedJsonString(getString(R.string.preference_key_cache_coupon))
 
         if (jsonString != "{}") {
             Log.d("Set Coupon (Cache)", "JSON: $jsonString")
@@ -240,7 +240,6 @@ class CouponFragment : Fragment() {
 
     private fun setCouponInfo(couponInfoResponse: CouponInfoResponse) {
         // ExpandableListView のそれぞれの Group 要素の展開状況を控えておく
-        val oldAdapter = couponExpandableListView.expandableListAdapter
         expandStateParcelable = couponExpandableListView.onSaveInstanceState()
 
         // 親要素のリスト

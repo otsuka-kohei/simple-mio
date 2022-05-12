@@ -1,23 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="クーポン切り替え">
-        <SwitchPreference
-            android:key="@string/preference_key_use_MB_only"
-            android:summary="クーポン残量でGB単位ではなく、MB単位で表示します。"
-            android:title="MB単位でクーポン残量表示" />
-    </PreferenceCategory>
-    <PreferenceCategory android:title="その他">
-        <SwitchPreference
-            android:key="@string/preference_key_expand_all_group"
-            android:summary="クーポン切り替え画面で、常にリストを展開した状態にします。"
-            android:title="リストを展開" />
-        <SwitchPreference
-            android:key="@string/preference_key_show_phone_number"
-            android:summary="メニューに端末の電話番号を表示します。"
-            android:title="電話番号を表示" />
-        <Preference
-            android:key="@string/preference_key_logout"
-            android:summary="IIJmioからログアウトします。"
-            android:title="ログアウト" />
-    </PreferenceCategory>
+    <SwitchPreference
+        android:key="@string/preference_key_use_MB_only"
+        android:summary="クーポン残量でGB単位ではなく、MB単位で表示します。"
+        android:title="MB単位でクーポン残量表示" />
+    <SwitchPreference
+        android:key="@string/preference_key_expand_all_group"
+        android:summary="クーポン切り替え画面で、常にリストを展開した状態にします。"
+        android:title="リストを展開" />
+    <Preference
+        android:key="@string/preference_key_logout"
+        android:summary="IIJmioからログアウトします。"
+        android:title="ログアウト" />
 </PreferenceScreen>

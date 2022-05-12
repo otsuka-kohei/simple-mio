@@ -87,20 +87,20 @@ class Mio(private val fragmentActivity: FragmentActivity) {
     }
 
     fun saveToken(token: String) {
-        val preference = fragmentActivity.applicationContext.getSharedPreferences(
-            fragmentActivity.applicationContext.getString(R.string.preference_file_name),
+        val preference = fragmentActivity.getSharedPreferences(
+            fragmentActivity.getString(R.string.preference_file_name),
             Context.MODE_PRIVATE
         )
         val editor = preference.edit()
         editor.putString(
-            fragmentActivity.applicationContext.getString(R.string.preference_key_token),
+            fragmentActivity.getString(R.string.preference_key_token),
             token
         )
         editor.apply()
     }
 
     private fun loadToken(): String {
-        val preference = fragmentActivity.applicationContext.getSharedPreferences(
+        val preference = fragmentActivity.getSharedPreferences(
             fragmentActivity.getString(R.string.preference_file_name),
             Context.MODE_PRIVATE
         )
@@ -271,8 +271,8 @@ class Mio(private val fragmentActivity: FragmentActivity) {
     }
 
     fun cacheJsonString(jsonString: String, jsonDataType: String) {
-        val preference = fragmentActivity.applicationContext.getSharedPreferences(
-            fragmentActivity.applicationContext.getString(R.string.preference_file_name),
+        val preference = fragmentActivity.getSharedPreferences(
+            fragmentActivity.getString(R.string.preference_file_name),
             Context.MODE_PRIVATE
         )
         Log.d("Cache JSON", jsonString)
@@ -282,8 +282,8 @@ class Mio(private val fragmentActivity: FragmentActivity) {
     }
 
     fun loadCachedJsonString(key: String): String {
-        val preference = fragmentActivity.applicationContext.getSharedPreferences(
-            fragmentActivity.applicationContext.getString(R.string.preference_file_name),
+        val preference = fragmentActivity.getSharedPreferences(
+            fragmentActivity.getString(R.string.preference_file_name),
             Context.MODE_PRIVATE
         )
         return preference.getString(key, "{}") ?: "{}"
