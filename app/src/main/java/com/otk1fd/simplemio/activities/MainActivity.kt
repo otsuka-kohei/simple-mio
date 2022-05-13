@@ -1,18 +1,10 @@
 package com.otk1fd.simplemio.activities
 
-import android.annotation.SuppressLint
-import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.telephony.TelephonyManager
-import android.util.Log
 import android.view.MenuItem
-import android.view.View
-import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.edit
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -20,11 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.navigation.NavigationView
 import com.otk1fd.simplemio.HttpErrorHandler
 import com.otk1fd.simplemio.R
-import com.otk1fd.simplemio.Util
 import com.otk1fd.simplemio.databinding.ActivityMainBinding
-import com.otk1fd.simplemio.databinding.NavHeaderMainBinding
-import com.otk1fd.simplemio.dialog.AlertDialogFragment
-import com.otk1fd.simplemio.dialog.AlertDialogFragmentData
 import com.otk1fd.simplemio.fragments.AboutFragment
 import com.otk1fd.simplemio.fragments.ConfigFragment
 import com.otk1fd.simplemio.fragments.CouponFragment

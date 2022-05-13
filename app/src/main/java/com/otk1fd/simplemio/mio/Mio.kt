@@ -168,7 +168,8 @@ class Mio(private val fragmentActivity: FragmentActivity) {
                     contains("hdo") -> hdoList.add(CouponSetting(serviceCode, status))
                     contains("hdu") -> hduList.add(CouponSetting(serviceCode, status))
                     contains("hdx") -> hdxList.add(CouponSetting(serviceCode, status))
-                    else -> {}
+                    else -> {
+                    }
                 }
             }
         }
@@ -197,7 +198,7 @@ class Mio(private val fragmentActivity: FragmentActivity) {
         }
 
     private data class CouponSetting(
-        val hdxServiceCode: String,
+        val hdzServiceCode: String,
         val coupon: Boolean
     )
 
@@ -212,7 +213,7 @@ class Mio(private val fragmentActivity: FragmentActivity) {
 
         for ((index, couponStatus) in hdoList.withIndex()) {
 
-            val hdo = couponStatus.hdxServiceCode
+            val hdo = couponStatus.hdzServiceCode
             val on = couponStatus.coupon
             val str = """{"hdoServiceCode":"$hdo","couponUse":$on}"""
 
@@ -226,7 +227,7 @@ class Mio(private val fragmentActivity: FragmentActivity) {
 
         for ((index, couponStatus) in hduList.withIndex()) {
 
-            val hdu = couponStatus.hdxServiceCode
+            val hdu = couponStatus.hdzServiceCode
             val on = couponStatus.coupon
             val str = """{"hduServiceCode":"$hdu","couponUse":$on}"""
 
@@ -237,6 +238,20 @@ class Mio(private val fragmentActivity: FragmentActivity) {
             }
         }
         hduStr += " ]"
+
+        for ((index, couponStatus) in hdxList.withIndex()) {
+
+            val hdx = couponStatus.hdzServiceCode
+            val on = couponStatus.coupon
+            val str = """{"hduServiceCode":"$hdx","couponUse":$on}"""
+
+            hdxStr += str
+
+            if (index < hduList.size - 1) {
+                hdxStr += ",\n"
+            }
+        }
+        hdxStr += " ]"
 
         return """
             {
@@ -255,7 +270,7 @@ class Mio(private val fragmentActivity: FragmentActivity) {
         var hdzStr = """"${hdz}Info":["""
 
         for ((index, couponStatus) in hdzList.withIndex()) {
-            val hdo = couponStatus.hdxServiceCode
+            val hdo = couponStatus.hdzServiceCode
             val on = couponStatus.coupon
             val str = """{"${hdz}ServiceCode":"$hdo","couponUse":$on}"""
 

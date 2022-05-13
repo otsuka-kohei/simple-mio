@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <SwitchPreference
-        android:key="@string/preference_key_use_MB_only"
-        android:summary="クーポン残量でGB単位ではなく、MB単位で表示します。"
-        android:title="MB単位でクーポン残量表示" />
-    <SwitchPreference
-        android:key="@string/preference_key_expand_all_group"
-        android:summary="クーポン切り替え画面で、常にリストを展開した状態にします。"
-        android:title="リストを展開" />
-    <Preference
-        android:key="@string/preference_key_logout"
-        android:summary="IIJmioからログアウトします。"
-        android:title="ログアウト" />
+
+    <PreferenceCategory android:title="表示設定">
+
+        <SwitchPreference
+            android:key="@string/preference_key_use_MB_only"
+            android:summary="クーポン残量をGB単位ではなくMB単位で表示します。"
+            android:title="MB単位でクーポン残量表示" />
+
+        <SwitchPreference
+            android:key="@string/preference_key_expand_all_group"
+            android:summary="クーポン画面で常にリストを展開します。"
+            android:title="リストを展開" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="アカウント設定">
+
+        <Preference
+            android:key="@string/preference_key_logout"
+            android:summary="mioIDからログアウトします。"
+            android:title="ログアウト" />
+    </PreferenceCategory>
 </PreferenceScreen>

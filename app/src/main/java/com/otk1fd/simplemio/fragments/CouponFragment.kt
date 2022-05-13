@@ -84,14 +84,13 @@ class CouponFragment : Fragment() {
         applyButton.setOnClickListener {
             requireActivity().lifecycleScope.launch {
                 startProgressDialog()
-                val couponInfoResponseWithHttpResponseCode = mio.getCouponInfo()
-                val httpResponseCode: Int = mio.applyCouponSetting(currentCouponStatusMap)
 
+                val httpResponseCode: Int = mio.applyCouponSetting(currentCouponStatusMap)
                 if (httpResponseCode == HttpErrorHandler.HTTP_OK) {
                     setCouponInfoByHttp()
                 } else {
                     httpErrorHandler.handleHttpError(
-                        couponInfoResponseWithHttpResponseCode.httpStatusCode,
+                        httpResponseCode,
                         errorByHttpGetRequest = false
                     )
                 }
@@ -207,11 +206,11 @@ class CouponFragment : Fragment() {
                 Mio.parseCouponToJson(it),
                 getString(R.string.preference_key_cache_coupon)
             )
-            setCouponInfoByCache()
         } ?: let {
             Log.d("Set Coupon Info (HTTP)", "Finish failed")
             httpErrorHandler.handleHttpError(couponInfoResponseWithHttpResponseCode.httpStatusCode)
         }
+        setCouponInfoByCache()
 
         couponSwipeRefreshLayout.isRefreshing = false
     }

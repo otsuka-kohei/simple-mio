@@ -1,16 +1,9 @@
 package com.otk1fd.simplemio.fragments
 
-import android.Manifest
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.core.content.edit
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.SwitchPreference
 import com.otk1fd.simplemio.R
-import com.otk1fd.simplemio.Util
 import com.otk1fd.simplemio.activities.FinishActivity
 import com.otk1fd.simplemio.activities.MainActivity
 import com.otk1fd.simplemio.dialog.AlertDialogFragment

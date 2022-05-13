@@ -97,7 +97,7 @@ class PacketLogChartActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(com.otk1fd.simplemio.R.menu.packet_log_chart_activity, menu)
+        menuInflater.inflate(R.menu.packet_log_chart_activity, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -198,11 +198,10 @@ class PacketLogChartActivity : AppCompatActivity() {
                     Mio.parsePacketLogToJson(it),
                     getString(R.string.preference_key_cache_packet_log)
                 )
-                setDataToLineChartByCache(hddServiceCode, serviceCode)
             }?.let {
                 httpErrorHandler.handleHttpError(packetLogInfoResponseWithHttpResponseCode.httpStatusCode)
-                setDataToLineChartByCache(hddServiceCode, serviceCode)
             }
+            setDataToLineChartByCache(hddServiceCode, serviceCode)
 
             stopProgressDialog()
         }

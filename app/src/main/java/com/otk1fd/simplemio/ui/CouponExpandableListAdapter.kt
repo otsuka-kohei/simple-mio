@@ -124,8 +124,8 @@ class CouponExpandableListAdapter(
                 message = "",
                 positiveButtonText = "完了",
                 positiveButtonFunc = { fragmentActivity, text ->
-                    val simnName = text.replace("\n", " ")
-                    Util.saveSimName(fragmentActivity, serviceCode, simnName)
+                    val simName = text.replace("\n", " ")
+                    Util.saveSimName(fragmentActivity, serviceCode, simName)
                     fragmentActivity.lifecycleScope.launch {
                         (fragment as CouponFragment).refreshCouponInfo()
                     }

@@ -3,8 +3,6 @@ package com.otk1fd.simplemio.mio
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import com.otk1fd.simplemio.R
 import com.otk1fd.simplemio.activities.FinishActivity
