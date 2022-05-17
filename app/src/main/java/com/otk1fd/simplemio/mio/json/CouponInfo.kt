@@ -1,5 +1,7 @@
 package com.otk1fd.simplemio.mio.json
 
+// 契約しているプランによって取得できるデータに違いがあるため、一部のデータをあえて Nullable にしている。
+
 data class CouponInfoResponseWithHttpResponseCode(
     val couponInfoResponse: CouponInfoResponse?,
     val httpStatusCode: Int

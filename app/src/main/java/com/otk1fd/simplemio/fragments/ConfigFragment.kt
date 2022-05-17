@@ -35,6 +35,7 @@ class ConfigFragment : PreferenceFragmentCompat() {
                 positiveButtonText = "はい",
                 positiveButtonFunc = { fragmentActivityForLogoutConfirmation ->
                     mio.deleteToken()
+                    mio.deleteCachedJsonString()
 
                     val alertDialogFragmentDataForLogoutMessage = AlertDialogFragmentData(
                         title = "ログアウト完了",

@@ -303,4 +303,9 @@ class Mio(private val fragmentActivity: FragmentActivity) {
         )
         return preference.getString(key, "{}") ?: "{}"
     }
+
+    fun deleteCachedJsonString() {
+        cacheJsonString("{}", fragmentActivity.getString(R.string.preference_key_cache_coupon))
+        cacheJsonString("{}", fragmentActivity.getString(R.string.preference_key_cache_packet_log))
+    }
 }

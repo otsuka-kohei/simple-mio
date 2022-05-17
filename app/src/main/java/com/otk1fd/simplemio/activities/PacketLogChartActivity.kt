@@ -159,6 +159,16 @@ class PacketLogChartActivity : AppCompatActivity() {
         lineChartView.description = description
     }
 
+    private fun showNodataMessage(showNodataMessage: Boolean) {
+        if (showNodataMessage) {
+            nodataMessageLayout.visibility = View.VISIBLE
+            lineChartView.visibility = View.GONE
+        } else {
+            nodataMessageLayout.visibility = View.GONE
+            lineChartView.visibility = View.VISIBLE
+        }
+    }
+
 
     /**
      * キャッシュから利用履歴データを読み出してグラフにセットする．
@@ -175,16 +185,18 @@ class PacketLogChartActivity : AppCompatActivity() {
         if (jsonString != "{}") {
             Log.d("Set Packet Log (Cache)", "JSON: $jsonString")
 
-            nodataMessageLayout.visibility = View.GONE
-            lineChartView.visibility = View.VISIBLE
-
             val packetLogInfoJson = Mio.parseJsonToPacketLog(jsonString)
-            packetLogInfoJson?.let { setDataToLineChart(it, hddServiceCode, serviceCode) }
+
+            if (packetLogInfoJson?.packetLogInfo?.isEmpty() == true) {
+                showNodataMessage(true)
+            } else {
+                showNodataMessage(false)
+                packetLogInfoJson?.let { setDataToLineChart(it, hddServiceCode, serviceCode) }
+            }
         } else {
             Log.d("Set Packet Log (Cache)", "Caches JSON is empty")
 
-            nodataMessageLayout.visibility = View.VISIBLE
-            lineChartView.visibility = View.GONE
+            showNodataMessage(true)
         }
     }
 
