@@ -62,6 +62,7 @@ class CouponExpandableListAdapter(
         val couponListItemParent: CouponListItemParent = parents[groupPosition]
 
         hddServiceCodeTextView.text = couponListItemParent.hddServiceCode
+        //hddServiceCodeTextView.text = "hdd12345678"
         planTextView.text = couponListItemParent.plan
         volumeTextView.text = couponListItemParent.volume
 
@@ -139,7 +140,9 @@ class CouponExpandableListAdapter(
         }
 
         phoneNumberTextView.text = couponListItemChild.phoneNumber
+        //phoneNumberTextView.text = "09012345678"
         serviceCodeTextView.text = couponListItemChild.serviceCode
+        //serviceCodeTextView.text = "hdo12345678"
         typeTextView.text = couponListItemChild.type
         couponSwitch.isChecked = getCouponStatusFunc(couponListItemChild.serviceCode)
 
